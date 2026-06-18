@@ -10,13 +10,13 @@ import { Footer } from "@/components/landing/Footer";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Seguro Auto Online — Cote, Compare e Economize | SeguroJá" },
+      { title: "Seguro Auto Online — Cote, Compare e Economize | Washington Seguros" },
       {
         name: "description",
         content:
           "Cote seu seguro auto online em 1 minuto e compare propostas das maiores seguradoras. 100% digital, sem ligações.",
       },
-      { property: "og:title", content: "SeguroJá — Cote, compare e economize no seu seguro" },
+      { property: "og:title", content: "Washington Seguros — Cote, compare e economize no seu seguro" },
       {
         property: "og:description",
         content:

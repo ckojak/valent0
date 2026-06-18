@@ -78,14 +78,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Seguro Auto Online — Cote, Compare e Economize | SeguroJá" },
+      { title: "Seguro Auto Online — Cote, Compare e Economize | Washington Seguros" },
       {
         name: "description",
         content:
           "Cote seu seguro auto online em 1 minuto, compare propostas das melhores seguradoras e economize. 100% digital, sem ligações.",
       },
-      { name: "author", content: "SeguroJá" },
-      { property: "og:title", content: "SeguroJá — Cote, compare e economize no seu seguro" },
+      { name: "author", content: "Washington Seguros" },
+      { property: "og:title", content: "Washington Seguros — Cote, compare e economize no seu seguro" },
       {
         property: "og:description",
         content:
