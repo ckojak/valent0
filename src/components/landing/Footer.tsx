@@ -10,7 +10,7 @@ export function Footer() {
               <ShieldCheck className="h-5 w-5" />
             </div>
             <span className="font-display text-lg font-extrabold text-brand">
-              Seguro<span className="text-cta">Já</span>
+              Washington <span className="text-cta">Seguros</span>
             </span>
           </div>
           <p className="mt-3 max-w-sm text-sm text-muted-foreground">
