@@ -1,29 +1,44 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Header } from "@/components/landing/Header";
+import { Hero } from "@/components/landing/Hero";
+import { TrustStrip } from "@/components/landing/TrustStrip";
+import { HowItWorks } from "@/components/landing/HowItWorks";
+import { Benefits } from "@/components/landing/Benefits";
+import { Faq } from "@/components/landing/Faq";
+import { Footer } from "@/components/landing/Footer";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "Seguro Auto Online — Cote, Compare e Economize | SeguroJá" },
+      {
+        name: "description",
+        content:
+          "Cote seu seguro auto online em 1 minuto e compare propostas das maiores seguradoras. 100% digital, sem ligações.",
+      },
+      { property: "og:title", content: "SeguroJá — Cote, compare e economize no seu seguro" },
+      {
+        property: "og:description",
+        content:
+          "Cotação online de seguro auto em minutos. Compare Porto Seguro, Bradesco, Tokio Marine, Allianz e mais.",
+      },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main>
+        <Hero />
+        <TrustStrip />
+        <HowItWorks />
+        <Benefits />
+        <Faq />
+      </main>
+      <Footer />
     </div>
   );
 }
