@@ -10,7 +10,7 @@ export function Header() {
           </div>
           <div className="flex flex-col leading-none">
             <span className="font-display text-lg font-extrabold tracking-tight text-brand">
-              Seguro<span className="text-cta">Já</span>
+              Washington <span className="text-cta">Seguros</span>
             </span>
             <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
               Corretora de Seguros

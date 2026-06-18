@@ -10,7 +10,7 @@ export function Footer() {
               <ShieldCheck className="h-5 w-5" />
             </div>
             <span className="font-display text-lg font-extrabold text-brand">
-              Seguro<span className="text-cta">Já</span>
+              Washington <span className="text-cta">Seguros</span>
             </span>
           </div>
           <p className="mt-3 max-w-sm text-sm text-muted-foreground">
@@ -38,7 +38,7 @@ export function Footer() {
       </div>
       <div className="border-t">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© {new Date().getFullYear()} SeguroJá Corretora de Seguros LTDA. CNPJ 00.000.000/0001-00.</p>
+          <p>© {new Date().getFullYear()} Washington Seguros Corretora de Seguros LTDA. CNPJ 00.000.000/0001-00.</p>
           <p>Registro SUSEP nº 00000000.</p>
         </div>
       </div>

@@ -12,7 +12,7 @@ export function Benefits() {
     <section id="beneficios" className="bg-brand text-brand-foreground">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-wider text-cta">Por que a SeguroJá</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-cta">Por que a Washington Seguros</p>
           <h2 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl">
             A forma mais inteligente de proteger seu carro
           </h2>

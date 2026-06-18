@@ -15,6 +15,9 @@ export function Hero() {
           <h1 className="mt-4 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-brand sm:text-5xl lg:text-6xl">
             Cote online, compare e economize no seu seguro
           </h1>
+          <p className="mt-3 font-display text-lg font-semibold italic text-cta sm:text-xl">
+            Mais rápido em direção ao seu destino.
+          </p>
           <p className="mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
             Compare propostas das maiores seguradoras do Brasil e contrate sem sair de casa.
             Sem ligações, sem letras miúdas.
