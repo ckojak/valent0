@@ -1,6 +1,5 @@
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { QuoteWizard } from "./QuoteWizard";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 export function QuoteWizardDialog({
   open,
@@ -12,12 +11,10 @@ export function QuoteWizardDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[92vh] w-[calc(100%-1rem)] max-w-md overflow-y-auto rounded-3xl border-0 bg-background p-0 shadow-2xl sm:rounded-3xl">
-        <VisuallyHidden>
-          <DialogTitle>Cotação de Seguro Auto</DialogTitle>
-          <DialogDescription>
-            Preencha os dados do veículo e contato para receber as melhores ofertas.
-          </DialogDescription>
-        </VisuallyHidden>
+        <DialogTitle className="sr-only">Cotação de Seguro Auto</DialogTitle>
+        <DialogDescription className="sr-only">
+          Preencha os dados do veículo e contato para receber as melhores ofertas.
+        </DialogDescription>
         <div className="p-5 sm:p-6">
           <QuoteWizard
             key={open ? "open" : "closed"}

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/landing/Header";
 import { Hero } from "@/components/landing/Hero";
-import { TrustStrip } from "@/components/landing/TrustStrip";
+import { CategoryMenu } from "@/components/landing/CategoryMenu";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { Benefits } from "@/components/landing/Benefits";
 import { Faq } from "@/components/landing/Faq";
@@ -10,17 +10,17 @@ import { Footer } from "@/components/landing/Footer";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Seguro Auto Online — Cote, Compare e Economize | Washington Seguros" },
+      { title: "VALENT Corretora & Consultoria de Seguros — Proteja o que você mais valoriza" },
       {
         name: "description",
         content:
-          "Cote seu seguro auto online em 1 minuto e compare propostas das maiores seguradoras. 100% digital, sem ligações.",
+          "VALENT Corretora & Consultoria de Seguros. Cote online seguro de carro, moto, viagem, residência, saúde e empresa. Atendimento humano, 100% digital.",
       },
-      { property: "og:title", content: "Washington Seguros — Cote, compare e economize no seu seguro" },
+      { property: "og:title", content: "VALENT Corretora & Consultoria de Seguros" },
       {
         property: "og:description",
         content:
-          "Cotação online de seguro auto em minutos. Compare Porto Seguro, Bradesco, Tokio Marine, Allianz e mais.",
+          "Entendemos a importância de proteger o que você mais valoriza. Cote agora online.",
       },
     ],
   }),
@@ -33,7 +33,7 @@ function Index() {
       <Header />
       <main>
         <Hero />
-        <TrustStrip />
+        <CategoryMenu />
         <HowItWorks />
         <Benefits />
         <Faq />

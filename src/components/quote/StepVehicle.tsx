@@ -37,7 +37,7 @@ export function StepVehicle({
     <form onSubmit={submit} className="flex flex-col gap-5">
       <div className="flex items-center gap-2 text-sm font-medium text-brand">
         <Car className="h-4 w-4" />
-        <span>Etapa 2 · Sobre o seu veículo</span>
+        <span>Etapa 1 · Sobre o seu veículo</span>
       </div>
 
       <div>
@@ -60,16 +60,16 @@ export function StepVehicle({
         />
         {error && <p className="mt-1.5 text-xs text-destructive">{error}</p>}
         {fipeOk && !error && (
-          <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-cta animate-in fade-in slide-in-from-top-1 duration-300">
+          <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-success animate-in fade-in slide-in-from-top-1 duration-300">
             <CheckCircle2 className="h-3.5 w-3.5" />
-            Veículo localizado na base FIPE
+            Veículo localizado na base FIPE ✓
           </p>
         )}
       </div>
 
       <label className="flex items-center justify-between rounded-xl border bg-secondary/40 px-4 py-3">
         <span className="flex items-center gap-2 text-sm font-medium text-foreground">
-          <Sparkles className="h-4 w-4 text-cta" />
+          <Sparkles className="h-4 w-4 text-brand" />
           É um carro Zero KM
         </span>
         <Switch
@@ -83,8 +83,8 @@ export function StepVehicle({
 
       <label className="flex items-center justify-between rounded-xl border bg-secondary/40 px-4 py-3">
         <span className="flex items-center gap-2 text-sm font-medium text-foreground">
-          <Fuel className="h-4 w-4 text-cta" />
-          Veículo possui Kit Gás (GNV)?
+          <Fuel className="h-4 w-4 text-brand" />
+          Possui Kit Gás (GNV)?
         </span>
         <Switch checked={gnv} onCheckedChange={setGnv} />
       </label>
@@ -96,11 +96,11 @@ export function StepVehicle({
           className="inline-flex h-12 items-center justify-center gap-1 rounded-xl border bg-background px-4 text-sm font-medium text-foreground transition hover:bg-accent sm:w-1/3"
         >
           <ChevronLeft className="h-4 w-4" />
-          Voltar
+          Cancelar
         </button>
         <button
           type="submit"
-          className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-cta text-base font-semibold text-cta-foreground shadow-sm transition hover:bg-cta-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cta focus-visible:ring-offset-2"
+          className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-brand text-base font-semibold text-brand-foreground shadow-sm transition hover:bg-cta-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           Continuar
           <ChevronRight className="h-4 w-4" />

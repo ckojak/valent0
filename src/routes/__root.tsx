@@ -78,18 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Seguro Auto Online — Cote, Compare e Economize | Washington Seguros" },
+      { title: "VALENT Corretora & Consultoria de Seguros" },
       {
         name: "description",
         content:
-          "Cote seu seguro auto online em 1 minuto, compare propostas das melhores seguradoras e economize. 100% digital, sem ligações.",
+          "VALENT Corretora & Consultoria de Seguros. Cote online seguro de carro, moto, viagem, residência, saúde e empresa.",
       },
-      { name: "author", content: "Washington Seguros" },
-      { property: "og:title", content: "Washington Seguros — Cote, compare e economize no seu seguro" },
+      { name: "author", content: "VALENT Corretora & Consultoria de Seguros" },
+      { property: "og:title", content: "VALENT Corretora & Consultoria de Seguros" },
       {
         property: "og:description",
         content:
-          "Cote online seu seguro auto e compare propostas das maiores seguradoras do Brasil em minutos.",
+          "Entendemos a importância de proteger o que você mais valoriza. Cote agora online.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

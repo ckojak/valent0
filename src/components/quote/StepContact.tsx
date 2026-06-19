@@ -34,7 +34,7 @@ export function StepContact({
     <form onSubmit={submit} className="flex flex-col gap-4">
       <div className="flex items-center gap-2 text-sm font-medium text-brand">
         <User className="h-4 w-4" />
-        <span>Etapa 2 de 2 · Seus dados</span>
+        <span>Etapa 2 · Seus dados</span>
       </div>
 
       <div>
@@ -96,7 +96,7 @@ export function StepContact({
         </button>
         <button
           type="submit"
-          className="inline-flex h-12 flex-1 items-center justify-center rounded-xl bg-cta text-base font-semibold text-cta-foreground shadow-sm transition hover:bg-cta-hover"
+          className="inline-flex h-12 flex-1 items-center justify-center rounded-xl bg-brand text-base font-semibold text-brand-foreground shadow-sm transition hover:bg-cta-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           Cotar Agora
         </button>
