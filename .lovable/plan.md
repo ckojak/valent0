@@ -1,82 +1,111 @@
+# VALENT Corretora — Plan
 
-## Landing Page: Corretora de Seguros
+Full rebrand and restructure of the existing landing page. The page becomes a mobile-first "categorized menu" home, with the multi-step quote wizard reserved exclusively for the **Carro** entry inside a modal.
 
-A mobile-first, conversion-focused landing page for an auto insurance brokerage, inspired by Minuto Seguros, with an interactive quote wizard and simulated results.
+## 1. Design System (src/styles.css)
 
-### Design system
-- Palette (added as tokens in `src/styles.css`):
-  - White `#FFFFFF` (background/surfaces)
-  - Deep Blue `#0A2A66` (primary, headings, trust)
-  - Vibrant Green `#16C172` (CTA, accents)
-  - Supporting neutrals (slate-50/100, slate-600) for body text and borders
-- Typography: Inter/Manrope pairing via `<link>` in `__root.tsx` + `@theme` font tokens — clean, trustworthy.
-- Rounded-2xl cards, soft shadows, generous spacing. Mobile-first; hero stacks form below headline on small screens, side-by-side on `md+`.
+Replace the current Deep Blue + Green tokens with a **Vibrant Orange / Clean White** system. Remove every blue/green reference.
 
-### Page structure (single route: `/`)
-Sections rendered top-to-bottom on `src/routes/index.tsx`:
-1. **Header / Nav** — logo (text mark "SeguroJá" placeholder), minimal links, phone CTA.
-2. **Hero** — headline "Cote online, compare e economize no seu seguro", subhead, trust badges (SSL, +500k clientes, parceiros), and the wizard card.
-3. **Trust strip** — row of insurer name placeholders (Porto Seguro, Bradesco, Tokio Marine, Allianz, HDI, SulAmérica).
-4. **How it works** — 3 steps with Lucide icons (Search, Scale, ShieldCheck).
-5. **Benefits** — 4-card grid (best price, 100% online, especialistas, suporte).
-6. **FAQ** — accordion (shadcn).
-7. **Footer** — minimal, with CNPJ/Susep placeholder lines for credibility.
+- `--brand: oklch(...)` ≈ `#F97316` (vibrant orange) — used for logo, accents, primary CTAs.
+- `--brand-foreground: white`
+- `--brand-soft: oklch(0.97 0.03 60)` — soft orange tint for chips, highlights, hover.
+- `--cta` and `--cta-hover` are remapped to the orange family (no green).
+- `--ring`, `--primary`, `--accent-foreground` all point to orange.
+- Background stays clean white; foreground a near-black neutral; borders a warm light gray.
+- Premium native-app feel: `--radius: 1rem`, soft shadow token `--shadow-card: 0 8px 24px -12px oklch(0.2 0.05 60 / 0.18)`.
+- Keep Inter / Manrope fonts.
 
-### Multi-step quote wizard (core interaction)
-Single state machine inside one card component, no route changes — modal-like progression.
+A search across the codebase will replace any lingering `text-brand`/`bg-brand` usages that visually rendered blue — tokens change in one place, classes stay.
 
-States: `step1` → `step2` → `loading` → `results` → (toast fires on entering results).
+## 2. Branding updates
 
-- **Step 1 — Veículo**
-  - Input `Placa do veículo` (auto-uppercase, formatted ABC-1D23 / ABC-1234)
-  - Toggle (shadcn Switch) `Zero KM` — disables placa input when on
-  - Button "Continuar" (green)
-- **Step 2 — Seus dados**
-  - Name, Email, Phone/WhatsApp (masked `(11) 99999-9999`)
-  - Back button + "Cotar Agora" (green primary)
-  - Lightweight validation (required + email regex + phone length)
-- **Loading**
-  - Centered spinner + rotating messages ("Consultando seguradoras...", "Comparando preços...", "Quase lá..."), ~2.2s simulated.
-- **Results**
-  - Heading "Encontramos 4 ofertas para você"
-  - 4 quote cards (Porto Seguro, Bradesco, Tokio Marine, Allianz):
-    - Insurer logo placeholder (initials in colored circle)
-    - Coverage summary line
-    - Total price (R$) + "12x sem juros de R$ XX,XX"
-    - "Contratar" button (green) + "Ver detalhes" (ghost)
-    - "Mais escolhido" badge on the best-price card
-  - On mount: `toast.success("Cotação enviada para o seu e-mail!")` via sonner (already wired in modern stack).
-  - "Nova cotação" link resets wizard to step 1.
+- **Header (`Header.tsx`)**: Replace name with **"VALENT"** + tagline `Corretora & Consultoria de Seguros`. Logo placeholder: a rounded orange tile with a `Home` Lucide icon framed by two small `Hand`-style accents (placeholder for "orange hands holding a house"). Replace the phone CTA with a **WhatsApp** button (Lucide `MessageCircle` icon, label "WhatsApp", orange-tinted).
+- **Footer**: "VALENT Corretora & Consultoria de Seguros".
+- **`__root.tsx` / `index.tsx` SEO**: title + meta updated to VALENT.
+- **Hero**: simplify to a single clean headline — *"Entendemos a importância de proteger o que você mais valoriza!"* — plus a short supporting line. Remove the inline wizard from the hero; the wizard now only opens from the Carro item.
+- Remove the old "Mais rápido em direção ao seu destino" slogan.
 
-### File layout (modular)
-- `src/routes/index.tsx` — composes sections, sets SEO head().
-- `src/components/landing/Header.tsx`
-- `src/components/landing/Hero.tsx` — headline + `<QuoteWizard />`
-- `src/components/landing/TrustStrip.tsx`
-- `src/components/landing/HowItWorks.tsx`
-- `src/components/landing/Benefits.tsx`
-- `src/components/landing/Faq.tsx`
-- `src/components/landing/Footer.tsx`
-- `src/components/quote/QuoteWizard.tsx` — state machine, renders step components
-- `src/components/quote/StepVehicle.tsx`
-- `src/components/quote/StepContact.tsx`
-- `src/components/quote/StepLoading.tsx`
-- `src/components/quote/StepResults.tsx`
-- `src/components/quote/QuoteCard.tsx`
-- `src/components/quote/InsurerLogo.tsx` — colored-initial placeholder
-- `src/lib/quote-data.ts` — mock insurers + price generator
-- `src/lib/masks.ts` — placa/phone formatters
+## 3. Home view — Categorized Menu
 
-### Technical details
-- Tailwind v4 tokens added to `src/styles.css` under `@theme inline` (e.g. `--color-brand`, `--color-brand-cta`) mapped to `:root` oklch values. No hardcoded color utilities in components.
-- Fonts loaded via `<link>` in `src/routes/__root.tsx` head.
-- Toast: import `toast` from `sonner`; `<Toaster />` is already rendered in the modern stack root — verify and add if missing.
-- Icons: `lucide-react` (Car, ShieldCheck, Search, Scale, Star, Mail, Phone, Loader2, Check, ChevronRight, ChevronLeft).
-- No backend, no Lovable Cloud — all interactions are local state + setTimeout simulation, per the brief.
-- SEO: update `head()` in `index.tsx` with PT-BR title "Seguro Auto Online — Cote, Compare e Economize | SeguroJá", meta description (<160 chars), og tags, single H1 in Hero.
-- Fully responsive: mobile-first; hero `grid-cols-1 lg:grid-cols-2`; wizard card full-width on mobile, fixed max-width on desktop; touch-friendly tap targets (min 44px); inputs use `inputMode` for numeric fields.
+New component: `src/components/landing/CategoryMenu.tsx` rendering **3 expandable card sections** built on the existing shadcn `Accordion` (each section open by default on desktop, collapsible on mobile for native-app feel).
 
-### Out of scope
-- No real API calls or email sending (simulated only).
-- No persistence, auth, or admin views.
-- No dark mode.
+Each section is a rounded card with soft shadow, generous padding, an orange section header (icon + title), and a vertical list of items. Each item row:
+
+- Left: Lucide icon in a soft orange chip.
+- Middle: item label (semibold) + tiny muted subtitle.
+- Right: action icon — `ShoppingCart` for direct-quote items, `ChevronRight` for "fale com consultor" items.
+- Tap target ≥ 56px, divider between rows, hover/active state in `--brand-soft`.
+
+Sections and items (icons in parens):
+
+**Para seu Veículo** (`Car` header)
+- Speed, Mountain Bike e Passeio (`Bike`)
+- Scooter, Patinete e Bike Elétricos (`Zap`)
+- Moto (`Bike` rotated / `Gauge`) — using `Bike` is fine; alt: `CircleGauge`
+- **Carro** (`Car`) — the only item that opens the wizard modal; right icon = `ShoppingCart`.
+
+**Para Você e sua família** (`Users` header)
+- Viagem (`Plane`)
+- Celular (`Smartphone`)
+- Residência (`Home`)
+- Saúde (`HeartPulse`)
+
+**Para sua Empresa** (`Briefcase` header)
+- Incêndio empresarial (`Flame`)
+- Frota de veículos (`Truck`)
+- Caminhão (`Truck`)
+- Saúde Empresarial (`Stethoscope`)
+
+Non-Carro items: clicking shows a small toast *"Em breve — fale com um consultor pelo WhatsApp"* (no route changes, no wizard). This keeps the focus on the Carro engine as specified.
+
+Data lives in `src/lib/menu-data.ts` so sections/items stay declarative.
+
+## 4. Carro Quote Wizard — Modal
+
+Wrap the existing `QuoteWizard` flow in a shadcn `Dialog` and trigger it **only** from the Carro row.
+
+- New component: `src/components/quote/QuoteWizardDialog.tsx`. Props: `open`, `onOpenChange`. Renders the wizard inside a full-height sheet on mobile (`max-w-md`, rounded top, slide-in) and a centered dialog on desktop.
+- Strip the "Seguro Auto / Vida / Acidentes" product step — Carro is implicit. Wizard stages become: `vehicle` → `contact` → `loading` → `results`. Progress dots updated to 3 steps.
+- **Step 1 (Vehicle)** — keep current `StepVehicle` with: Placa input, Zero KM toggle, Kit Gás (GNV) toggle, FIPE success line *"Veículo localizado na base FIPE ✓"* shown when the plate is valid. Back button closes the modal.
+- **Step 2 (Lead Capture)** — keep `StepContact` (Name, Email, Phone). Submit button label becomes **"Cotar Agora"**, vibrant orange.
+- **Step 3 (Loading)** — `StepLoading` text changes to *"Consultando seguradoras via API..."*.
+- **Step 4 (Results)** — `StepResults` shows 3 cards (Tokio Marine, Porto Seguro, Bradesco) — trim Allianz from `quote-data.ts` to land on 3. Each card: insurer logo placeholder, total price, *"12x sem juros"* installment, **Contratar** button (orange) + secondary "Ver detalhes". Toast on mount: *"Cotação enviada para o seu e-mail!"*.
+- Closing the dialog resets the wizard state.
+
+`QuoteWizard.tsx` is simplified accordingly (no product stage, no `StepProduct` import). `StepProduct.tsx` is deleted.
+
+## 5. Section cleanup
+
+The standalone `Hero`, `TrustStrip`, `HowItWorks`, `Benefits`, and `Faq` sections stay but adopt the orange palette automatically through tokens. The Hero loses the embedded wizard card — replaced by the new `CategoryMenu` directly under the headline, which is the user's requested architecture.
+
+`index.tsx` order: Header → Hero (text only) → CategoryMenu → HowItWorks → Benefits → Faq → Footer.
+
+## 6. Files
+
+**Create**
+- `src/components/landing/CategoryMenu.tsx`
+- `src/components/quote/QuoteWizardDialog.tsx`
+- `src/lib/menu-data.ts`
+
+**Edit**
+- `src/styles.css` — repaint tokens to orange.
+- `src/components/landing/Header.tsx` — VALENT branding + WhatsApp CTA.
+- `src/components/landing/Hero.tsx` — text-only hero, new headline.
+- `src/components/landing/Footer.tsx` — VALENT name.
+- `src/components/quote/QuoteWizard.tsx` — drop product stage, 3-step progress.
+- `src/components/quote/StepContact.tsx` — submit label "Cotar Agora".
+- `src/components/quote/StepLoading.tsx` — text "Consultando seguradoras via API...".
+- `src/lib/quote-data.ts` — keep Tokio Marine, Porto Seguro, Bradesco only.
+- `src/routes/index.tsx` — new layout, SEO for VALENT.
+- `src/routes/__root.tsx` — title/meta updates.
+
+**Delete**
+- `src/components/quote/StepProduct.tsx`
+
+## 7. Acceptance checks
+
+- No blue or green visible anywhere; primary accent is orange.
+- Home shows 3 categorized cards with all listed items and correct icons.
+- Only the **Carro** row opens the wizard modal; other items show the "em breve" toast.
+- Wizard runs vehicle → contact → loading → results with the exact copy specified, FIPE success line on valid plate, and email toast on results.
+- Layout is mobile-first, looks like a native app at 428×784.

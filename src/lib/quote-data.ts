@@ -8,6 +8,13 @@ export type Insurer = {
 
 export const INSURERS: Insurer[] = [
   {
+    id: "tokio",
+    name: "Tokio Marine",
+    initials: "TM",
+    color: "#003DA5",
+    coverage: "Compreensiva + vidros e retrovisores sem franquia",
+  },
+  {
     id: "porto",
     name: "Porto Seguro",
     initials: "PS",
@@ -20,20 +27,6 @@ export const INSURERS: Insurer[] = [
     initials: "BR",
     color: "#CC092F",
     coverage: "Cobertura total + assistência 24h ilimitada",
-  },
-  {
-    id: "tokio",
-    name: "Tokio Marine",
-    initials: "TM",
-    color: "#003DA5",
-    coverage: "Compreensiva + vidros e retrovisores sem franquia",
-  },
-  {
-    id: "allianz",
-    name: "Allianz",
-    initials: "AL",
-    color: "#003781",
-    coverage: "Cobertura total + carro reserva 30 dias",
   },
 ];
 

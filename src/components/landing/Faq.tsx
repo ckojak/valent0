@@ -33,8 +33,8 @@ export function Faq() {
     <section id="faq" className="py-16 sm:py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <div className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-wider text-cta">Dúvidas frequentes</p>
-          <h2 className="mt-2 font-display text-3xl font-extrabold text-brand sm:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-wider text-brand">Dúvidas frequentes</p>
+          <h2 className="mt-2 font-display text-3xl font-extrabold text-foreground sm:text-4xl">
             Tudo que você precisa saber
           </h2>
         </div>

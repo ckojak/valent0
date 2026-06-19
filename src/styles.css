@@ -41,43 +41,50 @@
   --color-cta: var(--cta);
   --color-cta-foreground: var(--cta-foreground);
   --color-cta-hover: var(--cta-hover);
+
+  --color-success: var(--success);
 }
 
 :root {
-  --radius: 0.75rem;
+  --radius: 1rem;
 
   --background: oklch(1 0 0);
-  --foreground: oklch(0.22 0.04 260);
+  --foreground: oklch(0.2 0.02 50);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.04 260);
+  --card-foreground: oklch(0.2 0.02 50);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.04 260);
+  --popover-foreground: oklch(0.2 0.02 50);
 
-  /* Deep Blue #0A2A66 */
-  --brand: oklch(0.31 0.11 263);
+  /* Vibrant Orange #F97316 */
+  --brand: oklch(0.7 0.19 47);
   --brand-foreground: oklch(1 0 0);
-  --brand-soft: oklch(0.96 0.02 260);
+  --brand-soft: oklch(0.97 0.03 60);
 
-  /* Vibrant Green #16C172 */
-  --cta: oklch(0.72 0.18 152);
+  /* CTA = same orange family, slightly deeper for hover */
+  --cta: oklch(0.7 0.19 47);
   --cta-foreground: oklch(1 0 0);
-  --cta-hover: oklch(0.66 0.18 152);
+  --cta-hover: oklch(0.62 0.2 40);
 
   --primary: var(--brand);
   --primary-foreground: var(--brand-foreground);
 
-  --secondary: oklch(0.97 0.01 260);
-  --secondary-foreground: oklch(0.22 0.04 260);
-  --muted: oklch(0.97 0.01 260);
-  --muted-foreground: oklch(0.5 0.03 258);
-  --accent: oklch(0.96 0.02 260);
+  --secondary: oklch(0.98 0.005 60);
+  --secondary-foreground: oklch(0.2 0.02 50);
+  --muted: oklch(0.97 0.005 60);
+  --muted-foreground: oklch(0.5 0.02 55);
+  --accent: oklch(0.97 0.03 60);
   --accent-foreground: var(--brand);
   --destructive: oklch(0.6 0.22 27);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.92 0.01 258);
-  --input: oklch(0.92 0.01 258);
+  --border: oklch(0.93 0.008 60);
+  --input: oklch(0.93 0.008 60);
   --ring: var(--brand);
+
+  /* Success green — only used for FIPE confirmation text */
+  --success: oklch(0.62 0.16 150);
+
+  --shadow-card: 0 8px 24px -12px oklch(0.2 0.05 60 / 0.18);
 }
 
 @layer base {
