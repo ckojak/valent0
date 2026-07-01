@@ -93,6 +93,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "VALENT Corretora & Consultoria de Seguros" },
+      { name: "description", content: "SecureQuote Express is a modern landing page for insurance brokerages, streamlining the online quoting process." },
+      { property: "og:description", content: "SecureQuote Express is a modern landing page for insurance brokerages, streamlining the online quoting process." },
+      { name: "twitter:description", content: "SecureQuote Express is a modern landing page for insurance brokerages, streamlining the online quoting process." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b4567868-9b3f-41c4-8d24-d930fe83a5ff/id-preview-222aeebf--3441cc93-b53a-412f-b303-4a52e5bb0497.lovable.app-1782931841215.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b4567868-9b3f-41c4-8d24-d930fe83a5ff/id-preview-222aeebf--3441cc93-b53a-412f-b303-4a52e5bb0497.lovable.app-1782931841215.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
