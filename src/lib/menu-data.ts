@@ -1,6 +1,7 @@
 import {
   Bike,
   Briefcase,
+  Building,
   Car,
   Flame,
   HeartPulse,
@@ -12,29 +13,18 @@ import {
   Users,
   Zap,
   Gauge,
+  Shield,
   type LucideIcon,
 } from "lucide-react";
 
-export type MenuItemId =
-  | "bike"
-  | "scooter"
-  | "moto"
-  | "carro"
-  | "viagem"
-  | "celular"
-  | "residencia"
-  | "saude"
-  | "incendio"
-  | "frota"
-  | "caminhao"
-  | "saude-empresarial";
-
 export type MenuItem = {
-  id: MenuItemId;
+  id: string;
   label: string;
   subtitle?: string;
   icon: LucideIcon;
-  /** When true, item triggers the quote wizard. Otherwise shows "fale com consultor" toast. */
+  /** Rota da página de categoria (quando existe). */
+  href?: string;
+  /** Quando true, item dispara o wizard modal simplificado (categorias sem página). */
   quote?: boolean;
 };
 
@@ -51,10 +41,10 @@ export const MENU_SECTIONS: MenuSection[] = [
     title: "Para seu Veículo",
     icon: Car,
     items: [
-      { id: "bike", label: "Speed, Mountain Bike e Passeio", subtitle: "Bicicletas convencionais", icon: Bike },
-      { id: "scooter", label: "Scooter, Patinete e Bike Elétricos", subtitle: "Mobilidade urbana elétrica", icon: Zap },
-      { id: "moto", label: "Moto", subtitle: "Cobertura completa", icon: Gauge },
-      { id: "carro", label: "Carro", subtitle: "Cote agora em 1 minuto", icon: Car, quote: true },
+      { id: "carro", label: "Carro", subtitle: "Cote agora em minutos", icon: Car, href: "/seguros/auto" },
+      { id: "moto", label: "Moto", subtitle: "Cobertura completa", icon: Gauge, quote: true },
+      { id: "bike", label: "Speed, Mountain Bike e Passeio", subtitle: "Bicicletas convencionais", icon: Bike, quote: true },
+      { id: "scooter", label: "Scooter, Patinete e Bike Elétricos", subtitle: "Mobilidade urbana elétrica", icon: Zap, quote: true },
     ],
   },
   {
@@ -62,10 +52,11 @@ export const MENU_SECTIONS: MenuSection[] = [
     title: "Para Você e sua família",
     icon: Users,
     items: [
-      { id: "viagem", label: "Viagem", subtitle: "Nacional e internacional", icon: Plane },
-      { id: "celular", label: "Celular", subtitle: "Roubo, furto e quebra", icon: Smartphone },
-      { id: "residencia", label: "Residência", subtitle: "Sua casa protegida", icon: Home },
-      { id: "saude", label: "Saúde", subtitle: "Planos individuais e família", icon: HeartPulse },
+      { id: "residencia", label: "Residência", subtitle: "Sua casa protegida", icon: Home, href: "/seguros/residencial" },
+      { id: "vida", label: "Seguro de Vida", subtitle: "Proteção pra quem você ama", icon: HeartPulse, href: "/seguros/vida" },
+      { id: "viagem", label: "Viagem", subtitle: "Nacional e internacional", icon: Plane, quote: true },
+      { id: "celular", label: "Celular", subtitle: "Roubo, furto e quebra", icon: Smartphone, quote: true },
+      { id: "saude", label: "Saúde", subtitle: "Planos individuais e família", icon: Stethoscope, quote: true },
     ],
   },
   {
@@ -73,10 +64,11 @@ export const MENU_SECTIONS: MenuSection[] = [
     title: "Para sua Empresa",
     icon: Briefcase,
     items: [
-      { id: "incendio", label: "Incêndio empresarial", subtitle: "Patrimônio e estoque", icon: Flame },
-      { id: "frota", label: "Frota de veículos", subtitle: "Gestão simplificada", icon: Truck },
-      { id: "caminhao", label: "Caminhão", subtitle: "Carga e cavalo mecânico", icon: Truck },
-      { id: "saude-empresarial", label: "Saúde Empresarial", subtitle: "Para seus colaboradores", icon: Stethoscope },
+      { id: "empresarial", label: "Seguro Empresarial", subtitle: "Estoque, RC e lucros cessantes", icon: Shield, href: "/seguros/empresarial" },
+      { id: "condominio", label: "Condomínio", subtitle: "Obrigatório por lei", icon: Building, href: "/seguros/condominio" },
+      { id: "incendio", label: "Incêndio empresarial", subtitle: "Patrimônio e estoque", icon: Flame, quote: true },
+      { id: "frota", label: "Frota de veículos", subtitle: "Gestão simplificada", icon: Truck, quote: true },
+      { id: "caminhao", label: "Caminhão", subtitle: "Carga e cavalo mecânico", icon: Truck, quote: true },
     ],
   },
 ];

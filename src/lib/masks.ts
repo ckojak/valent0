@@ -33,3 +33,37 @@ export function formatBRL(value: number): string {
     minimumFractionDigits: 2,
   });
 }
+
+export function formatCPF(input: string): string {
+  const d = input.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
+  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
+}
+
+export function isValidCPF(value: string): boolean {
+  return value.replace(/\D/g, "").length === 11;
+}
+
+export function formatCEP(input: string): string {
+  const d = input.replace(/\D/g, "").slice(0, 8);
+  if (d.length <= 5) return d;
+  return `${d.slice(0, 5)}-${d.slice(5)}`;
+}
+
+export function isValidCEP(value: string): boolean {
+  return value.replace(/\D/g, "").length === 8;
+}
+
+export function formatDateBR(input: string): string {
+  const d = input.replace(/\D/g, "").slice(0, 8);
+  if (d.length <= 2) return d;
+  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
+  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+}
+
+export function isValidDateBR(value: string): boolean {
+  return /^\d{2}\/\d{2}\/\d{4}$/.test(value);
+}
+

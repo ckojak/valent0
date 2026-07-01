@@ -1,111 +1,130 @@
-# VALENT Corretora — Plan
+# Plano de expansão VALENT — 3 frentes
 
-Full rebrand and restructure of the existing landing page. The page becomes a mobile-first "categorized menu" home, with the multi-step quote wizard reserved exclusively for the **Carro** entry inside a modal.
+Mantém identidade visual atual (laranja/branco, Header/Hero/Footer/TrustStrip/HowItWorks/Faq/Benefits) e componentes existentes. Nenhum cálculo real de seguro — tudo mock com comentário claro para integração futura.
 
-## 1. Design System (src/styles.css)
+## Ordem de execução
 
-Replace the current Deep Blue + Green tokens with a **Vibrant Orange / Clean White** system. Remove every blue/green reference.
+1. **Wizard completo Auto** (rota dedicada) — mais visível
+2. **Páginas de categoria** — reaproveitam template único
+3. **Supabase: leads + admin** — mínimo viável (tabela leads garantida)
 
-- `--brand: oklch(...)` ≈ `#F97316` (vibrant orange) — used for logo, accents, primary CTAs.
-- `--brand-foreground: white`
-- `--brand-soft: oklch(0.97 0.03 60)` — soft orange tint for chips, highlights, hover.
-- `--cta` and `--cta-hover` are remapped to the orange family (no green).
-- `--ring`, `--primary`, `--accent-foreground` all point to orange.
-- Background stays clean white; foreground a near-black neutral; borders a warm light gray.
-- Premium native-app feel: `--radius: 1rem`, soft shadow token `--shadow-card: 0 8px 24px -12px oklch(0.2 0.05 60 / 0.18)`.
-- Keep Inter / Manrope fonts.
+---
 
-A search across the codebase will replace any lingering `text-brand`/`bg-brand` usages that visually rendered blue — tokens change in one place, classes stay.
+## 1. Wizard de cotação Auto — `/cotacao/auto`
 
-## 2. Branding updates
+Página inteira (não modal), com barra de progresso topo e navegação Voltar/Continuar. State machine self-contained em `QuoteAutoWizard.tsx`.
 
-- **Header (`Header.tsx`)**: Replace name with **"VALENT"** + tagline `Corretora & Consultoria de Seguros`. Logo placeholder: a rounded orange tile with a `Home` Lucide icon framed by two small `Hand`-style accents (placeholder for "orange hands holding a house"). Replace the phone CTA with a **WhatsApp** button (Lucide `MessageCircle` icon, label "WhatsApp", orange-tinted).
-- **Footer**: "VALENT Corretora & Consultoria de Seguros".
-- **`__root.tsx` / `index.tsx` SEO**: title + meta updated to VALENT.
-- **Hero**: simplify to a single clean headline — *"Entendemos a importância de proteger o que você mais valoriza!"* — plus a short supporting line. Remove the inline wizard from the hero; the wizard now only opens from the Carro item.
-- Remove the old "Mais rápido em direção ao seu destino" slogan.
+**Novos arquivos:**
+- `src/routes/cotacao/auto.tsx` — rota, monta o wizard
+- `src/components/quote-auto/QuoteAutoWizard.tsx` — orquestrador + progresso
+- `src/components/quote-auto/steps/StepSituacao.tsx` (comprei / vou comprar / renovar / pesquisando — cards)
+- `src/components/quote-auto/steps/StepVeiculo.tsx` (marca, modelo, ano fab, ano modelo, versão, placa opcional — selects mockados; placa é placeholder visual, comentário `// MOCK FIPE/API paga`)
+- `src/components/quote-auto/steps/StepCondutor.tsx` (nome, nascimento, CPF, CEP, estado civil, uso)
+- `src/components/quote-auto/steps/StepPrioridade.tsx` (radio cards)
+- `src/components/quote-auto/steps/StepCoberturas.tsx` (toggles: reserva, vidros, terceiros, guincho 24h)
+- `src/components/quote-auto/steps/StepResumo.tsx`
+- `src/components/quote-auto/steps/StepLoadingAnalise.tsx`
+- `src/components/quote-auto/steps/StepResultados.tsx` (3 cards mock — Porto/Azul/Allianz, `// MOCK: substituir por API real de multicálculo`)
+- `src/components/quote-auto/steps/StepComparativo.tsx` (tabela lado a lado)
+- `src/components/quote-auto/steps/StepContatoFinal.tsx` (nome, WhatsApp, e-mail opcional; salva lead)
+- `src/components/quote-auto/steps/StepSucesso.tsx` (CTA WhatsApp com `wa.me/<telefone>?text=<resumo pré-preenchido>`)
+- `src/lib/quote-auto-data.ts` (marcas, modelos, mock quotes, tipos)
+- `src/lib/wa.ts` — helper `buildWhatsappUrl({phone, message})`
 
-## 3. Home view — Categorized Menu
+CTA final: `wa.me/{telefone_configuracao}?text=` codificado com nome + veículo + prioridade.
 
-New component: `src/components/landing/CategoryMenu.tsx` rendering **3 expandable card sections** built on the existing shadcn `Accordion` (each section open by default on desktop, collapsible on mobile for native-app feel).
+## 2. Páginas dedicadas de categoria
 
-Each section is a rounded card with soft shadow, generous padding, an orange section header (icon + title), and a vertical list of items. Each item row:
+Rotas: `/seguros/auto`, `/seguros/residencial`, `/seguros/empresarial`, `/seguros/vida`, `/seguros/condominio`.
 
-- Left: Lucide icon in a soft orange chip.
-- Middle: item label (semibold) + tiny muted subtitle.
-- Right: action icon — `ShoppingCart` for direct-quote items, `ChevronRight` for "fale com consultor" items.
-- Tap target ≥ 56px, divider between rows, hover/active state in `--brand-soft`.
+**Template único** parametrizado — edito só o config depois:
 
-Sections and items (icons in parens):
+- `src/components/category/CategoryPage.tsx` recebe `config: CategoryConfig`
+  - `<Header/>`, `<CategoryHero/>`, `<CoverageGrid/>` (cards expansíveis com Collapsible), `<PersonasSection/>` (3-4 cards), `<CategoryFaq/>` (Accordion), `<CategoryCTA/>` (grande, abre wizard), `<Footer/>`
+- `src/lib/category-configs.ts` — objeto `CATEGORY_CONFIGS: Record<slug, CategoryConfig>` com todo o copy (hero title/subtitle/badge, coverages[], personas[], faq[], ctaLabel, quoteHref)
+- Tipo `CategoryConfig` com todos os textos e ícones (referências Lucide por nome, resolvidos via mapa)
+- Rotas: 5 arquivos finos `src/routes/seguros/{slug}.tsx` que importam o template + config correto e definem `head()` com título/descrição próprios.
 
-**Para seu Veículo** (`Car` header)
-- Speed, Mountain Bike e Passeio (`Bike`)
-- Scooter, Patinete e Bike Elétricos (`Zap`)
-- Moto (`Bike` rotated / `Gauge`) — using `Bike` is fine; alt: `CircleGauge`
-- **Carro** (`Car`) — the only item that opens the wizard modal; right icon = `ShoppingCart`.
+Categoria Auto: `ctaHref = "/cotacao/auto"`. Outras: abrem `QuoteWizardDialog` existente com `defaultCategory`.
 
-**Para Você e sua família** (`Users` header)
-- Viagem (`Plane`)
-- Celular (`Smartphone`)
-- Residência (`Home`)
-- Saúde (`HeartPulse`)
+`CategoryMenu` atualizado: cada item vira `<Link to="/seguros/$slug">` (via `Link` do TanStack). Item Carro continua exibindo ícone destacado; agora navega para a página em vez de abrir modal.
 
-**Para sua Empresa** (`Briefcase` header)
-- Incêndio empresarial (`Flame`)
-- Frota de veículos (`Truck`)
-- Caminhão (`Truck`)
-- Saúde Empresarial (`Stethoscope`)
+## 3. Backend: Leads + Admin (Supabase / Lovable Cloud)
 
-Non-Carro items: clicking shows a small toast *"Em breve — fale com um consultor pelo WhatsApp"* (no route changes, no wizard). This keeps the focus on the Carro engine as specified.
+Habilita Lovable Cloud (`supabase--enable`).
 
-Data lives in `src/lib/menu-data.ts` so sections/items stay declarative.
+**Migrations:**
 
-## 4. Carro Quote Wizard — Modal
+```sql
+create table public.leads (
+  id uuid primary key default gen_random_uuid(),
+  nome text not null,
+  telefone text not null,
+  email text,
+  tipo_seguro text not null,
+  dados jsonb not null default '{}'::jsonb,
+  status text not null default 'novo',
+  created_at timestamptz not null default now()
+);
+grant insert on public.leads to anon;
+grant select, update, insert on public.leads to authenticated;
+grant all on public.leads to service_role;
+alter table public.leads enable row level security;
+create policy "anon insere leads" on public.leads for insert to anon with check (true);
+create policy "auth le leads" on public.leads for select to authenticated using (true);
+create policy "auth atualiza leads" on public.leads for update to authenticated using (true);
 
-Wrap the existing `QuoteWizard` flow in a shadcn `Dialog` and trigger it **only** from the Carro row.
+create table public.configuracoes (
+  chave text primary key,
+  valor text not null,
+  updated_at timestamptz not null default now()
+);
+grant select on public.configuracoes to anon, authenticated;
+grant all on public.configuracoes to authenticated, service_role;
+alter table public.configuracoes enable row level security;
+create policy "todos leem config" on public.configuracoes for select using (true);
+create policy "auth escreve config" on public.configuracoes for all to authenticated using (true) with check (true);
+insert into public.configuracoes (chave, valor) values ('telefone_contato','5511999999999') on conflict do nothing;
 
-- New component: `src/components/quote/QuoteWizardDialog.tsx`. Props: `open`, `onOpenChange`. Renders the wizard inside a full-height sheet on mobile (`max-w-md`, rounded top, slide-in) and a centered dialog on desktop.
-- Strip the "Seguro Auto / Vida / Acidentes" product step — Carro is implicit. Wizard stages become: `vehicle` → `contact` → `loading` → `results`. Progress dots updated to 3 steps.
-- **Step 1 (Vehicle)** — keep current `StepVehicle` with: Placa input, Zero KM toggle, Kit Gás (GNV) toggle, FIPE success line *"Veículo localizado na base FIPE ✓"* shown when the plate is valid. Back button closes the modal.
-- **Step 2 (Lead Capture)** — keep `StepContact` (Name, Email, Phone). Submit button label becomes **"Cotar Agora"**, vibrant orange.
-- **Step 3 (Loading)** — `StepLoading` text changes to *"Consultando seguradoras via API..."*.
-- **Step 4 (Results)** — `StepResults` shows 3 cards (Tokio Marine, Porto Seguro, Bradesco) — trim Allianz from `quote-data.ts` to land on 3. Each card: insurer logo placeholder, total price, *"12x sem juros"* installment, **Contratar** button (orange) + secondary "Ver detalhes". Toast on mount: *"Cotação enviada para o seu e-mail!"*.
-- Closing the dialog resets the wizard state.
+create table public.promocoes (
+  id uuid primary key default gen_random_uuid(),
+  titulo text not null,
+  descricao text,
+  imagem_url text,
+  link text,
+  valido_ate date,
+  ativo boolean not null default true,
+  created_at timestamptz not null default now()
+);
+grant select on public.promocoes to anon, authenticated;
+grant all on public.promocoes to authenticated, service_role;
+alter table public.promocoes enable row level security;
+create policy "publico le promocoes ativas" on public.promocoes for select using (ativo = true);
+create policy "auth gerencia promocoes" on public.promocoes for all to authenticated using (true) with check (true);
+```
 
-`QuoteWizard.tsx` is simplified accordingly (no product stage, no `StepProduct` import). `StepProduct.tsx` is deleted.
+**Rotas:**
+- `/admin/login` (pública) — email+senha via `supabase.auth.signInWithPassword`, sem link de cadastro. Instrução no rodapé: "Crie o primeiro admin no painel Lovable Cloud → Users".
+- `/_authenticated/admin/index.tsx` — dashboard com tabs: **Leads** (tabela + filtro por status + botão marcar como contatado/perdido/ganho), **Promoções** (CRUD simples), **Configurações** (edita `telefone_contato`).
 
-## 5. Section cleanup
+**Componentes:**
+- `src/components/admin/LeadsTable.tsx`, `PromocoesManager.tsx`, `ConfigForm.tsx`
+- `src/components/landing/PromoBanner.tsx` — carrega promoções ativas via Supabase publishable e exibe carrossel simples na home (acima de CategoryMenu).
 
-The standalone `Hero`, `TrustStrip`, `HowItWorks`, `Benefits`, and `Faq` sections stay but adopt the orange palette automatically through tokens. The Hero loses the embedded wizard card — replaced by the new `CategoryMenu` directly under the headline, which is the user's requested architecture.
+**Inserção de lead:** função helper `src/lib/leads.ts::insertLead(payload)` usando `supabase` publishable client (RLS permite anon insert). Chamada no `StepContatoFinal` do wizard Auto e no `StepContact` do wizard modal simplificado das outras categorias. Falha de rede → toast erro, mas NÃO bloqueia o fluxo para WhatsApp.
 
-`index.tsx` order: Header → Hero (text only) → CategoryMenu → HowItWorks → Benefits → Faq → Footer.
+**CTAs do site** (Header WhatsApp, Hero, footer) leem `telefone_contato` de `configuracoes` via query cacheada (hook `useContatoTelefone`), fallback hardcoded.
 
-## 6. Files
+## Ordem final de commits
 
-**Create**
-- `src/components/landing/CategoryMenu.tsx`
-- `src/components/quote/QuoteWizardDialog.tsx`
-- `src/lib/menu-data.ts`
+1. Habilitar Lovable Cloud + migrations (leads/configuracoes/promocoes)
+2. `wa.ts`, `leads.ts`, `useContatoTelefone`
+3. Wizard Auto completo + rota `/cotacao/auto`
+4. Template categoria + 5 rotas + configs + atualizar `CategoryMenu` para Link
+5. Rotas admin (`/admin/login`, `/_authenticated/admin`) + PromoBanner na home
 
-**Edit**
-- `src/styles.css` — repaint tokens to orange.
-- `src/components/landing/Header.tsx` — VALENT branding + WhatsApp CTA.
-- `src/components/landing/Hero.tsx` — text-only hero, new headline.
-- `src/components/landing/Footer.tsx` — VALENT name.
-- `src/components/quote/QuoteWizard.tsx` — drop product stage, 3-step progress.
-- `src/components/quote/StepContact.tsx` — submit label "Cotar Agora".
-- `src/components/quote/StepLoading.tsx` — text "Consultando seguradoras via API...".
-- `src/lib/quote-data.ts` — keep Tokio Marine, Porto Seguro, Bradesco only.
-- `src/routes/index.tsx` — new layout, SEO for VALENT.
-- `src/routes/__root.tsx` — title/meta updates.
+## Fora de escopo (explícito)
 
-**Delete**
-- `src/components/quote/StepProduct.tsx`
-
-## 7. Acceptance checks
-
-- No blue or green visible anywhere; primary accent is orange.
-- Home shows 3 categorized cards with all listed items and correct icons.
-- Only the **Carro** row opens the wizard modal; other items show the "em breve" toast.
-- Wizard runs vehicle → contact → loading → results with the exact copy specified, FIPE success line on valid plate, and email toast on results.
-- Layout is mobile-first, looks like a native app at 428×784.
+- Cálculo real de seguro, integração FIPE, API multicálculo real (todos marcados `// MOCK`)
+- Cadastro público de admin (feito manualmente no painel Cloud)
+- Upload de imagem de promoção (usa URL colada; Storage fica para depois se pedirem)
