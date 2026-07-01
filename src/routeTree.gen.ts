@@ -10,33 +10,43 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CotacaoAutoRouteImport } from './routes/cotacao/auto'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CotacaoAutoRoute = CotacaoAutoRouteImport.update({
+  id: '/cotacao/auto',
+  path: '/cotacao/auto',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cotacao/auto': typeof CotacaoAutoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cotacao/auto': typeof CotacaoAutoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cotacao/auto': typeof CotacaoAutoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/cotacao/auto'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/cotacao/auto'
+  id: '__root__' | '/' | '/cotacao/auto'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CotacaoAutoRoute: typeof CotacaoAutoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +58,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cotacao/auto': {
+      id: '/cotacao/auto'
+      path: '/cotacao/auto'
+      fullPath: '/cotacao/auto'
+      preLoaderRoute: typeof CotacaoAutoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CotacaoAutoRoute: CotacaoAutoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
