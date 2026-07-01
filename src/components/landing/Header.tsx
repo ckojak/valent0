@@ -1,6 +1,10 @@
 import { Home, MessageCircle } from "lucide-react";
+import { useContatoTelefone } from "@/hooks/use-contato-telefone";
+import { buildWhatsappUrl } from "@/lib/wa";
 
 export function Header() {
+  const telefone = useContatoTelefone();
+  const waUrl = buildWhatsappUrl(telefone, "Olá! Vim pelo site da VALENT e gostaria de tirar uma dúvida.");
   return (
     <header className="sticky top-0 z-30 w-full border-b bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
@@ -22,7 +26,7 @@ export function Header() {
         </a>
 
         <a
-          href="https://wa.me/5500000000000"
+          href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex h-10 items-center gap-2 rounded-xl bg-brand px-3 text-sm font-semibold text-brand-foreground shadow-sm transition hover:bg-cta-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
