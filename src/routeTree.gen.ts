@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SegurosSlugRouteImport } from './routes/seguros/$slug'
 import { Route as CotacaoAutoRouteImport } from './routes/cotacao/auto'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SegurosSlugRoute = SegurosSlugRouteImport.update({
+  id: '/seguros/$slug',
+  path: '/seguros/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CotacaoAutoRoute = CotacaoAutoRouteImport.update({
@@ -26,27 +32,31 @@ const CotacaoAutoRoute = CotacaoAutoRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
+  '/seguros/$slug': typeof SegurosSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
+  '/seguros/$slug': typeof SegurosSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
+  '/seguros/$slug': typeof SegurosSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cotacao/auto'
+  fullPaths: '/' | '/cotacao/auto' | '/seguros/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cotacao/auto'
-  id: '__root__' | '/' | '/cotacao/auto'
+  to: '/' | '/cotacao/auto' | '/seguros/$slug'
+  id: '__root__' | '/' | '/cotacao/auto' | '/seguros/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CotacaoAutoRoute: typeof CotacaoAutoRoute
+  SegurosSlugRoute: typeof SegurosSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seguros/$slug': {
+      id: '/seguros/$slug'
+      path: '/seguros/$slug'
+      fullPath: '/seguros/$slug'
+      preLoaderRoute: typeof SegurosSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cotacao/auto': {
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CotacaoAutoRoute: CotacaoAutoRoute,
+  SegurosSlugRoute: SegurosSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
