@@ -4,6 +4,7 @@ import { StepContact, type ContactData } from "./StepContact";
 import { StepLoading } from "./StepLoading";
 import { StepResults } from "./StepResults";
 import { generateQuotes, type Quote } from "@/lib/quote-data";
+import { insertLead } from "@/lib/leads";
 
 type Stage = "vehicle" | "contact" | "loading" | "results";
 
@@ -16,6 +17,14 @@ export function QuoteWizard({ onCancel }: { onCancel?: () => void }) {
   const handleSubmit = (data: ContactData) => {
     setContact(data);
     setStage("loading");
+    // Fire-and-forget: falha não bloqueia o fluxo (usuário ainda vê resultados).
+    void insertLead({
+      nome: data.name,
+      telefone: data.phone,
+      email: data.email,
+      tipo_seguro: "auto-simplificado",
+      dados: { vehicle, source: "modal-wizard" },
+    });
     setTimeout(() => {
       setQuotes(generateQuotes(vehicle.placa + data.email));
       setStage("results");
