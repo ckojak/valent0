@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Header } from "@/components/landing/Header";
 import { Hero } from "@/components/landing/Hero";
 import { CategoryMenu } from "@/components/landing/CategoryMenu";
@@ -32,6 +32,14 @@ function Index() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <div className="mx-auto flex max-w-3xl flex-col gap-3 px-4 py-6">
+        <Link to="/cotacao/auto" className="block rounded-xl bg-[#F97316] px-6 py-5 text-center text-lg font-extrabold text-white shadow-lg hover:bg-[#EA6A0C]">
+          → Ir para Wizard Auto (/cotacao/auto)
+        </Link>
+        <Link to="/admin" className="block rounded-xl bg-[#F97316] px-6 py-5 text-center text-lg font-extrabold text-white shadow-lg hover:bg-[#EA6A0C]">
+          → Ir para Painel Admin (/admin)
+        </Link>
+      </div>
       <main>
         <Hero />
         <PromoBanner />
