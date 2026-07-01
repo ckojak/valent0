@@ -14,7 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      configuracoes: {
+        Row: {
+          chave: string
+          updated_at: string
+          valor: string
+        }
+        Insert: {
+          chave: string
+          updated_at?: string
+          valor: string
+        }
+        Update: {
+          chave?: string
+          updated_at?: string
+          valor?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          created_at: string
+          dados: Json
+          email: string | null
+          id: string
+          nome: string
+          status: string
+          telefone: string
+          tipo_seguro: string
+        }
+        Insert: {
+          created_at?: string
+          dados?: Json
+          email?: string | null
+          id?: string
+          nome: string
+          status?: string
+          telefone: string
+          tipo_seguro: string
+        }
+        Update: {
+          created_at?: string
+          dados?: Json
+          email?: string | null
+          id?: string
+          nome?: string
+          status?: string
+          telefone?: string
+          tipo_seguro?: string
+        }
+        Relationships: []
+      }
+      promocoes: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          descricao: string | null
+          id: string
+          imagem_url: string | null
+          link: string | null
+          titulo: string
+          valido_ate: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          link?: string | null
+          titulo: string
+          valido_ate?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          link?: string | null
+          titulo?: string
+          valido_ate?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
