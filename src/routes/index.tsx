@@ -36,6 +36,7 @@ function Index() {
         <Hero />
         <PromoBanner />
         <CategoryMenu />
+        <QuickQuote />
         <HowItWorks />
         <Benefits />
         <Faq />
