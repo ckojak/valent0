@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-const FALLBACK = "5511999999999";
+const FALLBACK = "5521997625607";
 
 /**
  * Retorna o telefone de contato global (configurável no painel admin).
