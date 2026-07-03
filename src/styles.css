@@ -43,6 +43,9 @@
   --color-cta-hover: var(--cta-hover);
 
   --color-success: var(--success);
+  --color-navy: var(--navy);
+  --color-navy-foreground: var(--navy-foreground);
+  --color-wa: var(--wa);
 }
 
 :root {
@@ -83,6 +86,11 @@
 
   /* Success green — only used for FIPE confirmation text */
   --success: oklch(0.62 0.16 150);
+
+  /* Deep navy for hero card + dark sections */
+  --navy: oklch(0.24 0.04 250);
+  --navy-foreground: oklch(1 0 0);
+  --wa: oklch(0.55 0.11 165);
 
   --shadow-card: 0 8px 24px -12px oklch(0.2 0.05 60 / 0.18);
 }
