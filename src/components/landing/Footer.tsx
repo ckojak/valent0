@@ -37,8 +37,11 @@ export function Footer() {
       </div>
       <div className="border-t">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© {new Date().getFullYear()} VALENT Corretora &amp; Consultoria de Seguros. CNPJ 00.000.000/0001-00.</p>
-          <p>Registro SUSEP nº 00000000.</p>
+          <p>© {new Date().getFullYear()} VALENT Corretora &amp; Consultoria de Seguros.</p>
+          <p>
+            Registro SUSEP nº <strong className="text-foreground">212126836</strong> · Contato:{" "}
+            <a href="tel:+5521997625607" className="hover:text-brand">(21) 99762-5607</a>
+          </p>
         </div>
       </div>
     </footer>
