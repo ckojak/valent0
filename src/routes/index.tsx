@@ -6,6 +6,7 @@ import { PromoBanner } from "@/components/landing/PromoBanner";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { Benefits } from "@/components/landing/Benefits";
 import { Faq } from "@/components/landing/Faq";
+import { QuickQuote } from "@/components/landing/QuickQuote";
 import { Footer } from "@/components/landing/Footer";
 
 export const Route = createFileRoute("/")({

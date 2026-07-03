@@ -34,9 +34,9 @@ export function QuickQuote() {
     setLoading(true);
     try {
       await insertLead({
-        categoria: tipo,
-        origem: "home_quick_quote",
-        whatsapp: wa.replace(/\D/g, ""),
+        nome: "Lead rápido — home",
+        telefone: wa.replace(/\D/g, ""),
+        tipo_seguro: tipo,
         dados: { fonte: "form_home_dark_bar" },
       });
       toast.success("Recebemos seu contato! Vamos te chamar no WhatsApp.");
