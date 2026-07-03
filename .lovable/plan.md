@@ -1,130 +1,48 @@
-# Plano de expansão VALENT — 3 frentes
+## Objetivo
+Reformular o fluxo completo da VALENT alinhado aos 12 screens descritos, aplicando o design system (laranja #FF5722, azul marinho #0B1A30, verde WhatsApp #128C7E), atualizar contato para (21) 99762-5607, adicionar registro SUSEP 212126836 no rodapé, e polir home + wizard `/cotacao/auto` para bater com os mockups.
 
-Mantém identidade visual atual (laranja/branco, Header/Hero/Footer/TrustStrip/HowItWorks/Faq/Benefits) e componentes existentes. Nenhum cálculo real de seguro — tudo mock com comentário claro para integração futura.
+## Escopo
 
-## Ordem de execução
+### 1. Design tokens (`src/styles.css`)
+- Ajustar `--brand` para `#FF5722`, adicionar `--navy: #0B1A30`, `--wa-green: #128C7E`, `--surface-muted: #F5F7FA`.
+- Garantir tokens semânticos (`bg-navy`, `text-wa`, etc.) via `@theme inline`.
+- Bordas 8–12px e sombras suaves já existentes — revisar consistência.
 
-1. **Wizard completo Auto** (rota dedicada) — mais visível
-2. **Páginas de categoria** — reaproveitam template único
-3. **Supabase: leads + admin** — mínimo viável (tabela leads garantida)
+### 2. Branding / contato global
+- `Header`: telefone (21) 99762-5607 clicável (tel:) + botão WhatsApp verde.
+- `Footer`: telefone atualizado, adicionar linha "SUSEP nº 212126836".
+- `useContatoTelefone`: default seed = 5521997625607.
+- Migration: `UPDATE configuracoes SET valor='5521997625607' WHERE chave='whatsapp_telefone'` (mantém edição pelo admin).
 
----
+### 3. Home (`/`)
+- Remover os 2 botões laranja provisórios que coloquei no topo (o cliente só queria pra debug; agora entra o layout real).
+- Hero com headline "Proteção inteligente para o que realmente importa.", 4 value props em ícones (atendimento personalizado, top seguradoras, custo-benefício, acompanhamento passo a passo).
+- CategoryMenu como grid de 5 cards (Automóvel destacado com borda laranja, Residencial, Empresarial, Vida, Condomínio) — cada card navega para `/seguros/{slug}` e "Automóvel" abre `/cotacao/auto`.
+- CTA WhatsApp verde fixo/hero.
 
-## 1. Wizard de cotação Auto — `/cotacao/auto`
+### 4. Wizard `/cotacao/auto` — polimento das 12 telas
+Componentes já existem; ajustes visuais e de conteúdo:
+- **Stepper** no topo (telas 2–8 e 11) com ícones lineares + estado ativo laranja.
+- **Tela 1 (Home)** já cobre "Escolha do Seguro".
+- **Tela 2 Situação**: grid 2x2, card ativo com borda laranja + ícone laranja, botão "Continuar" full-width laranja (hoje avança on-click; adicionar botão explícito).
+- **Tela 3 Veículo**: layout 2 colunas com selects estilizados (Marca, Modelo, Ano fab, Ano mod, Versão, Placa opcional) + badge "Não se preocupe, seus dados estão seguros".
+- **Tela 4 Condutor**: inputs Nome/Nasc/CPF/CEP + selects Estado civil / Principal condutor + segmentado horizontal "Uso do veículo" (Particular/Trabalho/Aplicativo) com ícone laranja no selecionado.
+- **Tela 5 Prioridade**: 2x2 cards grandes + botão Continuar.
+- **Tela 6 Coberturas**: toggles iOS-style (já ok) + par de botões Voltar/Continuar.
+- **Tela 7 Resumo**: blocos bem definidos (Veículo / Condutor / Prioridade / Coberturas) + subtext "Ao enviar, nossos especialistas irão analisar…".
+- **Tela 8 Loading**: radar circular pulsante com ícone de carro + 3 colunas ("Análise personalizada", "Melhores seguradoras", "Proteção ideal") + faixa bege com CTA WhatsApp verde.
+- **Tela 9 Resultados**: layout com sidebar de filtros (Ordenar por, Tipo de cobertura, Franquia) + cards Porto/Azul/Allianz com preço e CTA laranja "Quero esta opção". Mock claramente comentado.
+- **Tela 10 Comparativo**: matrix grid com checks verdes; footer Voltar + "Escolher opção" laranja.
+- **Tela 11 Contato**: form Nome / WhatsApp mascarado / E-mail opcional + checkbox novidades + CTA "Receber minha cotação" + selo de segurança com cadeado.
+- **Tela 12 Sucesso**: fundo `--navy`, círculo laranja com check, 3 colunas de value props com ícones lineares laranjas, CTA WhatsApp verde grande, footer "Valent Seguros - Corretora & Consultoria de Seguros". Inserir lead em `leads` (já existe) mantido.
 
-Página inteira (não modal), com barra de progresso topo e navegação Voltar/Continuar. State machine self-contained em `QuoteAutoWizard.tsx`.
+### 5. Persistência de leads
+- Já existe `insertLead`. Garantir que Tela 11 grava lead com todos os dados coletados (veículo, condutor, prioridade, coberturas, seguradora escolhida) antes de mostrar Tela 12.
 
-**Novos arquivos:**
-- `src/routes/cotacao/auto.tsx` — rota, monta o wizard
-- `src/components/quote-auto/QuoteAutoWizard.tsx` — orquestrador + progresso
-- `src/components/quote-auto/steps/StepSituacao.tsx` (comprei / vou comprar / renovar / pesquisando — cards)
-- `src/components/quote-auto/steps/StepVeiculo.tsx` (marca, modelo, ano fab, ano modelo, versão, placa opcional — selects mockados; placa é placeholder visual, comentário `// MOCK FIPE/API paga`)
-- `src/components/quote-auto/steps/StepCondutor.tsx` (nome, nascimento, CPF, CEP, estado civil, uso)
-- `src/components/quote-auto/steps/StepPrioridade.tsx` (radio cards)
-- `src/components/quote-auto/steps/StepCoberturas.tsx` (toggles: reserva, vidros, terceiros, guincho 24h)
-- `src/components/quote-auto/steps/StepResumo.tsx`
-- `src/components/quote-auto/steps/StepLoadingAnalise.tsx`
-- `src/components/quote-auto/steps/StepResultados.tsx` (3 cards mock — Porto/Azul/Allianz, `// MOCK: substituir por API real de multicálculo`)
-- `src/components/quote-auto/steps/StepComparativo.tsx` (tabela lado a lado)
-- `src/components/quote-auto/steps/StepContatoFinal.tsx` (nome, WhatsApp, e-mail opcional; salva lead)
-- `src/components/quote-auto/steps/StepSucesso.tsx` (CTA WhatsApp com `wa.me/<telefone>?text=<resumo pré-preenchido>`)
-- `src/lib/quote-auto-data.ts` (marcas, modelos, mock quotes, tipos)
-- `src/lib/wa.ts` — helper `buildWhatsappUrl({phone, message})`
+## Fora de escopo
+- Cálculo real de seguro / API multicálculo (mantém mock comentado).
+- Novas tabelas no banco (apenas UPDATE em `configuracoes`).
+- Refatorar Admin (`/admin`) — mantém como está.
 
-CTA final: `wa.me/{telefone_configuracao}?text=` codificado com nome + veículo + prioridade.
-
-## 2. Páginas dedicadas de categoria
-
-Rotas: `/seguros/auto`, `/seguros/residencial`, `/seguros/empresarial`, `/seguros/vida`, `/seguros/condominio`.
-
-**Template único** parametrizado — edito só o config depois:
-
-- `src/components/category/CategoryPage.tsx` recebe `config: CategoryConfig`
-  - `<Header/>`, `<CategoryHero/>`, `<CoverageGrid/>` (cards expansíveis com Collapsible), `<PersonasSection/>` (3-4 cards), `<CategoryFaq/>` (Accordion), `<CategoryCTA/>` (grande, abre wizard), `<Footer/>`
-- `src/lib/category-configs.ts` — objeto `CATEGORY_CONFIGS: Record<slug, CategoryConfig>` com todo o copy (hero title/subtitle/badge, coverages[], personas[], faq[], ctaLabel, quoteHref)
-- Tipo `CategoryConfig` com todos os textos e ícones (referências Lucide por nome, resolvidos via mapa)
-- Rotas: 5 arquivos finos `src/routes/seguros/{slug}.tsx` que importam o template + config correto e definem `head()` com título/descrição próprios.
-
-Categoria Auto: `ctaHref = "/cotacao/auto"`. Outras: abrem `QuoteWizardDialog` existente com `defaultCategory`.
-
-`CategoryMenu` atualizado: cada item vira `<Link to="/seguros/$slug">` (via `Link` do TanStack). Item Carro continua exibindo ícone destacado; agora navega para a página em vez de abrir modal.
-
-## 3. Backend: Leads + Admin (Supabase / Lovable Cloud)
-
-Habilita Lovable Cloud (`supabase--enable`).
-
-**Migrations:**
-
-```sql
-create table public.leads (
-  id uuid primary key default gen_random_uuid(),
-  nome text not null,
-  telefone text not null,
-  email text,
-  tipo_seguro text not null,
-  dados jsonb not null default '{}'::jsonb,
-  status text not null default 'novo',
-  created_at timestamptz not null default now()
-);
-grant insert on public.leads to anon;
-grant select, update, insert on public.leads to authenticated;
-grant all on public.leads to service_role;
-alter table public.leads enable row level security;
-create policy "anon insere leads" on public.leads for insert to anon with check (true);
-create policy "auth le leads" on public.leads for select to authenticated using (true);
-create policy "auth atualiza leads" on public.leads for update to authenticated using (true);
-
-create table public.configuracoes (
-  chave text primary key,
-  valor text not null,
-  updated_at timestamptz not null default now()
-);
-grant select on public.configuracoes to anon, authenticated;
-grant all on public.configuracoes to authenticated, service_role;
-alter table public.configuracoes enable row level security;
-create policy "todos leem config" on public.configuracoes for select using (true);
-create policy "auth escreve config" on public.configuracoes for all to authenticated using (true) with check (true);
-insert into public.configuracoes (chave, valor) values ('telefone_contato','5511999999999') on conflict do nothing;
-
-create table public.promocoes (
-  id uuid primary key default gen_random_uuid(),
-  titulo text not null,
-  descricao text,
-  imagem_url text,
-  link text,
-  valido_ate date,
-  ativo boolean not null default true,
-  created_at timestamptz not null default now()
-);
-grant select on public.promocoes to anon, authenticated;
-grant all on public.promocoes to authenticated, service_role;
-alter table public.promocoes enable row level security;
-create policy "publico le promocoes ativas" on public.promocoes for select using (ativo = true);
-create policy "auth gerencia promocoes" on public.promocoes for all to authenticated using (true) with check (true);
-```
-
-**Rotas:**
-- `/admin/login` (pública) — email+senha via `supabase.auth.signInWithPassword`, sem link de cadastro. Instrução no rodapé: "Crie o primeiro admin no painel Lovable Cloud → Users".
-- `/_authenticated/admin/index.tsx` — dashboard com tabs: **Leads** (tabela + filtro por status + botão marcar como contatado/perdido/ganho), **Promoções** (CRUD simples), **Configurações** (edita `telefone_contato`).
-
-**Componentes:**
-- `src/components/admin/LeadsTable.tsx`, `PromocoesManager.tsx`, `ConfigForm.tsx`
-- `src/components/landing/PromoBanner.tsx` — carrega promoções ativas via Supabase publishable e exibe carrossel simples na home (acima de CategoryMenu).
-
-**Inserção de lead:** função helper `src/lib/leads.ts::insertLead(payload)` usando `supabase` publishable client (RLS permite anon insert). Chamada no `StepContatoFinal` do wizard Auto e no `StepContact` do wizard modal simplificado das outras categorias. Falha de rede → toast erro, mas NÃO bloqueia o fluxo para WhatsApp.
-
-**CTAs do site** (Header WhatsApp, Hero, footer) leem `telefone_contato` de `configuracoes` via query cacheada (hook `useContatoTelefone`), fallback hardcoded.
-
-## Ordem final de commits
-
-1. Habilitar Lovable Cloud + migrations (leads/configuracoes/promocoes)
-2. `wa.ts`, `leads.ts`, `useContatoTelefone`
-3. Wizard Auto completo + rota `/cotacao/auto`
-4. Template categoria + 5 rotas + configs + atualizar `CategoryMenu` para Link
-5. Rotas admin (`/admin/login`, `/_authenticated/admin`) + PromoBanner na home
-
-## Fora de escopo (explícito)
-
-- Cálculo real de seguro, integração FIPE, API multicálculo real (todos marcados `// MOCK`)
-- Cadastro público de admin (feito manualmente no painel Cloud)
-- Upload de imagem de promoção (usa URL colada; Storage fica para depois se pedirem)
+## Entrega
+Uma única leva de edits em paralelo (tokens + componentes + steps + home) + 1 migration curta para o telefone. Depois disso o preview deve refletir os 12 screens.
