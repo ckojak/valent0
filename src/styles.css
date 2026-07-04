@@ -46,6 +46,7 @@
   --color-navy: var(--navy);
   --color-navy-foreground: var(--navy-foreground);
   --color-wa: var(--wa);
+  --color-surface-muted: var(--surface-muted);
 }
 
 :root {
