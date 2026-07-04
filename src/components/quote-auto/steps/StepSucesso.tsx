@@ -39,7 +39,7 @@ export function StepSucesso({
   const firstName = contato.nome.split(" ")[0] ?? "";
 
   return (
-    <div className="-mx-4 -my-8 rounded-none bg-[#0B1A30] px-6 py-14 text-center text-white sm:mx-0 sm:my-0 sm:rounded-3xl">
+    <div className="-mx-4 -my-8 rounded-none bg-navy px-6 py-14 text-center text-white sm:mx-0 sm:my-0 sm:rounded-3xl">
       <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-brand text-white shadow-[0_10px_40px_-10px_oklch(0.7_0.19_47/0.7)]">
         <CheckCircle2 className="h-10 w-10" strokeWidth={2.2} />
       </div>
