@@ -59,8 +59,8 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.2 0.02 50);
 
-  /* Vibrant Orange #F97316 */
-  --brand: oklch(0.7 0.19 47);
+  /* Vibrant Orange #FF5722 */
+  --brand: oklch(0.679 0.213 36.5); /* #FF5722 */
   --brand-foreground: oklch(1 0 0);
   --brand-soft: oklch(0.97 0.03 60);
 
