@@ -67,7 +67,7 @@ export function StepSucesso({
           href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#128C7E] text-base font-bold text-white shadow-lg transition hover:brightness-110"
+          className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-wa text-base font-bold text-white shadow-lg transition hover:brightness-110"
         >
           <MessageCircle className="h-5 w-5" />
           Falar no WhatsApp
