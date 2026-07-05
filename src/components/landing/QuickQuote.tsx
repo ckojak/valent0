@@ -51,8 +51,8 @@ export function QuickQuote() {
   }
 
   return (
-    <section id="contato" className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
-      <div className="rounded-3xl bg-navy p-6 text-navy-foreground shadow-2xl sm:p-10">
+    <section id="contato" className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+      <div className="rounded-3xl bg-navy p-5 text-navy-foreground shadow-2xl sm:p-7">
         <div className="grid grid-cols-1 items-end gap-6 lg:grid-cols-[1.1fr_1fr_1fr_auto]">
           <div>
             <h3 className="font-display text-2xl font-extrabold leading-tight sm:text-3xl">
