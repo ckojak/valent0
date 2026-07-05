@@ -21,17 +21,18 @@ export function Footer() {
         <div>
           <h4 className="font-display text-sm font-bold text-foreground">Empresa</h4>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li><a href="#" className="hover:text-brand">Sobre nós</a></li>
-            <li><a href="#" className="hover:text-brand">Atendimento</a></li>
-            <li><a href="#" className="hover:text-brand">Imprensa</a></li>
+            <li><a href="/sobre" className="hover:text-brand">Sobre nós</a></li>
+            <li><a href="/atendimento" className="hover:text-brand">Atendimento</a></li>
+            <li><a href="/empresas" className="hover:text-brand">Para empresas</a></li>
           </ul>
         </div>
         <div>
           <h4 className="font-display text-sm font-bold text-foreground">Legal</h4>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li><a href="#" className="hover:text-brand">Termos de uso</a></li>
-            <li><a href="#" className="hover:text-brand">Privacidade (LGPD)</a></li>
-            <li><a href="#" className="hover:text-brand">Cookies</a></li>
+            <li><a href="/termos-de-uso" className="hover:text-brand">Termos de uso</a></li>
+            <li><a href="/privacidade" className="hover:text-brand">Privacidade (LGPD)</a></li>
+            <li><a href="/cookies" className="hover:text-brand">Cookies</a></li>
+            <li><a href="/conduta" className="hover:text-brand">Código de conduta</a></li>
           </ul>
         </div>
       </div>
