@@ -17,21 +17,21 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-brand-soft/40 via-background to-background">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 pt-6 pb-8 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:px-8 lg:pt-8 lg:pb-10">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 pt-4 pb-5 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:px-8 lg:pt-4 lg:pb-5">
         {/* Left: copy */}
         <div className="flex flex-col justify-center">
-          <h1 className="font-display text-3xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+          <h1 className="font-display text-2xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-3xl lg:text-4xl">
             Proteção inteligente para o que realmente <span className="text-brand">importa.</span>
           </h1>
-          <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
+          <p className="mt-2 max-w-xl text-sm text-muted-foreground">
             Na Valent Seguros você encontra as melhores opções de seguros com análise personalizada, comparação
             entre seguradoras e atendimento especializado.
           </p>
 
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <Link
               to="/cotacao/auto"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-brand px-6 text-sm font-bold uppercase tracking-wide text-brand-foreground shadow-[0_14px_32px_-14px_oklch(0.7_0.19_47/0.75)] transition hover:brightness-110"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand px-6 text-sm font-bold uppercase tracking-wide text-brand-foreground shadow-[0_14px_32px_-14px_oklch(0.7_0.19_47/0.75)] transition hover:brightness-110"
             >
               Quero cotar meu seguro
               <ArrowRight className="h-4 w-4" />
@@ -40,7 +40,7 @@ export function Hero() {
               href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border-2 border-border bg-background px-6 text-sm font-bold uppercase tracking-wide text-foreground transition hover:border-brand hover:text-brand"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border-2 border-border bg-background px-6 text-sm font-bold uppercase tracking-wide text-foreground transition hover:border-brand hover:text-brand"
             >
               <MessageCircle className="h-4 w-4 text-[oklch(0.55_0.11_165)]" />
               Falar com especialista
@@ -50,7 +50,7 @@ export function Hero() {
 
         {/* Right: image + overlay card */}
         <div className="relative">
-          <div className="relative h-[220px] overflow-hidden rounded-3xl bg-muted shadow-[0_30px_60px_-30px_oklch(0.2_0.05_60/0.35)] sm:h-[280px] lg:h-[340px]">
+          <div className="relative h-[150px] overflow-hidden rounded-3xl bg-muted shadow-[0_30px_60px_-30px_oklch(0.2_0.05_60/0.35)] sm:h-[190px] lg:h-[240px]">
             <img
               src={heroImg}
               alt="Família feliz protegida pela Valent Seguros"
@@ -59,14 +59,14 @@ export function Hero() {
               className="h-full w-full object-cover"
             />
           </div>
-          <div className="absolute right-4 top-1/2 hidden w-64 -translate-y-1/2 rounded-2xl bg-navy p-5 text-navy-foreground shadow-2xl sm:right-6 sm:block md:w-72 lg:right-[-16px]">
-            <ul className="flex flex-col gap-4">
+          <div className="absolute right-4 top-1/2 hidden w-64 -translate-y-1/2 rounded-2xl bg-navy p-4 text-navy-foreground shadow-2xl sm:right-6 sm:block md:w-72 lg:right-[-16px]">
+            <ul className="flex flex-col gap-3">
               {CARD_ITEMS.map(({ icon: Icon, label, label2 }) => (
                 <li key={label} className="flex items-start gap-3">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white/5 text-brand ring-1 ring-white/10">
-                    <Icon className="h-4.5 w-4.5" />
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/5 text-brand ring-1 ring-white/10">
+                    <Icon className="h-4 w-4" />
                   </span>
-                  <span className="text-sm leading-tight text-white/95">
+                  <span className="text-xs leading-tight text-white/95">
                     {label}
                     <br />
                     {label2}
