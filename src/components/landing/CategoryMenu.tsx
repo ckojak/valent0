@@ -18,17 +18,17 @@ const CATS: Cat[] = [
 
 export function CategoryMenu() {
   return (
-    <section id="categorias" className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+    <section id="categorias" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <h2 className="text-center font-display text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
         Encontre o seguro <span className="text-brand">ideal</span> para você
       </h2>
 
-      <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {CATS.map(({ icon: Icon, title, desc, href }) => (
           <Link
             key={title}
             to={href}
-            className="group flex min-h-[220px] flex-col rounded-2xl border bg-card p-6 shadow-[0_10px_30px_-18px_oklch(0.2_0.05_60/0.25)] transition hover:-translate-y-1 hover:border-brand/40 hover:shadow-[0_18px_40px_-18px_oklch(0.7_0.19_47/0.35)]"
+            className="group flex min-h-[160px] flex-col rounded-2xl border bg-card p-5 shadow-[0_10px_30px_-18px_oklch(0.2_0.05_60/0.25)] transition hover:-translate-y-1 hover:border-brand/40 hover:shadow-[0_18px_40px_-18px_oklch(0.7_0.19_47/0.35)]"
           >
             <span className="grid h-12 w-12 place-items-center rounded-xl text-brand">
               <Icon className="h-9 w-9" strokeWidth={1.8} />
