@@ -9,6 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
+import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as CookiesRouteImport } from './routes/cookies'
+import { Route as CondutaRouteImport } from './routes/conduta'
+import { Route as AtendimentoRouteImport } from './routes/atendimento'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SegurosSlugRouteImport } from './routes/seguros/$slug'
@@ -16,6 +23,41 @@ import { Route as CotacaoAutoRouteImport } from './routes/cotacao/auto'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 
+const TermosDeUsoRoute = TermosDeUsoRouteImport.update({
+  id: '/termos-de-uso',
+  path: '/termos-de-uso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SobreRoute = SobreRouteImport.update({
+  id: '/sobre',
+  path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmpresasRoute = EmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CondutaRoute = CondutaRouteImport.update({
+  id: '/conduta',
+  path: '/conduta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtendimentoRoute = AtendimentoRouteImport.update({
+  id: '/atendimento',
+  path: '/atendimento',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -48,6 +90,13 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/atendimento': typeof AtendimentoRoute
+  '/conduta': typeof CondutaRoute
+  '/cookies': typeof CookiesRoute
+  '/empresas': typeof EmpresasRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/sobre': typeof SobreRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/seguros/$slug': typeof SegurosSlugRoute
@@ -55,6 +104,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atendimento': typeof AtendimentoRoute
+  '/conduta': typeof CondutaRoute
+  '/cookies': typeof CookiesRoute
+  '/empresas': typeof EmpresasRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/sobre': typeof SobreRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/seguros/$slug': typeof SegurosSlugRoute
@@ -64,6 +120,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/atendimento': typeof AtendimentoRoute
+  '/conduta': typeof CondutaRoute
+  '/cookies': typeof CookiesRoute
+  '/empresas': typeof EmpresasRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/sobre': typeof SobreRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/seguros/$slug': typeof SegurosSlugRoute
@@ -73,16 +136,42 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/atendimento'
+    | '/conduta'
+    | '/cookies'
+    | '/empresas'
+    | '/privacidade'
+    | '/sobre'
+    | '/termos-de-uso'
     | '/admin/login'
     | '/cotacao/auto'
     | '/seguros/$slug'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin/login' | '/cotacao/auto' | '/seguros/$slug' | '/admin'
+  to:
+    | '/'
+    | '/atendimento'
+    | '/conduta'
+    | '/cookies'
+    | '/empresas'
+    | '/privacidade'
+    | '/sobre'
+    | '/termos-de-uso'
+    | '/admin/login'
+    | '/cotacao/auto'
+    | '/seguros/$slug'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/atendimento'
+    | '/conduta'
+    | '/cookies'
+    | '/empresas'
+    | '/privacidade'
+    | '/sobre'
+    | '/termos-de-uso'
     | '/admin/login'
     | '/cotacao/auto'
     | '/seguros/$slug'
@@ -92,6 +181,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AtendimentoRoute: typeof AtendimentoRoute
+  CondutaRoute: typeof CondutaRoute
+  CookiesRoute: typeof CookiesRoute
+  EmpresasRoute: typeof EmpresasRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
+  SobreRoute: typeof SobreRoute
+  TermosDeUsoRoute: typeof TermosDeUsoRoute
   AdminLoginRoute: typeof AdminLoginRoute
   CotacaoAutoRoute: typeof CotacaoAutoRoute
   SegurosSlugRoute: typeof SegurosSlugRoute
@@ -99,6 +195,55 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos-de-uso': {
+      id: '/termos-de-uso'
+      path: '/termos-de-uso'
+      fullPath: '/termos-de-uso'
+      preLoaderRoute: typeof TermosDeUsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sobre': {
+      id: '/sobre'
+      path: '/sobre'
+      fullPath: '/sobre'
+      preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/empresas': {
+      id: '/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conduta': {
+      id: '/conduta'
+      path: '/conduta'
+      fullPath: '/conduta'
+      preLoaderRoute: typeof CondutaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/atendimento': {
+      id: '/atendimento'
+      path: '/atendimento'
+      fullPath: '/atendimento'
+      preLoaderRoute: typeof AtendimentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -158,6 +303,13 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AtendimentoRoute: AtendimentoRoute,
+  CondutaRoute: CondutaRoute,
+  CookiesRoute: CookiesRoute,
+  EmpresasRoute: EmpresasRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
+  SobreRoute: SobreRoute,
+  TermosDeUsoRoute: TermosDeUsoRoute,
   AdminLoginRoute: AdminLoginRoute,
   CotacaoAutoRoute: CotacaoAutoRoute,
   SegurosSlugRoute: SegurosSlugRoute,
