@@ -16,8 +16,8 @@ function formatPhoneDisplay(digits: string): string {
 const NAV = [
   { label: "Início", href: "/" as const },
   { label: "Seguros", href: "/#categorias" as const, hasCaret: true },
-  { label: "Empresas", href: "/seguros/empresarial" as const },
-  { label: "Sobre a Valent", href: "/#sobre" as const },
+  { label: "Empresas", href: "/empresas" as const },
+  { label: "Sobre a Valent", href: "/sobre" as const },
   { label: "Contato", href: "/#contato" as const },
 ];
 
@@ -28,14 +28,14 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-30 w-full border-b bg-background/90 backdrop-blur">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <a href="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="relative grid h-11 w-11 place-items-center rounded-2xl bg-brand text-brand-foreground shadow-[0_6px_18px_-6px_oklch(0.7_0.19_47/0.55)]">
+          <div className="relative grid h-10 w-10 place-items-center rounded-2xl bg-brand text-brand-foreground shadow-[0_6px_18px_-6px_oklch(0.7_0.19_47/0.55)]">
             <Home className="h-5 w-5" strokeWidth={2.4} />
           </div>
           <div className="flex flex-col leading-none">
-            <span className="font-display text-2xl font-extrabold tracking-tight text-brand">
+            <span className="font-display text-xl font-extrabold tracking-tight text-brand">
               VALENT
             </span>
             <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
@@ -71,7 +71,7 @@ export function Header() {
           </a>
           <Link
             to="/cotacao/auto"
-            className="hidden h-11 items-center rounded-xl bg-brand px-5 text-sm font-bold uppercase tracking-wide text-brand-foreground shadow-[0_10px_24px_-10px_oklch(0.7_0.19_47/0.7)] transition hover:brightness-110 sm:inline-flex"
+            className="hidden h-10 items-center rounded-xl bg-brand px-5 text-sm font-bold uppercase tracking-wide text-brand-foreground shadow-[0_10px_24px_-10px_oklch(0.7_0.19_47/0.7)] transition hover:brightness-110 sm:inline-flex"
           >
             Faça sua cotação
           </Link>
