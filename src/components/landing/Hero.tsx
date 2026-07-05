@@ -50,7 +50,7 @@ export function Hero() {
 
         {/* Right: image + overlay card */}
         <div className="relative">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-muted shadow-[0_30px_60px_-30px_oklch(0.2_0.05_60/0.35)] lg:aspect-[16/10]">
+          <div className="relative h-[220px] overflow-hidden rounded-3xl bg-muted shadow-[0_30px_60px_-30px_oklch(0.2_0.05_60/0.35)] sm:h-[280px] lg:h-[340px]">
             <img
               src={heroImg}
               alt="Família feliz protegida pela Valent Seguros"
