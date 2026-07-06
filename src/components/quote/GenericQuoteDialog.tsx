@@ -4,6 +4,8 @@ import { ArrowRight, Lock, CheckCircle2, type LucideIcon } from "lucide-react";
 import { insertLead } from "@/lib/leads";
 import { useContatoTelefone } from "@/hooks/use-contato-telefone";
 import { buildWhatsappUrl } from "@/lib/wa";
+import { QUICK_QUESTIONS } from "@/lib/quote-quick-questions";
+import type { CategorySlug } from "@/lib/category-configs";
 
 function maskWhats(v: string): string {
   const d = v.replace(/\D/g, "").slice(0, 11);
@@ -21,16 +23,20 @@ export function GenericQuoteDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  slug: string;
+  slug: CategorySlug;
   eyebrow: string;
   icon: LucideIcon;
 }) {
   const [nome, setNome] = useState("");
   const [wa, setWa] = useState("");
   const [email, setEmail] = useState("");
+  const [mensagem, setMensagem] = useState("");
+  const [respostas, setRespostas] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const telefone = useContatoTelefone();
+
+  const perguntas = QUICK_QUESTIONS[slug] ?? [];
 
   const waUrl = buildWhatsappUrl(
     telefone,
@@ -41,6 +47,8 @@ export function GenericQuoteDialog({
     setNome("");
     setWa("");
     setEmail("");
+    setMensagem("");
+    setRespostas({});
     setDone(false);
   }
 
@@ -53,7 +61,7 @@ export function GenericQuoteDialog({
       telefone: wa.replace(/\D/g, ""),
       email: email.trim() || null,
       tipo_seguro: slug,
-      dados: { fonte: "modal_categoria" },
+      dados: { fonte: "modal_categoria", respostas, mensagem: mensagem.trim() || null },
     });
     setLoading(false);
     if (res.ok) setDone(true);
@@ -67,7 +75,7 @@ export function GenericQuoteDialog({
         if (!o) setTimeout(reset, 200);
       }}
     >
-      <DialogContent className="w-[calc(100%-1rem)] max-w-md overflow-hidden rounded-3xl border-0 bg-background p-0 shadow-2xl">
+      <DialogContent className="max-h-[90vh] w-[calc(100%-1rem)] max-w-md overflow-y-auto rounded-3xl border-0 bg-background p-0 shadow-2xl">
         <DialogTitle className="sr-only">Cotação de {eyebrow}</DialogTitle>
         <DialogDescription className="sr-only">
           Preencha seus dados para receber uma cotação de {eyebrow.toLowerCase()}.
@@ -101,32 +109,69 @@ export function GenericQuoteDialog({
               Receba sua cotação
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Preencha seus dados que um especialista te chama no WhatsApp.
+              Responda rapidinho que um especialista te chama no WhatsApp.
             </p>
 
-            <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3">
-              <input
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                placeholder="Nome completo"
-                required
-                className="h-12 rounded-xl border px-4 text-sm outline-none focus:border-brand"
-              />
-              <input
-                value={wa}
-                onChange={(e) => setWa(maskWhats(e.target.value))}
-                placeholder="(11) 99999-9999"
-                inputMode="numeric"
-                required
-                className="h-12 rounded-xl border px-4 text-sm outline-none focus:border-brand"
-              />
-              <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                type="email"
-                placeholder="E-mail (opcional)"
-                className="h-12 rounded-xl border px-4 text-sm outline-none focus:border-brand"
-              />
+            <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4">
+              {perguntas.map((q) => (
+                <div key={q.key}>
+                  <label className="mb-1.5 block text-xs font-semibold text-foreground">{q.label}</label>
+                  <div className="flex flex-wrap gap-2">
+                    {q.options.map((opt) => {
+                      const selected = respostas[q.key] === opt;
+                      return (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() =>
+                            setRespostas((r) => ({ ...r, [q.key]: selected ? "" : opt }))
+                          }
+                          className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                            selected
+                              ? "border-brand bg-brand text-brand-foreground"
+                              : "border-border bg-background text-foreground hover:border-brand/50"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+
+              <div className="flex flex-col gap-3 border-t pt-4">
+                <input
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Nome completo"
+                  required
+                  className="h-12 rounded-xl border px-4 text-sm outline-none focus:border-brand"
+                />
+                <input
+                  value={wa}
+                  onChange={(e) => setWa(maskWhats(e.target.value))}
+                  placeholder="(11) 99999-9999"
+                  inputMode="numeric"
+                  required
+                  className="h-12 rounded-xl border px-4 text-sm outline-none focus:border-brand"
+                />
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  type="email"
+                  placeholder="E-mail (opcional)"
+                  className="h-12 rounded-xl border px-4 text-sm outline-none focus:border-brand"
+                />
+                <textarea
+                  value={mensagem}
+                  onChange={(e) => setMensagem(e.target.value)}
+                  placeholder="Conte rapidamente o que você precisa (opcional)"
+                  rows={2}
+                  className="resize-none rounded-xl border px-4 py-3 text-sm outline-none focus:border-brand"
+                />
+              </div>
+
               <button
                 type="submit"
                 disabled={loading}
