@@ -14,7 +14,7 @@ import {
 import { ChevronDown, ChevronRight, MessageCircle } from "lucide-react";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
-import { QuoteWizardDialog } from "@/components/quote/QuoteWizardDialog";
+import { GenericQuoteDialog } from "@/components/quote/GenericQuoteDialog";
 import type { CategoryConfig } from "@/lib/category-configs";
 import { useContatoTelefone } from "@/hooks/use-contato-telefone";
 import { buildWhatsappUrl } from "@/lib/wa";
@@ -45,7 +45,13 @@ export function CategoryPage({ config }: { config: CategoryConfig }) {
         <CategoryCTA config={config} onQuote={openQuote} />
       </main>
       <Footer />
-      <QuoteWizardDialog open={wizardOpen} onOpenChange={setWizardOpen} />
+      <GenericQuoteDialog
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        slug={config.slug}
+        eyebrow={config.eyebrow}
+        icon={Icon}
+      />
     </div>
   );
 }
