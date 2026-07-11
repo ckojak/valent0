@@ -5,10 +5,14 @@ import { CATEGORY_CONFIGS, isCategorySlug } from "@/lib/category-configs";
 export const Route = createFileRoute("/seguros/$slug")({
   loader: ({ params }) => {
     if (!isCategorySlug(params.slug)) throw notFound();
-    return { config: CATEGORY_CONFIGS[params.slug] };
+    // Só o slug (string) atravessa a fronteira servidor→cliente.
+    // O objeto de config completo (que tem componentes de ícone React,
+    // não serializáveis) é resolvido depois, direto no componente.
+    return { slug: params.slug };
   },
   head: ({ loaderData }) => {
-    const c = loaderData?.config;
+    const slug = loaderData?.slug;
+    const c = slug ? CATEGORY_CONFIGS[slug] : undefined;
     if (!c) return { meta: [{ title: "Categoria não encontrada — VALENT" }] };
     return {
       meta: [
@@ -40,6 +44,7 @@ export const Route = createFileRoute("/seguros/$slug")({
 });
 
 function SegurosCategoria() {
-  const { config } = Route.useLoaderData();
+  const { slug } = Route.useLoaderData();
+  const config = CATEGORY_CONFIGS[slug];
   return <CategoryPage config={config} />;
 }
