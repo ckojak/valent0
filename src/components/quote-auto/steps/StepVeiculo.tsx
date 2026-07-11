@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Car, ChevronLeft, ChevronRight, Info } from "lucide-react";
+import { Car, ChevronLeft, ChevronRight, Info, KeyRound, PencilLine } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -34,6 +34,8 @@ export function StepVeiculo({
 }) {
   const [data, setData] = useState<VeiculoData>(initial);
   const [errors, setErrors] = useState<Partial<Record<keyof VeiculoData, string>>>({});
+  // Placa é o caminho principal. "manual" só aparece se a pessoa não tiver a placa em mãos.
+  const [mode, setMode] = useState<"placa" | "manual">(initial.marca ? "manual" : "placa");
 
   const modelos = useMemo(
     () => (data.marca ? (MODELOS_POR_MARCA[data.marca] ?? []) : []),
@@ -45,7 +47,18 @@ export function StepVeiculo({
     setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submitPlaca = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (data.placa.replace(/[^A-Z0-9]/gi, "").length < 7) {
+      setErrors({ placa: "Digite a placa completa." });
+      return;
+    }
+    // MOCK: consulta de placa (API paga de terceiros) ainda não integrada.
+    // Quando a API estiver disponível, marca/modelo/ano virão preenchidos aqui.
+    onNext(data);
+  };
+
+  const submitManual = (e: React.FormEvent) => {
     e.preventDefault();
     const next: typeof errors = {};
     if (!data.marca) next.marca = "Selecione a marca.";
@@ -57,12 +70,79 @@ export function StepVeiculo({
     if (Object.keys(next).length === 0) onNext(data);
   };
 
+  if (mode === "placa") {
+    return (
+      <form onSubmit={submitPlaca} className="flex flex-col gap-5">
+        <div className="flex items-center gap-2 text-sm font-medium text-brand">
+          <Car className="h-4 w-4" />
+          Sobre o seu veículo
+        </div>
+
+        <div>
+          <Label htmlFor="placa">Placa do veículo</Label>
+          <div className="relative mt-1.5">
+            <KeyRound className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="placa"
+              placeholder="ABC-1D23"
+              value={data.placa}
+              onChange={(e) => set("placa", formatPlaca(e.target.value))}
+              className="h-12 pl-10 text-center text-lg uppercase tracking-[0.2em]"
+              maxLength={8}
+              autoFocus
+            />
+          </div>
+          {errors.placa && <p className="mt-1 text-xs text-destructive">{errors.placa}</p>}
+          <p className="mt-1.5 flex items-start gap-1.5 text-xs text-muted-foreground">
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            Com a placa, buscamos os dados do seu veículo automaticamente.
+          </p>
+        </div>
+
+        <div className="flex flex-col-reverse gap-2 sm:flex-row">
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex h-12 items-center justify-center gap-1 rounded-xl border bg-background px-4 text-sm font-medium text-foreground transition hover:bg-accent sm:w-1/3"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Voltar
+          </button>
+          <button
+            type="submit"
+            className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-brand text-base font-semibold text-brand-foreground shadow-sm transition hover:bg-cta-hover"
+          >
+            Continuar <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setMode("manual")}
+          className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-muted-foreground underline-offset-2 hover:text-brand hover:underline"
+        >
+          <PencilLine className="h-3.5 w-3.5" />
+          Não tenho a placa em mãos — quero informar manualmente
+        </button>
+      </form>
+    );
+  }
+
   return (
-    <form onSubmit={submit} className="flex flex-col gap-5">
+    <form onSubmit={submitManual} className="flex flex-col gap-5">
       <div className="flex items-center gap-2 text-sm font-medium text-brand">
         <Car className="h-4 w-4" />
         Sobre o seu veículo
       </div>
+
+      <button
+        type="button"
+        onClick={() => setMode("placa")}
+        className="inline-flex w-fit items-center gap-1.5 text-xs font-medium text-muted-foreground underline-offset-2 hover:text-brand hover:underline"
+      >
+        <KeyRound className="h-3.5 w-3.5" />
+        Prefiro informar a placa
+      </button>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
@@ -121,21 +201,15 @@ export function StepVeiculo({
         </div>
 
         <div className="sm:col-span-2">
-          <Label htmlFor="placa">Placa <span className="text-xs font-normal text-muted-foreground">(opcional)</span></Label>
-          {/* MOCK: campo visual pronto para futura integração com API paga
-              (FIPE / consulta de placa de terceiros). Nenhum autopreenchimento aqui. */}
+          <Label htmlFor="placa-manual">Placa <span className="text-xs font-normal text-muted-foreground">(opcional)</span></Label>
           <Input
-            id="placa"
+            id="placa-manual"
             placeholder="ABC-1D23"
             value={data.placa}
             onChange={(e) => set("placa", formatPlaca(e.target.value))}
             className="mt-1.5 h-11 uppercase tracking-wider"
             maxLength={8}
           />
-          <p className="mt-1.5 flex items-start gap-1.5 text-xs text-muted-foreground">
-            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            Informar a placa acelera a cotação, mas não é obrigatório.
-          </p>
         </div>
       </div>
 
