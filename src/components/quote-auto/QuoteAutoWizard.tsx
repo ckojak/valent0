@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ShieldCheck } from "lucide-react";
 
 import { StepSituacao } from "./steps/StepSituacao";
@@ -9,17 +9,9 @@ import { StepCondutor, type CondutorData } from "./steps/StepCondutor";
 import { StepPrioridade } from "./steps/StepPrioridade";
 import { StepCoberturas, type CoberturasData } from "./steps/StepCoberturas";
 import { StepResumo } from "./steps/StepResumo";
-import { StepLoadingAnalise } from "./steps/StepLoadingAnalise";
-import { StepResultados } from "./steps/StepResultados";
-import { StepComparativo } from "./steps/StepComparativo";
-import { StepContatoFinal, type ContatoFinalData } from "./steps/StepContatoFinal";
-import { StepSucesso } from "./steps/StepSucesso";
-import {
-  generateAutoQuotes,
-  type QuoteAuto,
-  type Situacao,
-  type Prioridade,
-} from "@/lib/quote-auto-data";
+import { StepWhatsapp } from "./steps/StepWhatsapp";
+import { StepCotacaoReal } from "./steps/StepCotacaoReal";
+import type { Situacao, Prioridade } from "@/lib/quote-auto-data";
 import { insertLead } from "@/lib/leads";
 
 type Stage =
@@ -29,11 +21,8 @@ type Stage =
   | "prioridade"
   | "coberturas"
   | "resumo"
-  | "loading"
-  | "resultados"
-  | "comparativo"
-  | "contato"
-  | "sucesso";
+  | "whatsapp"
+  | "cotacao";
 
 const STAGE_ORDER: Stage[] = [
   "situacao",
@@ -42,11 +31,8 @@ const STAGE_ORDER: Stage[] = [
   "prioridade",
   "coberturas",
   "resumo",
-  "loading",
-  "resultados",
-  "comparativo",
-  "contato",
-  "sucesso",
+  "whatsapp",
+  "cotacao",
 ];
 
 const emptyVeiculo: VeiculoData = {
@@ -73,20 +59,15 @@ const emptyCoberturas: CoberturasData = {
 };
 
 export function QuoteAutoWizard() {
-  const navigate = useNavigate();
   const [stage, setStage] = useState<Stage>("situacao");
   const [situacao, setSituacao] = useState<Situacao | null>(null);
   const [veiculo, setVeiculo] = useState<VeiculoData>(emptyVeiculo);
   const [condutor, setCondutor] = useState<CondutorData>(emptyCondutor);
   const [prioridade, setPrioridade] = useState<Prioridade | null>(null);
   const [coberturas, setCoberturas] = useState<CoberturasData>(emptyCoberturas);
-  const [quotes, setQuotes] = useState<QuoteAuto[]>([]);
-  const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null);
-  const [contato, setContato] = useState<ContatoFinalData | null>(null);
 
   const stepIndex = STAGE_ORDER.indexOf(stage);
-  const visibleSteps = STAGE_ORDER.length - 1; // esconde "sucesso" da contagem
-  const progress = Math.min(100, Math.round(((stepIndex + 1) / visibleSteps) * 100));
+  const progress = Math.min(100, Math.round(((stepIndex + 1) / STAGE_ORDER.length) * 100));
 
   const goTo = (s: Stage) => setStage(s);
   const back = () => {
@@ -94,51 +75,32 @@ export function QuoteAutoWizard() {
     if (idx > 0) setStage(STAGE_ORDER[idx - 1]);
   };
 
-  const runAnalise = () => {
-    setStage("loading");
-    // MOCK: aguardar 2.5s simula a chamada ao multicálculo real.
-    setTimeout(() => {
-      const seed = `${veiculo.marca}-${veiculo.modelo}-${veiculo.ano_mod}-${condutor.cpf}`;
-      setQuotes(generateAutoQuotes(seed));
-      setStage("resultados");
-    }, 2500);
-  };
-
-  const handleContatoSubmit = async (data: ContatoFinalData) => {
-    setContato(data);
+  const handleWhatsappSubmit = async (telefone: string) => {
     const payload = {
-      nome: data.nome,
-      telefone: data.telefone,
-      email: data.email || null,
+      nome: condutor.nome || "Lead cotação auto",
+      telefone,
       tipo_seguro: "auto",
       dados: {
         situacao,
         veiculo,
-        condutor: { ...condutor, cpf: `***${condutor.cpf.slice(-4)}` }, // não gravar CPF completo em jsonb
+        condutor: { ...condutor, cpf: condutor.cpf ? `***${condutor.cpf.slice(-4)}` : "" },
         prioridade,
         coberturas,
-        quote_escolhida_id: selectedQuoteId,
-        quotes_mock: quotes.map((q) => ({
-          id: q.id,
-          seguradora: q.seguradora,
-          premio_total: q.premio_total,
-        })),
+        fonte: "wizard_auto_cotacao_real",
       },
     };
     const { ok, error } = await insertLead(payload);
     if (!ok) {
-      // Falha não bloqueia; usuário continua o fluxo.
       console.warn("[leads] falha ao gravar:", error);
-      toast.error("Não conseguimos salvar seus dados agora, mas você já pode falar com nosso time.");
+      toast.error("Não conseguimos salvar seus dados, mas sua cotação já vai abrir.");
     } else {
-      toast.success("Cotação registrada! Nosso time vai te chamar no WhatsApp.");
+      toast.success("Recebemos seus dados! Confira sua cotação abaixo.");
     }
-    setStage("sucesso");
+    goTo("cotacao");
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Cabeçalho fino com progresso */}
       <div className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-3 sm:px-6">
           <Link
@@ -156,7 +118,7 @@ export function QuoteAutoWizard() {
                 Cotação Seguro Auto
               </span>
               <span>
-                Passo {Math.min(stepIndex + 1, visibleSteps)} de {visibleSteps}
+                Passo {stepIndex + 1} de {STAGE_ORDER.length}
               </span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
@@ -177,10 +139,7 @@ export function QuoteAutoWizard() {
           {stage === "situacao" && (
             <StepSituacao
               value={situacao}
-              onNext={(v) => {
-                setSituacao(v);
-                goTo("veiculo");
-              }}
+              onNext={(v) => { setSituacao(v); goTo("veiculo"); }}
             />
           )}
           {stage === "veiculo" && (
@@ -203,40 +162,13 @@ export function QuoteAutoWizard() {
               prioridade={prioridade}
               coberturas={coberturas}
               onBack={back}
-              onConfirm={runAnalise}
+              onConfirm={() => goTo("whatsapp")}
             />
           )}
-          {stage === "loading" && <StepLoadingAnalise />}
-          {stage === "resultados" && (
-            <StepResultados
-              quotes={quotes}
-              onCompare={() => goTo("comparativo")}
-              onSelect={(id) => { setSelectedQuoteId(id); goTo("contato"); }}
-            />
+          {stage === "whatsapp" && (
+            <StepWhatsapp onBack={back} onNext={handleWhatsappSubmit} />
           )}
-          {stage === "comparativo" && (
-            <StepComparativo
-              quotes={quotes}
-              onBack={() => goTo("resultados")}
-              onSelect={(id) => { setSelectedQuoteId(id); goTo("contato"); }}
-            />
-          )}
-          {stage === "contato" && (
-            <StepContatoFinal
-              initial={contato}
-              onBack={() => goTo("resultados")}
-              onSubmit={handleContatoSubmit}
-            />
-          )}
-          {stage === "sucesso" && contato && (
-            <StepSucesso
-              contato={contato}
-              veiculo={veiculo}
-              prioridade={prioridade}
-              quote={quotes.find((q) => q.id === selectedQuoteId) ?? null}
-              onFinish={() => navigate({ to: "/" })}
-            />
-          )}
+          {stage === "cotacao" && <StepCotacaoReal />}
         </div>
       </div>
     </div>
