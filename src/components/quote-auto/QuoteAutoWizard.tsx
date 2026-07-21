@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ShieldCheck } from "lucide-react";
@@ -13,6 +13,7 @@ import { StepWhatsapp } from "./steps/StepWhatsapp";
 import { StepCotacaoReal } from "./steps/StepCotacaoReal";
 import type { Situacao, Prioridade } from "@/lib/quote-auto-data";
 import { insertLead } from "@/lib/leads";
+import type { SegfyQuoteInput } from "@/lib/segfy/types";
 
 type Stage =
   | "situacao"
@@ -36,8 +37,11 @@ const STAGE_ORDER: Stage[] = [
 ];
 
 const emptyVeiculo: VeiculoData = {
+  tipo: "car",
   marca: "",
+  marca_id: "",
   modelo: "",
+  modelo_id: "",
   ano_fab: "",
   ano_mod: "",
   versao: "",
@@ -48,6 +52,8 @@ const emptyCondutor: CondutorData = {
   nascimento: "",
   cpf: "",
   cep: "",
+  profissao: "",
+  profissao_id: "",
   estado_civil: "",
   uso: "",
 };
@@ -65,6 +71,12 @@ export function QuoteAutoWizard() {
   const [condutor, setCondutor] = useState<CondutorData>(emptyCondutor);
   const [prioridade, setPrioridade] = useState<Prioridade | null>(null);
   const [coberturas, setCoberturas] = useState<CoberturasData>(emptyCoberturas);
+  const [whatsapp, setWhatsapp] = useState("");
+  const [callbackId] = useState(() =>
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  );
 
   const stepIndex = STAGE_ORDER.indexOf(stage);
   const progress = Math.min(100, Math.round(((stepIndex + 1) / STAGE_ORDER.length) * 100));
@@ -76,6 +88,7 @@ export function QuoteAutoWizard() {
   };
 
   const handleWhatsappSubmit = async (telefone: string) => {
+    setWhatsapp(telefone);
     const payload = {
       nome: condutor.nome || "Lead cotação auto",
       telefone,
@@ -98,6 +111,19 @@ export function QuoteAutoWizard() {
     }
     goTo("cotacao");
   };
+
+  const quoteInput: SegfyQuoteInput = useMemo(
+    () => ({
+      callback: callbackId,
+      telefone: whatsapp,
+      situacao,
+      prioridade,
+      coberturas,
+      veiculo,
+      condutor,
+    }),
+    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp],
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -168,7 +194,7 @@ export function QuoteAutoWizard() {
           {stage === "whatsapp" && (
             <StepWhatsapp onBack={back} onNext={handleWhatsappSubmit} />
           )}
-          {stage === "cotacao" && <StepCotacaoReal />}
+          {stage === "cotacao" && <StepCotacaoReal input={quoteInput} />}
         </div>
       </div>
     </div>
