@@ -164,12 +164,6 @@ export function StepCondutor({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="sm:col-span-2">
-          <Label htmlFor="nome">Nome completo</Label>
-          <Input id="nome" value={data.nome} onChange={(e) => set("nome", e.target.value)} className="mt-1.5 h-11" />
-          {errors.nome && <p className="mt-1 text-xs text-destructive">{errors.nome}</p>}
-        </div>
-
         <div>
           <Label htmlFor="cpf">CPF</Label>
           <Input id="cpf" inputMode="numeric" placeholder="000.000.000-00"
@@ -189,6 +183,13 @@ export function StepCondutor({
             className="mt-1.5 h-11" maxLength={10} />
           {errors.nascimento && <p className="mt-1 text-xs text-destructive">{errors.nascimento}</p>}
         </div>
+        
+        <div className="sm:col-span-2">
+          <Label htmlFor="nome">Nome completo</Label>
+          <Input id="nome" value={data.nome} onChange={(e) => set("nome", e.target.value)} className="mt-1.5 h-11" />
+          {errors.nome && <p className="mt-1 text-xs text-destructive">{errors.nome}</p>}
+        </div>
+
 
         <div>
           <Label htmlFor="cep">CEP de pernoite</Label>

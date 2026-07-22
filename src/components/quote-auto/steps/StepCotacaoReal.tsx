@@ -165,7 +165,12 @@ function getStatusTone(status?: string) {
 function getResultStatusLabel(result: SegfyResult) {
   const status = String(result.status || "").trim();
   if (!status) return "Em processamento";
+  if (status.toLowerCase() === "login_invalid") return "Credencial pendente";
   return status;
+}
+
+function isLoginInvalid(result: SegfyResult) {
+  return String(result.status || "").toLowerCase() === "login_invalid";
 }
 
 function getResultKey(result: SegfyResult, index: number) {
@@ -242,16 +247,44 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
       try {
         socket = io(SOCKET_URL, {
           transports: ["websocket"],
+          upgrade: true,
+          rememberUpgrade: true,
+          reconnection: true,
+          reconnectionAttempts: 20,
+          reconnectionDelay: 1200,
+          timeout: 20000,
           auth: { roomId },
+        });
+
+        socket.on(`${roomId}`, (message) => {
+          console.info("[SegfySocket:raw]", message);
+  })
+
+        socket.on("connect_error", (err) => {
+          console.error("[SegfySocket:connect_error]", {
+            message: err?.message,
+            description: (err as Error & { description?: unknown })?.description,
+            context: (err as Error & { context?: unknown })?.context,
+          });
+        });
+
+        socket.on("reconnect_attempt", (attempt) => {
+          console.info("[SegfySocket:reconnect_attempt]", { attempt, roomId });
+        });
+
+        socket.on("reconnect", (attempt) => {
+          console.info("[SegfySocket:reconnect]", { attempt, roomId });
         });
 
         socket.on("connect", () => {
           if (!active) return;
+          console.info("[SegfySocket:connect]", { roomId, socketId: socket?.id });
           setSocketConnected(true);
         });
 
         socket.on("disconnect", () => {
           if (!active) return;
+          console.warn("[SegfySocket:disconnect]", { roomId });
           setSocketConnected(false);
         });
 
@@ -276,6 +309,7 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
         socket.on(roomId, (message: unknown) => {
           const normalized = normalizeMessage(message);
           console.info("[SegfySocket:event]", normalized);
+          console.info("[SegfySocket:active]", active);
           if (!active) return;
           setEvents((old) => [normalized, ...old].slice(0, 80));
 
@@ -343,8 +377,10 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
       try {
         const result = await segfyShowResults(quotationId);
         console.info("[SegfySocket:show-results]", result.payload);
+        console.info("cancelled", cancelled, "attempts", attempts, "quotationId", quotationId);
         if (cancelled) return;
         const found = extractResults(result.payload);
+        console.info("found", found);
         if (found.length > 0) {
           mergeResults(found);
           setEvents((old) => [
@@ -358,13 +394,14 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
           return;
         }
       } catch {
+        console.warn("[SegfySocket:show-results] falha ao consultar resultados via API REST");
         // fallback silencioso; o websocket continua sendo a fonte principal.
       } finally {
         if (!cancelled) setPolling(false);
       }
 
-      if (attempts < 8 && !cancelled) {
-        timeoutId = setTimeout(poll, 5000);
+      if (attempts < 20 && !cancelled) {
+        timeoutId = setTimeout(poll, 10000);
       } else if (!cancelled) {
         setNoOffersYet(true);
       }
@@ -422,7 +459,7 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
       </Card>
 
       {!error && resultCount === 0 && (
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3">
           {[0, 1, 2].map((index) => (
             <Card key={index} className="border-dashed bg-background/80">
               <CardContent className="p-5">
@@ -461,12 +498,13 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
       )}
 
       {resultCards.length > 0 && (
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4">
           {resultCards.map((result, index) => {
             const companyName = getCompanyName(result);
             const initials = getCompanyInitials(companyName);
             const price = getResultPrice(result);
             const franchise = getResultFranchise(result);
+            const loginInvalid = isLoginInvalid(result);
 
             return (
               <Card key={result.result_id || result.id || `${companyName}-${index}`} className="overflow-hidden border-border/70 shadow-md">
@@ -481,24 +519,24 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
                         <p className="mt-1 text-sm text-muted-foreground">{result.product || "Seguro auto"}</p>
                       </div>
                     </div>
-                    <span className="w-fit rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700">
+                    <span className={`w-fit rounded-full border px-3 py-1 text-xs font-semibold ${getStatusTone(result.status)}`}>
                       {getResultStatusLabel(result)}
                     </span>
                   </div>
                 </CardHeader>
                 <CardContent className="p-5">
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div className="rounded-2xl bg-emerald-500/10 p-4">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div className={`rounded-2xl p-4 ${loginInvalid ? "bg-amber-500/10" : "bg-emerald-500/10"}`}>
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
                         Prêmio estimado
                       </p>
-                      <p className="mt-2 text-2xl font-semibold text-foreground">{formatCurrency(price)}</p>
+                      <p className="mt-2 break-words text-xl font-semibold text-foreground sm:text-2xl">{formatCurrency(price)}</p>
                     </div>
-                    <div className="rounded-2xl bg-sky-500/10 p-4">
+                    <div className={`rounded-2xl p-4 ${loginInvalid ? "bg-amber-500/10" : "bg-sky-500/10"}`}>
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-700">
                         Franquia
                       </p>
-                      <p className="mt-2 text-2xl font-semibold text-foreground">{formatCurrency(franchise)}</p>
+                      <p className="mt-2 break-words text-xl font-semibold text-foreground sm:text-2xl">{formatCurrency(franchise)}</p>
                     </div>
                   </div>
 
@@ -519,6 +557,7 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
 
                   {result.messages && (
                     <div className="mt-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-800">
+                      {loginInvalid ? "Esta seguradora exige login/senha configurados no painel da Segfy para retornar proposta. " : ""}
                       {result.messages}
                     </div>
                   )}

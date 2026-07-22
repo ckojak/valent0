@@ -203,11 +203,30 @@ async function resolveInsurers(input: SegfyQuoteInput): Promise<Array<{ name: st
         commission: 20,
       }));
     }
+    console.warn("[SegfyProxy] company-list retornou vazio para", input.veiculo.tipo);
   } catch {
-    // fallback abaixo
+    console.warn("[SegfyProxy] falha ao consultar company-list; seguindo sem insurers explícitos");
   }
 
-  return [{ name: "all", commission: 20 }];
+  try {
+    const renewalPayload = await callVehicleEndpoint("/api/vehicle/version/1.0/renewal-list", {
+      data: {},
+    });
+    const renewalItems = normalizeList(renewalPayload)
+      .map(mapOption)
+      .map((it) => String(it.id ?? "").trim())
+      .filter((id) => id.length > 0 && id !== "new");
+
+    const uniqueIds = Array.from(new Set(renewalItems));
+    if (uniqueIds.length > 0) {
+      console.warn("[SegfyProxy] usando renewal-list como fallback de insurers", uniqueIds.length);
+      return uniqueIds.map((id) => ({ name: id, commission: 20 }));
+    }
+  } catch {
+    console.warn("[SegfyProxy] falha ao consultar renewal-list para fallback de insurers");
+  }
+
+  return [{ name: "ace", commission: 20 }];
 }
 
 async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
