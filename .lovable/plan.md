@@ -1,48 +1,51 @@
-## Objetivo
-Reformular o fluxo completo da VALENT alinhado aos 12 screens descritos, aplicando o design system (laranja #FF5722, azul marinho #0B1A30, verde WhatsApp #128C7E), atualizar contato para (21) 99762-5607, adicionar registro SUSEP 212126836 no rodapé, e polir home + wizard `/cotacao/auto` para bater com os mockups.
+# Protocolo Valent + preparação para pagamento Segfy
 
-## Escopo
+## O problema
 
-### 1. Design tokens (`src/styles.css`)
-- Ajustar `--brand` para `#FF5722`, adicionar `--navy: #0B1A30`, `--wa-green: #128C7E`, `--surface-muted: #F5F7FA`.
-- Garantir tokens semânticos (`bg-navy`, `text-wa`, etc.) via `@theme inline`.
-- Bordas 8–12px e sombras suaves já existentes — revisar consistência.
+O código feio (`702b492e-b15a-4674-...`) que aparece na tela é o "ID cotação" gerado dentro do iframe da plataforma parceira — não temos como renomeá-lo lá dentro. A solução é a Valent passar a ter o seu próprio **protocolo de atendimento**, gerado e exibido pelo nosso site, que é o número que o cliente guarda e cita no WhatsApp.
 
-### 2. Branding / contato global
-- `Header`: telefone (21) 99762-5607 clicável (tel:) + botão WhatsApp verde.
-- `Footer`: telefone atualizado, adicionar linha "SUSEP nº 212126836".
-- `useContatoTelefone`: default seed = 5521997625607.
-- Migration: `UPDATE configuracoes SET valor='5521997625607' WHERE chave='whatsapp_telefone'` (mantém edição pelo admin).
+## O que será feito
 
-### 3. Home (`/`)
-- Remover os 2 botões laranja provisórios que coloquei no topo (o cliente só queria pra debug; agora entra o layout real).
-- Hero com headline "Proteção inteligente para o que realmente importa.", 4 value props em ícones (atendimento personalizado, top seguradoras, custo-benefício, acompanhamento passo a passo).
-- CategoryMenu como grid de 5 cards (Automóvel destacado com borda laranja, Residencial, Empresarial, Vida, Condomínio) — cada card navega para `/seguros/{slug}` e "Automóvel" abre `/cotacao/auto`.
-- CTA WhatsApp verde fixo/hero.
+### 1. Protocolo profissional da cotação
 
-### 4. Wizard `/cotacao/auto` — polimento das 12 telas
-Componentes já existem; ajustes visuais e de conteúdo:
-- **Stepper** no topo (telas 2–8 e 11) com ícones lineares + estado ativo laranja.
-- **Tela 1 (Home)** já cobre "Escolha do Seguro".
-- **Tela 2 Situação**: grid 2x2, card ativo com borda laranja + ícone laranja, botão "Continuar" full-width laranja (hoje avança on-click; adicionar botão explícito).
-- **Tela 3 Veículo**: layout 2 colunas com selects estilizados (Marca, Modelo, Ano fab, Ano mod, Versão, Placa opcional) + badge "Não se preocupe, seus dados estão seguros".
-- **Tela 4 Condutor**: inputs Nome/Nasc/CPF/CEP + selects Estado civil / Principal condutor + segmentado horizontal "Uso do veículo" (Particular/Trabalho/Aplicativo) com ícone laranja no selecionado.
-- **Tela 5 Prioridade**: 2x2 cards grandes + botão Continuar.
-- **Tela 6 Coberturas**: toggles iOS-style (já ok) + par de botões Voltar/Continuar.
-- **Tela 7 Resumo**: blocos bem definidos (Veículo / Condutor / Prioridade / Coberturas) + subtext "Ao enviar, nossos especialistas irão analisar…".
-- **Tela 8 Loading**: radar circular pulsante com ícone de carro + 3 colunas ("Análise personalizada", "Melhores seguradoras", "Proteção ideal") + faixa bege com CTA WhatsApp verde.
-- **Tela 9 Resultados**: layout com sidebar de filtros (Ordenar por, Tipo de cobertura, Franquia) + cards Porto/Azul/Allianz com preço e CTA laranja "Quero esta opção". Mock claramente comentado.
-- **Tela 10 Comparativo**: matrix grid com checks verdes; footer Voltar + "Escolher opção" laranja.
-- **Tela 11 Contato**: form Nome / WhatsApp mascarado / E-mail opcional + checkbox novidades + CTA "Receber minha cotação" + selo de segurança com cadeado.
-- **Tela 12 Sucesso**: fundo `--navy`, círculo laranja com check, 3 colunas de value props com ícones lineares laranjas, CTA WhatsApp verde grande, footer "Valent Seguros - Corretora & Consultoria de Seguros". Inserir lead em `leads` (já existe) mantido.
+Formato: `VLT-CARLOS-742` (prefixo + primeiro nome em maiúsculas, sem acentos + 3 primeiros dígitos do CPF).
 
-### 5. Persistência de leads
-- Já existe `insertLead`. Garantir que Tela 11 grava lead com todos os dados coletados (veículo, condutor, prioridade, coberturas, seguradora escolhida) antes de mostrar Tela 12.
+- Se não houver CPF, cai para 3 dígitos derivados do telefone.
+- Gerado uma única vez por cotação e mantido durante todo o wizard.
+- Salvo junto ao lead, para o admin localizar o cliente pelo protocolo.
+
+Onde aparece:
+- Barra superior do wizard, discreta, a partir do momento em que temos nome/CPF.
+- Tela de resultado/cotação, em destaque, com botão "copiar".
+- Tela de sucesso.
+- Mensagem pré-preenchida do WhatsApp (`Protocolo: VLT-CARLOS-742`).
+- Painel `/admin`: nova coluna Protocolo na lista de leads, com busca por protocolo.
+
+### 2. Camada de pagamento pronta para a Segfy
+
+Estrutura preparada, sem integração real ainda (encaixa a URL e a chave depois):
+
+- Bloco "Contratar e pagar" na tela final da cotação, exibido após a escolha da opção — hoje mostra o estado "pagamento em breve / falar com especialista".
+- Um ponto único de integração no servidor (`criarCheckoutSegfy`) que hoje devolve `{ status: "nao_configurado" }` e, quando as credenciais existirem, chamará o endpoint real.
+- Endpoint público de retorno (webhook) já criado e assinado, para a Segfy confirmar pagamento e atualizar o status do lead.
+- Nenhuma chave é inventada agora: quando você tiver a documentação, apenas cadastramos o segredo e ligamos.
+
+### 3. Banco de dados
+
+Nova migração:
+- `leads.protocolo` (texto, único) — o protocolo mostrado ao cliente.
+- `leads.pagamento_status` (texto, padrão `pendente`) e `leads.pagamento_ref` (texto) — para o retorno da Segfy.
+
+## Detalhes técnicos
+
+- `src/lib/protocolo.ts`: `gerarProtocolo({ nome, cpf, telefone })`, com normalização de acentos e fallback.
+- Protocolo mantido em estado no `QuoteAutoWizard`, propagado por props para `StepResumo`, `StepCotacaoReal`, `StepWhatsapp` e `StepSucesso`.
+- `insertLead` passa a aceitar e gravar `protocolo`.
+- `src/lib/segfy.functions.ts`: `createServerFn` `criarCheckoutSegfy` lendo `process.env['SEGFY_API_URL']`/`SEGFY_API_KEY` dentro do handler; sem variáveis, retorna `nao_configurado`.
+- `src/routes/api/public/segfy-webhook.ts`: valida assinatura HMAC antes de qualquer escrita; atualiza o lead via cliente admin importado dentro do handler.
+- Migração inclui os `GRANT` necessários nas novas colunas (tabela já existente, apenas `ALTER TABLE`).
 
 ## Fora de escopo
-- Cálculo real de seguro / API multicálculo (mantém mock comentado).
-- Novas tabelas no banco (apenas UPDATE em `configuracoes`).
-- Refatorar Admin (`/admin`) — mantém como está.
 
-## Entrega
-Uma única leva de edits em paralelo (tokens + componentes + steps + home) + 1 migration curta para o telefone. Depois disso o preview deve refletir os 12 screens.
+- Cálculo real de seguro e substituição do iframe da plataforma parceira.
+- Cobrança real (só entra quando a documentação da Segfy chegar).
