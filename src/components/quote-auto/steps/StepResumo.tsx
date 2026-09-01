@@ -55,12 +55,13 @@ export function StepResumo({
 
       <div className="rounded-xl border bg-secondary/30 p-4">
         <Row label="Situação" value={situacao ? SITUACAO_LABEL[situacao] : "—"} />
-        <Row label="Veículo" value={`${veiculo.marca} ${veiculo.modelo} ${veiculo.versao}`} />
+        <Row label="Veículo" value={[veiculo.marca, veiculo.modelo].filter(Boolean).join(" ") || "—"} />
         <Row label="Ano fab/mod" value={`${veiculo.ano_fab}/${veiculo.ano_mod}`} />
         {veiculo.placa && <Row label="Placa" value={veiculo.placa} />}
         <Row label="Condutor" value={condutor.nome} />
         <Row label="Nascimento" value={condutor.nascimento} />
         <Row label="CEP" value={condutor.cep} />
+        <Row label="Profissão" value={condutor.profissao || "—"} />
         <Row label="Estado civil" value={condutor.estado_civil} />
         <Row label="Uso" value={condutor.uso} />
         <Row label="Prioridade" value={prioridade ? PRIORIDADE_LABEL[prioridade] : "—"} />

@@ -29,7 +29,7 @@ export function StepSucesso({
 
   const msg = [
     `Olá! Sou ${contato.nome} e acabei de fazer uma cotação no site da VALENT.`,
-    `Veículo: ${veiculo.marca} ${veiculo.modelo} ${veiculo.versao} (${veiculo.ano_fab}/${veiculo.ano_mod}).`,
+    `Veículo: ${veiculo.marca} ${veiculo.modelo} (${veiculo.ano_fab}/${veiculo.ano_mod}).`,
     prioridade ? `Prioridade: ${PRIORIDADE_LABEL[prioridade]}.` : null,
     quote ? `Seguradora escolhida: ${quote.seguradora} — ${formatBRL(quote.premio_total)}/ano.` : null,
     "Podemos continuar por aqui?",
