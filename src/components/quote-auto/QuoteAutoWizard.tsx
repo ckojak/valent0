@@ -177,7 +177,9 @@ export function QuoteAutoWizard() {
           {stage === "whatsapp" && (
             <StepWhatsapp onBack={back} onNext={handleWhatsappSubmit} />
           )}
-          {stage === "cotacao" && <StepCotacaoReal />}
+          {stage === "cotacao" && (
+            <StepCotacaoReal protocolo={protocolo ?? gerarProtocolo({ nome: condutor.nome, cpf: condutor.cpf })} />
+          )}
         </div>
       </div>
     </div>
