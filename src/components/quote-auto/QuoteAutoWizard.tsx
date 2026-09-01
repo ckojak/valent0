@@ -79,11 +79,16 @@ export function QuoteAutoWizard() {
   };
 
   const handleWhatsappSubmit = async (telefone: string) => {
+    const proto =
+      protocolo ?? gerarProtocolo({ nome: condutor.nome, cpf: condutor.cpf, telefone });
+    setProtocolo(proto);
     const payload = {
       nome: condutor.nome || "Lead cotação auto",
       telefone,
       tipo_seguro: "auto",
+      protocolo: proto,
       dados: {
+        protocolo: proto,
         situacao,
         veiculo,
         condutor: { ...condutor, cpf: condutor.cpf ? `***${condutor.cpf.slice(-4)}` : "" },
