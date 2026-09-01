@@ -203,7 +203,7 @@ export function QuoteAutoWizard() {
             <StepVeiculo initial={veiculo} onBack={back} onNext={(v) => { setVeiculo(v); goTo("condutor"); }} />
           )}
           {stage === "condutor" && (
-            <StepCondutor initial={condutor} onBack={back} onNext={(v) => { setCondutor(v); goTo("prioridade"); }} />
+            <StepCondutor initial={condutor} onBack={back} onNext={(v) => { setCondutor(v); salvarParcialSegfy("pos-condutor", { condutor: v }); goTo("prioridade"); }} />
           )}
           {stage === "prioridade" && (
             <StepPrioridade value={prioridade} onBack={back} onNext={(v) => { setPrioridade(v); goTo("coberturas"); }} />
