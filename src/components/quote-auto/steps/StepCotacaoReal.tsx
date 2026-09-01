@@ -910,8 +910,13 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
           }
         }
 
-        await segfySaveCustomer(input).catch(() => {
+        await segfySaveCustomer(input).catch((err: unknown) => {
           // save-customer é opcional para jornada de lead, não pode bloquear calculate.
+          const message = err instanceof Error ? err.message : String(err);
+          console.error("[SegfySaveCustomer:error] (cotacao)", message);
+          toast.warning(
+            "Não conseguimos confirmar o registro no painel, mas sua cotação continua normalmente.",
+          );
           return null;
         });
 
