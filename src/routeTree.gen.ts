@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as SegfyTesteRouteImport } from './routes/segfy-teste'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as CookiesRouteImport } from './routes/cookies'
@@ -22,7 +23,6 @@ import { Route as SegurosSlugRouteImport } from './routes/seguros/$slug'
 import { Route as CotacaoAutoRouteImport } from './routes/cotacao/auto'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
-import { Route as ApiPublicSegfyWebhookRouteImport } from './routes/api/public/segfy-webhook'
 
 const TermosDeUsoRoute = TermosDeUsoRouteImport.update({
   id: '/termos-de-uso',
@@ -32,6 +32,11 @@ const TermosDeUsoRoute = TermosDeUsoRouteImport.update({
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SegfyTesteRoute = SegfyTesteRouteImport.update({
+  id: '/segfy-teste',
+  path: '/segfy-teste',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -88,11 +93,6 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ApiPublicSegfyWebhookRoute = ApiPublicSegfyWebhookRouteImport.update({
-  id: '/api/public/segfy-webhook',
-  path: '/api/public/segfy-webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -101,12 +101,12 @@ export interface FileRoutesByFullPath {
   '/cookies': typeof CookiesRoute
   '/empresas': typeof EmpresasRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/segfy-teste': typeof SegfyTesteRoute
   '/sobre': typeof SobreRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/seguros/$slug': typeof SegurosSlugRoute
-  '/api/public/segfy-webhook': typeof ApiPublicSegfyWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -116,12 +116,12 @@ export interface FileRoutesByTo {
   '/cookies': typeof CookiesRoute
   '/empresas': typeof EmpresasRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/segfy-teste': typeof SegfyTesteRoute
   '/sobre': typeof SobreRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/seguros/$slug': typeof SegurosSlugRoute
-  '/api/public/segfy-webhook': typeof ApiPublicSegfyWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -133,12 +133,12 @@ export interface FileRoutesById {
   '/cookies': typeof CookiesRoute
   '/empresas': typeof EmpresasRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/segfy-teste': typeof SegfyTesteRoute
   '/sobre': typeof SobreRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/seguros/$slug': typeof SegurosSlugRoute
-  '/api/public/segfy-webhook': typeof ApiPublicSegfyWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -150,12 +150,12 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/empresas'
     | '/privacidade'
+    | '/segfy-teste'
     | '/sobre'
     | '/termos-de-uso'
     | '/admin/login'
     | '/cotacao/auto'
     | '/seguros/$slug'
-    | '/api/public/segfy-webhook'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -165,12 +165,12 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/empresas'
     | '/privacidade'
+    | '/segfy-teste'
     | '/sobre'
     | '/termos-de-uso'
     | '/admin/login'
     | '/cotacao/auto'
     | '/seguros/$slug'
-    | '/api/public/segfy-webhook'
     | '/admin'
   id:
     | '__root__'
@@ -181,12 +181,12 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/empresas'
     | '/privacidade'
+    | '/segfy-teste'
     | '/sobre'
     | '/termos-de-uso'
     | '/admin/login'
     | '/cotacao/auto'
     | '/seguros/$slug'
-    | '/api/public/segfy-webhook'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -198,12 +198,12 @@ export interface RootRouteChildren {
   CookiesRoute: typeof CookiesRoute
   EmpresasRoute: typeof EmpresasRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
+  SegfyTesteRoute: typeof SegfyTesteRoute
   SobreRoute: typeof SobreRoute
   TermosDeUsoRoute: typeof TermosDeUsoRoute
   AdminLoginRoute: typeof AdminLoginRoute
   CotacaoAutoRoute: typeof CotacaoAutoRoute
   SegurosSlugRoute: typeof SegurosSlugRoute
-  ApiPublicSegfyWebhookRoute: typeof ApiPublicSegfyWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -220,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/sobre'
       fullPath: '/sobre'
       preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/segfy-teste': {
+      id: '/segfy-teste'
+      path: '/segfy-teste'
+      fullPath: '/segfy-teste'
+      preLoaderRoute: typeof SegfyTesteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -299,13 +306,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/segfy-webhook': {
-      id: '/api/public/segfy-webhook'
-      path: '/api/public/segfy-webhook'
-      fullPath: '/api/public/segfy-webhook'
-      preLoaderRoute: typeof ApiPublicSegfyWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -328,12 +328,12 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesRoute: CookiesRoute,
   EmpresasRoute: EmpresasRoute,
   PrivacidadeRoute: PrivacidadeRoute,
+  SegfyTesteRoute: SegfyTesteRoute,
   SobreRoute: SobreRoute,
   TermosDeUsoRoute: TermosDeUsoRoute,
   AdminLoginRoute: AdminLoginRoute,
   CotacaoAutoRoute: CotacaoAutoRoute,
   SegurosSlugRoute: SegurosSlugRoute,
-  ApiPublicSegfyWebhookRoute: ApiPublicSegfyWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
