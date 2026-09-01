@@ -67,6 +67,7 @@ export function QuoteAutoWizard() {
   const [condutor, setCondutor] = useState<CondutorData>(emptyCondutor);
   const [prioridade, setPrioridade] = useState<Prioridade | null>(null);
   const [coberturas, setCoberturas] = useState<CoberturasData>(emptyCoberturas);
+  const [protocolo, setProtocolo] = useState<string | null>(null);
 
   const stepIndex = STAGE_ORDER.indexOf(stage);
   const progress = Math.min(100, Math.round(((stepIndex + 1) / STAGE_ORDER.length) * 100));
