@@ -35,8 +35,7 @@ function EmpresasPage() {
           formulário automático do site.
         </p>
         <Link
-          to="/"
-          hash="contato"
+          to="/#contato"
           className="inline-flex h-11 items-center justify-center rounded-xl bg-brand px-6 text-sm font-bold uppercase tracking-wide text-brand-foreground transition hover:brightness-110"
         >
           Falar com um consultor
