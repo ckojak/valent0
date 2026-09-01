@@ -31,6 +31,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import { useContatoTelefone } from "@/hooks/use-contato-telefone";
+import { buildWhatsappUrl } from "@/lib/wa";
 
 const SOCKET_URL = import.meta.env.VITE_SEGFY_SOCKET_URL || "https://socket-io.segfy.com";
 
