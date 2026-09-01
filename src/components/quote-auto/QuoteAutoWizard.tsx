@@ -13,6 +13,8 @@ import { StepWhatsapp } from "./steps/StepWhatsapp";
 import { StepCotacaoReal } from "./steps/StepCotacaoReal";
 import type { Situacao, Prioridade } from "@/lib/quote-auto-data";
 import { insertLead } from "@/lib/leads";
+import { gerarProtocolo } from "@/lib/protocolo";
+import { ProtocoloBadge } from "./ProtocoloBadge";
 
 type Stage =
   | "situacao"
