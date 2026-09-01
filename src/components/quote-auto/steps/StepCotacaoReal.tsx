@@ -748,6 +748,39 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
     [input.callback, input.reference],
   );
 
+  /**
+   * "Adquirir agora": abre o WhatsApp com a opção escolhida e registra a
+   * escolha na Segfy (fire-and-forget, sem travar o clique).
+   */
+  const handleAdquirir = (result: SegfyResult) => {
+    const seguradora = getCompanyName(result);
+    const price = getResultPrice(result);
+    const premio = formatCurrency(price);
+    const { condutor, veiculo } = input;
+
+    const msg = [
+      `Olá! Sou ${condutor?.nome || "cliente"} e acabei de fazer uma cotação no site da VALENT.`,
+      veiculo ? `Veículo: ${veiculo.marca} ${veiculo.modelo} (${veiculo.ano_fab}/${veiculo.ano_mod}).` : null,
+      `Seguradora escolhida: ${seguradora} — ${premio}/ano.`,
+      "Quero adquirir agora. Podemos continuar por aqui?",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    window.open(buildWhatsappUrl(contatoTelefone, msg), "_blank", "noopener,noreferrer");
+
+    void segfySaveCustomer({
+      ...input,
+      seguradora_escolhida: seguradora,
+      premio_escolhido: price ?? null,
+    } as SegfyQuoteInput).catch((err: unknown) => {
+      console.error(
+        "[SegfySaveCustomer:error] (adquirir-agora)",
+        err instanceof Error ? err.message : err,
+      );
+    });
+  };
+
   useEffect(() => {
     resultCardsRef.current = resultCards;
   }, [resultCards]);
