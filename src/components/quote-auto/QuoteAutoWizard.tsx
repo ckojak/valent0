@@ -125,7 +125,8 @@ export function QuoteAutoWizard() {
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Cotação Seguro Auto
               </span>
-              <span>
+              <span className="flex items-center gap-2">
+                {protocolo && <ProtocoloBadge protocolo={protocolo} />}
                 Passo {stepIndex + 1} de {STAGE_ORDER.length}
               </span>
             </div>
