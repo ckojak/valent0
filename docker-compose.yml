@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    container_name: valent0-app
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      VITE_SEGFY_SOCKET_URL: ${VITE_SEGFY_SOCKET_URL:-https://socket-io.segfy.com}
+      SEGFY_API_BASE_URL: ${SEGFY_API_BASE_URL:-https://api.automation.segfy.com}
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    command: sh -c "bun install && bun run dev --host 0.0.0.0 --port 5173"
