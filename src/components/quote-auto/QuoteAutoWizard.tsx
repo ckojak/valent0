@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ShieldCheck } from "lucide-react";
@@ -13,8 +13,7 @@ import { StepWhatsapp } from "./steps/StepWhatsapp";
 import { StepCotacaoReal } from "./steps/StepCotacaoReal";
 import type { Situacao, Prioridade } from "@/lib/quote-auto-data";
 import { insertLead } from "@/lib/leads";
-import { gerarProtocolo } from "@/lib/protocolo";
-import { ProtocoloBadge } from "./ProtocoloBadge";
+import type { SegfyQuoteInput } from "@/lib/segfy/types";
 
 type Stage =
   | "situacao"
@@ -38,8 +37,11 @@ const STAGE_ORDER: Stage[] = [
 ];
 
 const emptyVeiculo: VeiculoData = {
+  tipo: "car",
   marca: "",
+  marca_id: "",
   modelo: "",
+  modelo_id: "",
   ano_fab: "",
   ano_mod: "",
   versao: "",
@@ -50,6 +52,8 @@ const emptyCondutor: CondutorData = {
   nascimento: "",
   cpf: "",
   cep: "",
+  profissao: "",
+  profissao_id: "",
   estado_civil: "",
   uso: "",
 };
@@ -67,7 +71,12 @@ export function QuoteAutoWizard() {
   const [condutor, setCondutor] = useState<CondutorData>(emptyCondutor);
   const [prioridade, setPrioridade] = useState<Prioridade | null>(null);
   const [coberturas, setCoberturas] = useState<CoberturasData>(emptyCoberturas);
-  const [protocolo, setProtocolo] = useState<string | null>(null);
+  const [whatsapp, setWhatsapp] = useState("");
+  const [callbackId] = useState(() =>
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  );
 
   const stepIndex = STAGE_ORDER.indexOf(stage);
   const progress = Math.min(100, Math.round(((stepIndex + 1) / STAGE_ORDER.length) * 100));
@@ -79,16 +88,12 @@ export function QuoteAutoWizard() {
   };
 
   const handleWhatsappSubmit = async (telefone: string) => {
-    const proto =
-      protocolo ?? gerarProtocolo({ nome: condutor.nome, cpf: condutor.cpf, telefone });
-    setProtocolo(proto);
+    setWhatsapp(telefone);
     const payload = {
       nome: condutor.nome || "Lead cotação auto",
       telefone,
       tipo_seguro: "auto",
-      protocolo: proto,
       dados: {
-        protocolo: proto,
         situacao,
         veiculo,
         condutor: { ...condutor, cpf: condutor.cpf ? `***${condutor.cpf.slice(-4)}` : "" },
@@ -106,6 +111,20 @@ export function QuoteAutoWizard() {
     }
     goTo("cotacao");
   };
+
+  const quoteInput: SegfyQuoteInput = useMemo(
+    () => ({
+      callback: callbackId,
+      reference: callbackId,
+      telefone: whatsapp,
+      situacao,
+      prioridade,
+      coberturas,
+      veiculo,
+      condutor,
+    }),
+    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp],
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -125,8 +144,7 @@ export function QuoteAutoWizard() {
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Cotação Seguro Auto
               </span>
-              <span className="flex items-center gap-2">
-                {protocolo && <ProtocoloBadge protocolo={protocolo} />}
+              <span>
                 Passo {stepIndex + 1} de {STAGE_ORDER.length}
               </span>
             </div>
@@ -140,10 +158,10 @@ export function QuoteAutoWizard() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-10">
+      <div className={`mx-auto px-4 py-6 sm:px-6 sm:py-10 ${stage === "cotacao" ? "max-w-7xl" : "max-w-2xl"}`}>
         <div
           key={stage}
-          className="rounded-2xl border bg-card p-5 shadow-[var(--shadow-card)] sm:p-8 animate-in fade-in slide-in-from-bottom-2 duration-300"
+          className={`${stage === "cotacao" ? "" : "rounded-2xl border bg-card p-5 shadow-[var(--shadow-card)] sm:p-8"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
         >
           {stage === "situacao" && (
             <StepSituacao
@@ -177,9 +195,7 @@ export function QuoteAutoWizard() {
           {stage === "whatsapp" && (
             <StepWhatsapp onBack={back} onNext={handleWhatsappSubmit} />
           )}
-          {stage === "cotacao" && (
-            <StepCotacaoReal protocolo={protocolo ?? gerarProtocolo({ nome: condutor.nome, cpf: condutor.cpf })} />
-          )}
+          {stage === "cotacao" && <StepCotacaoReal input={quoteInput} />}
         </div>
       </div>
     </div>
