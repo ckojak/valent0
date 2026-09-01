@@ -20,6 +20,7 @@ export function useContatoTelefone(): string {
       return data?.valor ?? FALLBACK;
     },
     staleTime: 5 * 60 * 1000,
+    retry: false,
   });
   return data ?? FALLBACK;
 }
