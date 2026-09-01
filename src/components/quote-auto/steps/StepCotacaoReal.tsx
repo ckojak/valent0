@@ -1270,6 +1270,13 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
                   )}
 
                   <div className="mt-4 flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-wa text-white hover:brightness-110"
+                      onClick={() => handleAdquirir(result)}
+                    >
+                      Adquirir agora
+                    </Button>
                     <Button variant="outline" size="sm" onClick={() => setSelectedResult(result)}>
                       Ver detalhes
                     </Button>
@@ -1281,6 +1288,7 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
                       </Button>
                     )}
                   </div>
+
 
                 </CardContent>
               </Card>
