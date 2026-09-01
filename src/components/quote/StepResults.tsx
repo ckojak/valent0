@@ -34,7 +34,7 @@ export function StepResults({
         </p>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {quotes.map((q, i) => (
           <QuoteCard key={q.insurer.id} quote={q} best={i === 0} />
         ))}
