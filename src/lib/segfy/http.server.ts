@@ -223,14 +223,17 @@ async function resolveInsurers(input: SegfyQuoteInput): Promise<Array<{ name: st
     const items = normalizeList(payload).map(mapOption);
     if (items.length > 0) {
       return items.slice(0, 10).map((it) => {
+        const raw = it as unknown as JsonRecord;
+        const company = raw["company"];
         const companyName = String(
-          (it.company && typeof it.company === "object" ? (it.company as JsonRecord).name : null)
-          ?? it.name
-          ?? it.id
-          ?? it.slug
-          ?? it.code
+          (company && typeof company === "object" ? (company as JsonRecord).name : null)
+          ?? raw["name"]
+          ?? raw["id"]
+          ?? raw["slug"]
+          ?? raw["code"]
           ?? "ace",
         ).trim().toLowerCase();
+
 
         return {
           name: companyName || "ace",
