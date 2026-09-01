@@ -13,6 +13,8 @@ import { StepWhatsapp } from "./steps/StepWhatsapp";
 import { StepCotacaoReal } from "./steps/StepCotacaoReal";
 import type { Situacao, Prioridade } from "@/lib/quote-auto-data";
 import { insertLead } from "@/lib/leads";
+import { gerarProtocolo } from "@/lib/protocolo";
+import { ProtocoloBadge } from "./ProtocoloBadge";
 
 type Stage =
   | "situacao"
@@ -65,6 +67,7 @@ export function QuoteAutoWizard() {
   const [condutor, setCondutor] = useState<CondutorData>(emptyCondutor);
   const [prioridade, setPrioridade] = useState<Prioridade | null>(null);
   const [coberturas, setCoberturas] = useState<CoberturasData>(emptyCoberturas);
+  const [protocolo, setProtocolo] = useState<string | null>(null);
 
   const stepIndex = STAGE_ORDER.indexOf(stage);
   const progress = Math.min(100, Math.round(((stepIndex + 1) / STAGE_ORDER.length) * 100));
@@ -76,11 +79,16 @@ export function QuoteAutoWizard() {
   };
 
   const handleWhatsappSubmit = async (telefone: string) => {
+    const proto =
+      protocolo ?? gerarProtocolo({ nome: condutor.nome, cpf: condutor.cpf, telefone });
+    setProtocolo(proto);
     const payload = {
       nome: condutor.nome || "Lead cotação auto",
       telefone,
       tipo_seguro: "auto",
+      protocolo: proto,
       dados: {
+        protocolo: proto,
         situacao,
         veiculo,
         condutor: { ...condutor, cpf: condutor.cpf ? `***${condutor.cpf.slice(-4)}` : "" },
@@ -117,7 +125,8 @@ export function QuoteAutoWizard() {
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Cotação Seguro Auto
               </span>
-              <span>
+              <span className="flex items-center gap-2">
+                {protocolo && <ProtocoloBadge protocolo={protocolo} />}
                 Passo {stepIndex + 1} de {STAGE_ORDER.length}
               </span>
             </div>
