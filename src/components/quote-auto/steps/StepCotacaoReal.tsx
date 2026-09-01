@@ -723,6 +723,7 @@ function getResultKey(result: SegfyResult, index: number) {
 }
 
 export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
+  const contatoTelefone = useContatoTelefone();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<SegfySocketMessage[]>([]);
