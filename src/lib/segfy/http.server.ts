@@ -432,7 +432,6 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
       alive_extension: "false",
       brand_id: String(input.veiculo.marca_id || "").trim(),
       model_id: String(input.veiculo.modelo_id || input.veiculo.modelo || "").trim(),
-      quotation_date: toIsoDate(today),
     },
   };
 }
