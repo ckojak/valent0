@@ -88,8 +88,37 @@ export function QuoteAutoWizard() {
     if (idx > 0) setStage(STAGE_ORDER[idx - 1]);
   };
 
+  /**
+   * Envia o lead parcial para a Segfy (aba Cotações Hfy > Orçamentos) assim que
+   * temos o mínimo necessário, sem travar a navegação do wizard.
+   * Usa o mesmo callback/reference da sessão para não duplicar registros.
+   */
+  const salvarParcialSegfy = (
+    origem: string,
+    overrides: Partial<SegfyQuoteInput> = {},
+  ) => {
+    const partialInput: SegfyQuoteInput = {
+      callback: callbackId,
+      reference: callbackId,
+      telefone: whatsapp,
+      situacao,
+      prioridade,
+      coberturas,
+      veiculo,
+      condutor,
+      ...overrides,
+    };
+    void segfySaveCustomer(partialInput).catch((err: unknown) => {
+      console.error(
+        `[SegfySaveCustomer:error] (${origem})`,
+        err instanceof Error ? err.message : err,
+      );
+    });
+  };
+
   const handleWhatsappSubmit = async (telefone: string) => {
     setWhatsapp(telefone);
+    salvarParcialSegfy("pos-whatsapp", { telefone });
     const payload = {
       nome: condutor.nome || "Lead cotação auto",
       telefone,
