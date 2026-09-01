@@ -13,6 +13,7 @@ import { StepWhatsapp } from "./steps/StepWhatsapp";
 import { StepCotacaoReal } from "./steps/StepCotacaoReal";
 import type { Situacao, Prioridade } from "@/lib/quote-auto-data";
 import { insertLead } from "@/lib/leads";
+import { segfySaveCustomer } from "@/lib/segfy/client";
 import type { SegfyQuoteInput } from "@/lib/segfy/types";
 
 type Stage =
