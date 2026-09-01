@@ -13,6 +13,7 @@ import { StepWhatsapp } from "./steps/StepWhatsapp";
 import { StepCotacaoReal } from "./steps/StepCotacaoReal";
 import type { Situacao, Prioridade } from "@/lib/quote-auto-data";
 import { insertLead } from "@/lib/leads";
+import { segfySaveCustomer } from "@/lib/segfy/client";
 import type { SegfyQuoteInput } from "@/lib/segfy/types";
 
 type Stage =
@@ -87,8 +88,37 @@ export function QuoteAutoWizard() {
     if (idx > 0) setStage(STAGE_ORDER[idx - 1]);
   };
 
+  /**
+   * Envia o lead parcial para a Segfy (aba Cotações Hfy > Orçamentos) assim que
+   * temos o mínimo necessário, sem travar a navegação do wizard.
+   * Usa o mesmo callback/reference da sessão para não duplicar registros.
+   */
+  const salvarParcialSegfy = (
+    origem: string,
+    overrides: Partial<SegfyQuoteInput> = {},
+  ) => {
+    const partialInput: SegfyQuoteInput = {
+      callback: callbackId,
+      reference: callbackId,
+      telefone: whatsapp,
+      situacao,
+      prioridade,
+      coberturas,
+      veiculo,
+      condutor,
+      ...overrides,
+    };
+    void segfySaveCustomer(partialInput).catch((err: unknown) => {
+      console.error(
+        `[SegfySaveCustomer:error] (${origem})`,
+        err instanceof Error ? err.message : err,
+      );
+    });
+  };
+
   const handleWhatsappSubmit = async (telefone: string) => {
     setWhatsapp(telefone);
+    salvarParcialSegfy("pos-whatsapp", { telefone });
     const payload = {
       nome: condutor.nome || "Lead cotação auto",
       telefone,
@@ -173,7 +203,7 @@ export function QuoteAutoWizard() {
             <StepVeiculo initial={veiculo} onBack={back} onNext={(v) => { setVeiculo(v); goTo("condutor"); }} />
           )}
           {stage === "condutor" && (
-            <StepCondutor initial={condutor} onBack={back} onNext={(v) => { setCondutor(v); goTo("prioridade"); }} />
+            <StepCondutor initial={condutor} onBack={back} onNext={(v) => { setCondutor(v); salvarParcialSegfy("pos-condutor", { condutor: v }); goTo("prioridade"); }} />
           )}
           {stage === "prioridade" && (
             <StepPrioridade value={prioridade} onBack={back} onNext={(v) => { setPrioridade(v); goTo("coberturas"); }} />

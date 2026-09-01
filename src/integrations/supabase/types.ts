@@ -39,6 +39,9 @@ export type Database = {
           email: string | null
           id: string
           nome: string
+          pagamento_ref: string | null
+          pagamento_status: string
+          protocolo: string | null
           status: string
           telefone: string
           tipo_seguro: string
@@ -49,6 +52,9 @@ export type Database = {
           email?: string | null
           id?: string
           nome: string
+          pagamento_ref?: string | null
+          pagamento_status?: string
+          protocolo?: string | null
           status?: string
           telefone: string
           tipo_seguro: string
@@ -59,6 +65,9 @@ export type Database = {
           email?: string | null
           id?: string
           nome?: string
+          pagamento_ref?: string | null
+          pagamento_status?: string
+          protocolo?: string | null
           status?: string
           telefone?: string
           tipo_seguro?: string

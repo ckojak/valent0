@@ -31,6 +31,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import { useContatoTelefone } from "@/hooks/use-contato-telefone";
+import { buildWhatsappUrl } from "@/lib/wa";
 
 const SOCKET_URL = import.meta.env.VITE_SEGFY_SOCKET_URL || "https://socket-io.segfy.com";
 
@@ -723,6 +725,7 @@ function getResultKey(result: SegfyResult, index: number) {
 }
 
 export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
+  const contatoTelefone = useContatoTelefone();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<SegfySocketMessage[]>([]);
@@ -746,6 +749,39 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
     () => String(input.reference ?? input.callback ?? "").trim() || String(input.callback ?? "").trim(),
     [input.callback, input.reference],
   );
+
+  /**
+   * "Adquirir agora": abre o WhatsApp com a opção escolhida e registra a
+   * escolha na Segfy (fire-and-forget, sem travar o clique).
+   */
+  const handleAdquirir = (result: SegfyResult) => {
+    const seguradora = getCompanyName(result);
+    const price = getResultPrice(result);
+    const premio = formatCurrency(price);
+    const { condutor, veiculo } = input;
+
+    const msg = [
+      `Olá! Sou ${condutor?.nome || "cliente"} e acabei de fazer uma cotação no site da VALENT.`,
+      veiculo ? `Veículo: ${veiculo.marca} ${veiculo.modelo} (${veiculo.ano_fab}/${veiculo.ano_mod}).` : null,
+      `Seguradora escolhida: ${seguradora} — ${premio}/ano.`,
+      "Quero adquirir agora. Podemos continuar por aqui?",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    window.open(buildWhatsappUrl(contatoTelefone, msg), "_blank", "noopener,noreferrer");
+
+    void segfySaveCustomer({
+      ...input,
+      seguradora_escolhida: seguradora,
+      premio_escolhido: price ?? null,
+    } as SegfyQuoteInput).catch((err: unknown) => {
+      console.error(
+        "[SegfySaveCustomer:error] (adquirir-agora)",
+        err instanceof Error ? err.message : err,
+      );
+    });
+  };
 
   useEffect(() => {
     resultCardsRef.current = resultCards;
@@ -910,8 +946,13 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
           }
         }
 
-        await segfySaveCustomer(input).catch(() => {
+        await segfySaveCustomer(input).catch((err: unknown) => {
           // save-customer é opcional para jornada de lead, não pode bloquear calculate.
+          const message = err instanceof Error ? err.message : String(err);
+          console.error("[SegfySaveCustomer:error] (cotacao)", message);
+          toast.warning(
+            "Não conseguimos confirmar o registro no painel, mas sua cotação continua normalmente.",
+          );
           return null;
         });
 
@@ -1229,6 +1270,13 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
                   )}
 
                   <div className="mt-4 flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-wa text-white hover:brightness-110"
+                      onClick={() => handleAdquirir(result)}
+                    >
+                      Adquirir agora
+                    </Button>
                     <Button variant="outline" size="sm" onClick={() => setSelectedResult(result)}>
                       Ver detalhes
                     </Button>
@@ -1240,6 +1288,7 @@ export function StepCotacaoReal({ input }: { input: SegfyQuoteInput }) {
                       </Button>
                     )}
                   </div>
+
 
                 </CardContent>
               </Card>
