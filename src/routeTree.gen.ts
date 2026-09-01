@@ -22,6 +22,7 @@ import { Route as SegurosSlugRouteImport } from './routes/seguros/$slug'
 import { Route as CotacaoAutoRouteImport } from './routes/cotacao/auto'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as ApiPublicSegfyWebhookRouteImport } from './routes/api/public/segfy-webhook'
 
 const TermosDeUsoRoute = TermosDeUsoRouteImport.update({
   id: '/termos-de-uso',
@@ -87,6 +88,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicSegfyWebhookRoute = ApiPublicSegfyWebhookRouteImport.update({
+  id: '/api/public/segfy-webhook',
+  path: '/api/public/segfy-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/seguros/$slug': typeof SegurosSlugRoute
+  '/api/public/segfy-webhook': typeof ApiPublicSegfyWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/seguros/$slug': typeof SegurosSlugRoute
+  '/api/public/segfy-webhook': typeof ApiPublicSegfyWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/seguros/$slug': typeof SegurosSlugRoute
+  '/api/public/segfy-webhook': typeof ApiPublicSegfyWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/cotacao/auto'
     | '/seguros/$slug'
+    | '/api/public/segfy-webhook'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/cotacao/auto'
     | '/seguros/$slug'
+    | '/api/public/segfy-webhook'
     | '/admin'
   id:
     | '__root__'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/cotacao/auto'
     | '/seguros/$slug'
+    | '/api/public/segfy-webhook'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -191,6 +203,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   CotacaoAutoRoute: typeof CotacaoAutoRoute
   SegurosSlugRoute: typeof SegurosSlugRoute
+  ApiPublicSegfyWebhookRoute: typeof ApiPublicSegfyWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -286,6 +299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/segfy-webhook': {
+      id: '/api/public/segfy-webhook'
+      path: '/api/public/segfy-webhook'
+      fullPath: '/api/public/segfy-webhook'
+      preLoaderRoute: typeof ApiPublicSegfyWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -313,6 +333,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   CotacaoAutoRoute: CotacaoAutoRoute,
   SegurosSlugRoute: SegurosSlugRoute,
+  ApiPublicSegfyWebhookRoute: ApiPublicSegfyWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

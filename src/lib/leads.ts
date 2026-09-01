@@ -5,6 +5,7 @@ export type LeadPayload = {
   telefone: string;
   email?: string | null;
   tipo_seguro: string;
+  protocolo?: string | null;
   dados?: Record<string, unknown>;
 };
 
@@ -19,6 +20,7 @@ export async function insertLead(payload: LeadPayload): Promise<{ ok: boolean; e
       telefone: payload.telefone,
       email: payload.email ?? null,
       tipo_seguro: payload.tipo_seguro,
+      protocolo: payload.protocolo ?? null,
       dados: (payload.dados ?? {}) as never,
     });
     if (error) return { ok: false, error: error.message };
