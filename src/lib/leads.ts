@@ -1,31 +1,15 @@
-import { supabase } from "@/integrations/supabase/client";
-
 export type LeadPayload = {
   nome: string;
   telefone: string;
   email?: string | null;
   tipo_seguro: string;
-  protocolo?: string | null;
   dados?: Record<string, unknown>;
 };
 
 /**
- * Insere um lead na base. RLS permite insert público (anon).
- * Retorna { ok } para o UI decidir; nunca lança para não bloquear o fluxo do usuário.
+ * A persistência de leads foi desativada para não bloquear o fluxo da cotação Segfy.
+ * Mantém a API compatível para o restante da aplicação sem disparar chamadas ao Supabase.
  */
-export async function insertLead(payload: LeadPayload): Promise<{ ok: boolean; error?: string }> {
-  try {
-    const { error } = await supabase.from("leads").insert({
-      nome: payload.nome,
-      telefone: payload.telefone,
-      email: payload.email ?? null,
-      tipo_seguro: payload.tipo_seguro,
-      protocolo: payload.protocolo ?? null,
-      dados: (payload.dados ?? {}) as never,
-    });
-    if (error) return { ok: false, error: error.message };
-    return { ok: true };
-  } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "erro desconhecido" };
-  }
+export async function insertLead(_payload: LeadPayload): Promise<{ ok: boolean; error?: string }> {
+  return { ok: true };
 }
