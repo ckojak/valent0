@@ -226,6 +226,28 @@ export function StepCondutor({
           {errors.sexo && <p className="mt-1 text-xs text-destructive">{errors.sexo}</p>}
         </div>
 
+        <div>
+          <Label htmlFor="email">E-mail</Label>
+          <Input id="email" type="email" inputMode="email" placeholder="voce@email.com"
+            value={data.email || ""}
+            onChange={(e) => set("email", e.target.value)}
+            className="mt-1.5 h-11" maxLength={255} />
+          {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
+        </div>
+
+        <div>
+          <Label>Relação com o segurado</Label>
+          <Select value={data.relacao || ""} onValueChange={(v) => set("relacao", v)}>
+            <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="Selecione" /></SelectTrigger>
+            <SelectContent>
+              {RELACAO_SEGURADO.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          {errors.relacao && <p className="mt-1 text-xs text-destructive">{errors.relacao}</p>}
+        </div>
+
+
+
 
 
         <div>
