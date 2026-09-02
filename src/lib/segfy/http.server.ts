@@ -242,26 +242,31 @@ async function resolveInsurers(input: SegfyQuoteInput): Promise<Array<{ name: st
       });
     }
     console.warn("[SegfyProxy] company-list retornou vazio para", input.veiculo.tipo);
-  } catch {
-    console.warn("[SegfyProxy] falha ao consultar company-list; seguindo sem insurers explícitos");
+  } catch (err) {
+    console.error(
+      "[SegfyProxy] falha ao consultar company-list; seguindo sem insurers explícitos:",
+      err instanceof Error ? err.message : err,
+    );
   }
 
-  try {
-    const renewalPayload = await callVehicleEndpoint("/api/vehicle/version/1.0/renewal-list", {
-      data: {},
-    });
-    const renewalItems = normalizeList(renewalPayload)
-      .map(mapOption)
-      .map((it) => String(it.name ?? it.id ?? "").trim().toLowerCase())
-      .filter((name) => name.length > 0 && name !== "new" && name !== "ace");
+  if (input.situacao === "renovar") {
+    try {
+      const renewalPayload = await callVehicleEndpoint("/api/vehicle/version/1.0/renewal-list", {
+        data: {},
+      });
+      const renewalItems = normalizeList(renewalPayload)
+        .map(mapOption)
+        .map((it) => String(it.name ?? it.id ?? "").trim().toLowerCase())
+        .filter((name) => name.length > 0 && name !== "new" && name !== "ace");
 
-    const uniqueNames = Array.from(new Set(renewalItems));
-    if (uniqueNames.length > 0) {
-      console.warn("[SegfyProxy] usando renewal-list como fallback de insurers", uniqueNames.length);
-      return uniqueNames.map((name) => ({ name, commission: 20 }));
+      const uniqueNames = Array.from(new Set(renewalItems));
+      if (uniqueNames.length > 0) {
+        console.warn("[SegfyProxy] usando renewal-list como fallback de insurers", uniqueNames.length);
+        return uniqueNames.map((name) => ({ name, commission: 20 }));
+      }
+    } catch {
+      console.warn("[SegfyProxy] falha ao consultar renewal-list para fallback de insurers");
     }
-  } catch {
-    console.warn("[SegfyProxy] falha ao consultar renewal-list para fallback de insurers");
   }
 
   return [{ name: "ace", commission: 20 }];
