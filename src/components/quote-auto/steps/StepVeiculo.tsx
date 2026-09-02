@@ -195,6 +195,33 @@ export function StepVeiculo({
     setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
+  const caracteristicasBlock = (
+    <div>
+      <Label>Características do veículo</Label>
+      <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {CARACTERISTICAS.map((item) => {
+          const active = Boolean(data[item.key]);
+          return (
+            <button
+              key={String(item.key)}
+              type="button"
+              onClick={() => set(item.key, !active as never)}
+              className={`flex h-11 items-center justify-center rounded-xl border px-3 text-xs font-medium transition ${
+                active
+                  ? "border-brand bg-brand-soft text-brand"
+                  : "bg-background text-foreground hover:bg-accent"
+              }`}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+
+
   const submitPlaca = async (e: React.FormEvent) => {
     e.preventDefault();
     if (data.placa.replace(/[^A-Z0-9]/gi, "").length < 7) {
