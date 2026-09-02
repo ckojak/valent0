@@ -72,11 +72,11 @@ export function StepSeguroAtual({
     if (!data.seguradora_atual.trim()) next.seguradora_atual = "Informe a seguradora.";
     if (!data.numero_apolice_anterior.trim()) next.numero_apolice_anterior = "Informe o número da apólice.";
     if (!data.teve_sinistro) next.teve_sinistro = "Selecione.";
-    if (data.vigencia_inicio && !isValidDateBR(data.vigencia_inicio)) next.vigencia_inicio = "DD/MM/AAAA";
-    if (data.vigencia_fim && !isValidDateBR(data.vigencia_fim)) next.vigencia_fim = "DD/MM/AAAA";
+    if (data.vigencia_fim_apolice && !isValidDateBR(data.vigencia_fim_apolice)) next.vigencia_fim_apolice = "DD/MM/AAAA";
     setErrors(next);
     if (Object.keys(next).length === 0) onNext(data);
   };
+
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-5">
@@ -151,22 +151,22 @@ export function StepSeguroAtual({
         </div>
 
         <div>
-          <Label htmlFor="vigencia_inicio">Início da vigência atual</Label>
-          <Input id="vigencia_inicio" inputMode="numeric" placeholder="DD/MM/AAAA"
-            value={data.vigencia_inicio}
-            onChange={(e) => set("vigencia_inicio", formatDateBR(e.target.value))}
+          <Label htmlFor="vigencia_fim_apolice">Final de vigência da apólice</Label>
+          <Input id="vigencia_fim_apolice" inputMode="numeric" placeholder="DD/MM/AAAA"
+            value={data.vigencia_fim_apolice}
+            onChange={(e) => set("vigencia_fim_apolice", formatDateBR(e.target.value))}
             className="mt-1.5 h-11" maxLength={10} />
-          {errors.vigencia_inicio && <p className="mt-1 text-xs text-destructive">{errors.vigencia_inicio}</p>}
+          {errors.vigencia_fim_apolice && <p className="mt-1 text-xs text-destructive">{errors.vigencia_fim_apolice}</p>}
         </div>
 
         <div>
-          <Label htmlFor="vigencia_fim">Fim da vigência atual</Label>
-          <Input id="vigencia_fim" inputMode="numeric" placeholder="DD/MM/AAAA"
-            value={data.vigencia_fim}
-            onChange={(e) => set("vigencia_fim", formatDateBR(e.target.value))}
-            className="mt-1.5 h-11" maxLength={10} />
-          {errors.vigencia_fim && <p className="mt-1 text-xs text-destructive">{errors.vigencia_fim}</p>}
+          <Label htmlFor="ci_vigente">C.I vigente</Label>
+          <Input id="ci_vigente" inputMode="numeric" placeholder="Ex: 12345"
+            value={data.ci_vigente}
+            onChange={(e) => set("ci_vigente", e.target.value.replace(/\s/g, "").slice(0, 20))}
+            className="mt-1.5 h-11" />
         </div>
+
       </div>
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row">
