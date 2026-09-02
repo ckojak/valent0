@@ -17,8 +17,8 @@ export type SeguroAtualData = {
   teve_sinistro: "" | "sim" | "nao";
   bonus_atual: string;
   bonus_futuro: string;
-  vigencia_inicio: string;
-  vigencia_fim: string;
+  vigencia_fim_apolice: string;
+  ci_vigente: string;
 };
 
 export const emptySeguroAtual: SeguroAtualData = {
@@ -27,9 +27,10 @@ export const emptySeguroAtual: SeguroAtualData = {
   teve_sinistro: "",
   bonus_atual: "",
   bonus_futuro: "",
-  vigencia_inicio: "",
-  vigencia_fim: "",
+  vigencia_fim_apolice: "",
+  ci_vigente: "",
 };
+
 
 const BONUS_CLASSES = Array.from({ length: 10 }, (_, i) => String(i));
 
