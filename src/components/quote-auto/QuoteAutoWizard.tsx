@@ -76,6 +76,7 @@ const emptyCoberturas: CoberturasData = {
 export function QuoteAutoWizard() {
   const [stage, setStage] = useState<Stage>("situacao");
   const [situacao, setSituacao] = useState<Situacao | null>(null);
+  const [seguroAtual, setSeguroAtual] = useState<SeguroAtualData>(emptySeguroAtual);
   const [veiculo, setVeiculo] = useState<VeiculoData>(emptyVeiculo);
   const [condutor, setCondutor] = useState<CondutorData>(emptyCondutor);
   const [prioridade, setPrioridade] = useState<Prioridade | null>(null);
@@ -90,10 +91,18 @@ export function QuoteAutoWizard() {
   const stepIndex = STAGE_ORDER.indexOf(stage);
   const progress = Math.min(100, Math.round(((stepIndex + 1) / STAGE_ORDER.length) * 100));
 
+  // O passo "seguro_atual" só aparece para quem escolheu "renovar" ou "comprei".
+  const temSeguroAtual = situacao !== null && SITUACOES_COM_SEGURO_ATUAL.includes(situacao);
+
   const goTo = (s: Stage) => setStage(s);
+  const nextStage = (s: Stage): Stage =>
+    s === "seguro_atual" && !temSeguroAtual ? "veiculo" : s;
   const back = () => {
     const idx = STAGE_ORDER.indexOf(stage);
-    if (idx > 0) setStage(STAGE_ORDER[idx - 1]);
+    if (idx <= 0) return;
+    let prev = STAGE_ORDER[idx - 1];
+    if (prev === "seguro_atual" && !temSeguroAtual) prev = "situacao";
+    setStage(prev);
   };
 
   /**
