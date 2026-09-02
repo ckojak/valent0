@@ -332,6 +332,10 @@ export function StepVeiculo({
           </p>
         </div>
 
+        {caracteristicasBlock}
+
+
+
         <div className="flex flex-col-reverse gap-2 sm:flex-row">
           <button
             type="button"
@@ -484,7 +488,10 @@ export function StepVeiculo({
             maxLength={8}
           />
         </div>
+
+        <div className="sm:col-span-2">{caracteristicasBlock}</div>
       </div>
+
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row">
         <button type="button" onClick={onBack}
