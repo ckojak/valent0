@@ -61,7 +61,7 @@ export type SegfyQuoteInput = {
     profissao_id?: string;
     estado_civil: string;
     uso: string;
-    sexo?: "male" | "female";
+    sexo?: "male" | "female" | "";
   };
 };
 
