@@ -53,6 +53,7 @@ export type SegfyQuoteInput = {
   };
   condutor: {
     nome: string;
+    nome_social?: string;
     nascimento: string;
     cpf: string;
     cep: string;
@@ -60,6 +61,7 @@ export type SegfyQuoteInput = {
     profissao_id?: string;
     estado_civil: string;
     uso: string;
+    sexo?: "male" | "female";
   };
 };
 

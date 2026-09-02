@@ -49,6 +49,7 @@ function normalizeBirthDate(value: string): string {
 
 export type CondutorData = {
   nome: string;
+  nome_social?: string;
   nascimento: string;
   cpf: string;
   cep: string;
@@ -56,6 +57,7 @@ export type CondutorData = {
   profissao_id?: string;
   estado_civil: string;
   uso: string;
+  sexo?: "" | "male" | "female";
 };
 
 export function StepCondutor({
