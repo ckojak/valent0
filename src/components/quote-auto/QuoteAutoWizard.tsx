@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ShieldCheck } from "lucide-react";
 
 import { StepSituacao } from "./steps/StepSituacao";
+import { StepSeguroAtual, emptySeguroAtual, type SeguroAtualData } from "./steps/StepSeguroAtual";
 import { StepVeiculo, type VeiculoData } from "./steps/StepVeiculo";
 import { StepCondutor, type CondutorData } from "./steps/StepCondutor";
 import { StepPrioridade } from "./steps/StepPrioridade";
@@ -18,6 +19,7 @@ import type { SegfyQuoteInput } from "@/lib/segfy/types";
 
 type Stage =
   | "situacao"
+  | "seguro_atual"
   | "veiculo"
   | "condutor"
   | "prioridade"
@@ -28,6 +30,7 @@ type Stage =
 
 const STAGE_ORDER: Stage[] = [
   "situacao",
+  "seguro_atual",
   "veiculo",
   "condutor",
   "prioridade",
@@ -36,6 +39,9 @@ const STAGE_ORDER: Stage[] = [
   "whatsapp",
   "cotacao",
 ];
+
+// Situações em que o cliente já tem/teve seguro — exibimos o passo extra.
+const SITUACOES_COM_SEGURO_ATUAL: Situacao[] = ["renovar", "comprei"];
 
 const emptyVeiculo: VeiculoData = {
   tipo: "car",
@@ -50,6 +56,7 @@ const emptyVeiculo: VeiculoData = {
 };
 const emptyCondutor: CondutorData = {
   nome: "",
+  nome_social: "",
   nascimento: "",
   cpf: "",
   cep: "",
@@ -57,6 +64,7 @@ const emptyCondutor: CondutorData = {
   profissao_id: "",
   estado_civil: "",
   uso: "",
+  sexo: "",
 };
 const emptyCoberturas: CoberturasData = {
   carro_reserva: true,
