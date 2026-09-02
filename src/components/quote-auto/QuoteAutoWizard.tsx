@@ -235,7 +235,17 @@ export function QuoteAutoWizard() {
           {stage === "situacao" && (
             <StepSituacao
               value={situacao}
-              onNext={(v) => { setSituacao(v); goTo("veiculo"); }}
+              onNext={(v) => {
+                setSituacao(v);
+                goTo(SITUACOES_COM_SEGURO_ATUAL.includes(v) ? "seguro_atual" : "veiculo");
+              }}
+            />
+          )}
+          {stage === "seguro_atual" && (
+            <StepSeguroAtual
+              initial={seguroAtual}
+              onBack={back}
+              onNext={(v) => { setSeguroAtual(v); goTo("veiculo"); }}
             />
           )}
           {stage === "veiculo" && (
