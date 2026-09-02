@@ -11,8 +11,14 @@ import {
 } from "@/components/ui/select";
 import { USO_VEICULO } from "@/lib/quote-auto-data";
 
+export type ResidenceGarageOption =
+  | "yes_with_electronic_gate"
+  | "yes_without_electronic_gate"
+  | "no_garage"
+  | "not_kept_in_garage";
+
 export type AvaliacaoRiscoData = {
-  garagem_residencia: "" | "sim" | "nao";
+  garagem_residencia: "" | ResidenceGarageOption;
   garagem_trabalho: "" | "sim" | "nao";
   tipo_uso: string;
   km_mensal: string;
@@ -68,12 +74,14 @@ export function StepAvaliacaoRisco({
           <Label>Garagem na residência</Label>
           <Select
             value={data.garagem_residencia}
-            onValueChange={(v) => set("garagem_residencia", v as "sim" | "nao")}
+            onValueChange={(v) => set("garagem_residencia", v as ResidenceGarageOption)}
           >
             <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="Selecione" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="sim">Sim</SelectItem>
-              <SelectItem value="nao">Não</SelectItem>
+              <SelectItem value="yes_with_electronic_gate">Sim, com portão eletrônico</SelectItem>
+              <SelectItem value="yes_without_electronic_gate">Sim, sem portão eletrônico</SelectItem>
+              <SelectItem value="no_garage">Não possui</SelectItem>
+              <SelectItem value="not_kept_in_garage">Não deixa em garagem</SelectItem>
             </SelectContent>
           </Select>
           {errors.garagem_residencia && <p className="mt-1 text-xs text-destructive">{errors.garagem_residencia}</p>}

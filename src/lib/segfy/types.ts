@@ -36,7 +36,7 @@ export type SegfyQuoteInput = {
   ci_vigente?: string;
   // Passo aditivo "Avaliação de Risco" (obrigatório para todos).
   avaliacao_risco?: {
-    garagem_residencia: "" | "sim" | "nao";
+    garagem_residencia: "" | "yes_with_electronic_gate" | "yes_without_electronic_gate" | "no_garage" | "not_kept_in_garage";
     garagem_trabalho: "" | "sim" | "nao";
     tipo_uso: string;
     km_mensal: string;
