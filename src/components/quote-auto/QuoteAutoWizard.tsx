@@ -260,8 +260,16 @@ export function QuoteAutoWizard() {
             />
           )}
           {stage === "veiculo" && (
-            <StepVeiculo initial={veiculo} onBack={back} onNext={(v) => { setVeiculo(v); goTo("condutor"); }} />
+            <StepVeiculo initial={veiculo} onBack={back} onNext={(v) => { setVeiculo(v); goTo("avaliacao_risco"); }} />
           )}
+          {stage === "avaliacao_risco" && (
+            <StepAvaliacaoRisco
+              initial={avaliacaoRisco}
+              onBack={back}
+              onNext={(v) => { setAvaliacaoRisco(v); goTo("condutor"); }}
+            />
+          )}
+
           {stage === "condutor" && (
             <StepCondutor initial={condutor} onBack={back} onNext={(v) => { setCondutor(v); salvarParcialSegfy("pos-condutor", { condutor: v }); goTo("prioridade"); }} />
           )}
