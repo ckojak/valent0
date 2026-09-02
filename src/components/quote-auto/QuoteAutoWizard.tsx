@@ -40,8 +40,8 @@ const STAGE_ORDER: Stage[] = [
   "cotacao",
 ];
 
-// Situações em que o cliente já tem/teve seguro — exibimos o passo extra.
-const SITUACOES_COM_SEGURO_ATUAL: Situacao[] = ["renovar", "comprei"];
+// Situação em que o cliente vai renovar — exibimos o passo extra.
+const SITUACOES_COM_SEGURO_ATUAL: Situacao[] = ["renovar"];
 
 const emptyVeiculo: VeiculoData = {
   tipo: "car",
@@ -91,7 +91,7 @@ export function QuoteAutoWizard() {
   const stepIndex = STAGE_ORDER.indexOf(stage);
   const progress = Math.min(100, Math.round(((stepIndex + 1) / STAGE_ORDER.length) * 100));
 
-  // O passo "seguro_atual" só aparece para quem escolheu "renovar" ou "comprei".
+  // O passo "seguro_atual" só aparece para quem escolheu "renovar".
   const temSeguroAtual = situacao !== null && SITUACOES_COM_SEGURO_ATUAL.includes(situacao);
 
   const goTo = (s: Stage) => setStage(s);
