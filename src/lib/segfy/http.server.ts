@@ -189,6 +189,24 @@ function mapUtilizationType(value: string) {
   return "personal";
 }
 
+// Relação do condutor principal com o segurado.
+// Se a Segfy recusar algum destes valores, ajustamos o mapeamento.
+function mapRelationship(value?: string) {
+  switch (value) {
+    case "Cônjuge":
+      return "spouse";
+    case "Filho(a)":
+      return "child";
+    case "Pai/Mãe":
+      return "parent";
+    case "Outro":
+      return "other";
+    default:
+      return "himself";
+  }
+}
+
+
 function normalizeInsurerEntry(item: unknown): { name: string; commission: number } | null {
   if (!item || typeof item !== "object") return null;
 
