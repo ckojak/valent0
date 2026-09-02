@@ -130,11 +130,12 @@ export function QuoteAutoWizard() {
     origem: string,
     overrides: Partial<SegfyQuoteInput> = {},
   ) => {
+    const condutorFinal = overrides.condutor ?? condutor;
     const partialInput: SegfyQuoteInput = {
       callback: callbackId,
       reference: callbackId,
       telefone: whatsapp,
-      sexo: condutor.sexo || undefined,
+      sexo: condutorFinal.sexo || undefined,
       situacao,
       prioridade,
       coberturas,
@@ -182,13 +183,16 @@ export function QuoteAutoWizard() {
       callback: callbackId,
       reference: callbackId,
       telefone: whatsapp,
+      sexo: condutor.sexo || undefined,
       situacao,
       prioridade,
       coberturas,
       veiculo,
       condutor,
+      ...dadosSeguroAtual,
     }),
-    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp, seguroAtual],
   );
 
   return (
