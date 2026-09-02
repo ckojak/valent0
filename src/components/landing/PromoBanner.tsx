@@ -27,6 +27,7 @@ export function PromoBanner() {
       return (data ?? []) as Promo[];
     },
     staleTime: 60 * 1000,
+    retry: false,
   });
 
   const visible = (data ?? []).filter((p) => !dismissed.has(p.id));

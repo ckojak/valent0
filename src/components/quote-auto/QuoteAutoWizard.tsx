@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ShieldCheck } from "lucide-react";
 
 import { StepSituacao } from "./steps/StepSituacao";
+import { StepSeguroAtual, emptySeguroAtual, type SeguroAtualData } from "./steps/StepSeguroAtual";
 import { StepVeiculo, type VeiculoData } from "./steps/StepVeiculo";
+import { StepAvaliacaoRisco, emptyAvaliacaoRisco, type AvaliacaoRiscoData } from "./steps/StepAvaliacaoRisco";
 import { StepCondutor, type CondutorData } from "./steps/StepCondutor";
 import { StepPrioridade } from "./steps/StepPrioridade";
 import { StepCoberturas, type CoberturasData } from "./steps/StepCoberturas";
@@ -13,12 +15,14 @@ import { StepWhatsapp } from "./steps/StepWhatsapp";
 import { StepCotacaoReal } from "./steps/StepCotacaoReal";
 import type { Situacao, Prioridade } from "@/lib/quote-auto-data";
 import { insertLead } from "@/lib/leads";
-import { gerarProtocolo } from "@/lib/protocolo";
-import { ProtocoloBadge } from "./ProtocoloBadge";
+import { segfySaveCustomer } from "@/lib/segfy/client";
+import type { SegfyQuoteInput } from "@/lib/segfy/types";
 
 type Stage =
   | "situacao"
+  | "seguro_atual"
   | "veiculo"
+  | "avaliacao_risco"
   | "condutor"
   | "prioridade"
   | "coberturas"
@@ -28,7 +32,9 @@ type Stage =
 
 const STAGE_ORDER: Stage[] = [
   "situacao",
+  "seguro_atual",
   "veiculo",
+  "avaliacao_risco",
   "condutor",
   "prioridade",
   "coberturas",
@@ -37,9 +43,16 @@ const STAGE_ORDER: Stage[] = [
   "cotacao",
 ];
 
+// Situação em que o cliente vai renovar — exibimos o passo extra.
+const SITUACOES_COM_SEGURO_ATUAL: Situacao[] = ["renovar"];
+
+
 const emptyVeiculo: VeiculoData = {
+  tipo: "car",
   marca: "",
+  marca_id: "",
   modelo: "",
+  modelo_id: "",
   ano_fab: "",
   ano_mod: "",
   versao: "",
@@ -47,11 +60,15 @@ const emptyVeiculo: VeiculoData = {
 };
 const emptyCondutor: CondutorData = {
   nome: "",
+  nome_social: "",
   nascimento: "",
   cpf: "",
   cep: "",
+  profissao: "",
+  profissao_id: "",
   estado_civil: "",
   uso: "",
+  sexo: "",
 };
 const emptyCoberturas: CoberturasData = {
   carro_reserva: true,
@@ -63,32 +80,94 @@ const emptyCoberturas: CoberturasData = {
 export function QuoteAutoWizard() {
   const [stage, setStage] = useState<Stage>("situacao");
   const [situacao, setSituacao] = useState<Situacao | null>(null);
+  const [seguroAtual, setSeguroAtual] = useState<SeguroAtualData>(emptySeguroAtual);
   const [veiculo, setVeiculo] = useState<VeiculoData>(emptyVeiculo);
+  const [avaliacaoRisco, setAvaliacaoRisco] = useState<AvaliacaoRiscoData>(emptyAvaliacaoRisco);
   const [condutor, setCondutor] = useState<CondutorData>(emptyCondutor);
+
   const [prioridade, setPrioridade] = useState<Prioridade | null>(null);
   const [coberturas, setCoberturas] = useState<CoberturasData>(emptyCoberturas);
-  const [protocolo, setProtocolo] = useState<string | null>(null);
+  const [whatsapp, setWhatsapp] = useState("");
+  const [callbackId] = useState(() =>
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  );
 
   const stepIndex = STAGE_ORDER.indexOf(stage);
   const progress = Math.min(100, Math.round(((stepIndex + 1) / STAGE_ORDER.length) * 100));
 
+  // O passo "seguro_atual" só aparece para quem escolheu "renovar".
+  const temSeguroAtual = situacao !== null && SITUACOES_COM_SEGURO_ATUAL.includes(situacao);
+
   const goTo = (s: Stage) => setStage(s);
   const back = () => {
     const idx = STAGE_ORDER.indexOf(stage);
-    if (idx > 0) setStage(STAGE_ORDER[idx - 1]);
+    if (idx <= 0) return;
+    let prev = STAGE_ORDER[idx - 1];
+    if (prev === "seguro_atual" && !temSeguroAtual) prev = "situacao";
+    setStage(prev);
+  };
+
+  /**
+   * Envia o lead parcial para a Segfy (aba Cotações Hfy > Orçamentos) assim que
+   * temos o mínimo necessário, sem travar a navegação do wizard.
+   * Usa o mesmo callback/reference da sessão para não duplicar registros.
+   */
+  // Campos aditivos do seguro atual + sexo — enviados junto ao payload já existente.
+  const dadosSeguroAtual: Partial<SegfyQuoteInput> = temSeguroAtual
+    ? {
+        seguradora_atual: seguroAtual.seguradora_atual || undefined,
+        numero_apolice_anterior: seguroAtual.numero_apolice_anterior || undefined,
+        teve_sinistro:
+          seguroAtual.teve_sinistro === ""
+            ? null
+            : seguroAtual.teve_sinistro === "sim",
+        bonus_atual: seguroAtual.bonus_atual || undefined,
+        bonus_futuro: seguroAtual.bonus_futuro || undefined,
+        vigencia_fim_apolice: seguroAtual.vigencia_fim_apolice || undefined,
+        ci_vigente: seguroAtual.ci_vigente || undefined,
+
+      }
+    : {};
+
+  const salvarParcialSegfy = (
+    origem: string,
+    overrides: Partial<SegfyQuoteInput> = {},
+  ) => {
+    const condutorFinal = overrides.condutor ?? condutor;
+    const partialInput: SegfyQuoteInput = {
+      callback: callbackId,
+      reference: callbackId,
+      telefone: whatsapp,
+      email: condutorFinal.email || undefined,
+      sexo: condutorFinal.sexo || undefined,
+      situacao,
+      prioridade,
+      coberturas,
+      veiculo,
+      avaliacao_risco: avaliacaoRisco,
+      condutor,
+      ...dadosSeguroAtual,
+      ...overrides,
+    };
+
+    void segfySaveCustomer(partialInput).catch((err: unknown) => {
+      console.error(
+        `[SegfySaveCustomer:error] (${origem})`,
+        err instanceof Error ? err.message : err,
+      );
+    });
   };
 
   const handleWhatsappSubmit = async (telefone: string) => {
-    const proto =
-      protocolo ?? gerarProtocolo({ nome: condutor.nome, cpf: condutor.cpf, telefone });
-    setProtocolo(proto);
+    setWhatsapp(telefone);
+    salvarParcialSegfy("pos-whatsapp", { telefone });
     const payload = {
       nome: condutor.nome || "Lead cotação auto",
       telefone,
       tipo_seguro: "auto",
-      protocolo: proto,
       dados: {
-        protocolo: proto,
         situacao,
         veiculo,
         condutor: { ...condutor, cpf: condutor.cpf ? `***${condutor.cpf.slice(-4)}` : "" },
@@ -106,6 +185,26 @@ export function QuoteAutoWizard() {
     }
     goTo("cotacao");
   };
+
+  const quoteInput: SegfyQuoteInput = useMemo(
+    () => ({
+      callback: callbackId,
+      reference: callbackId,
+      telefone: whatsapp,
+      email: condutor.email || undefined,
+      sexo: condutor.sexo || undefined,
+      situacao,
+      prioridade,
+      coberturas,
+      veiculo,
+      avaliacao_risco: avaliacaoRisco,
+      condutor,
+      ...dadosSeguroAtual,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp, seguroAtual, avaliacaoRisco],
+
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -125,8 +224,7 @@ export function QuoteAutoWizard() {
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Cotação Seguro Auto
               </span>
-              <span className="flex items-center gap-2">
-                {protocolo && <ProtocoloBadge protocolo={protocolo} />}
+              <span>
                 Passo {stepIndex + 1} de {STAGE_ORDER.length}
               </span>
             </div>
@@ -140,22 +238,40 @@ export function QuoteAutoWizard() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-10">
+      <div className={`mx-auto px-4 py-6 sm:px-6 sm:py-10 ${stage === "cotacao" ? "max-w-7xl" : "max-w-2xl"}`}>
         <div
           key={stage}
-          className="rounded-2xl border bg-card p-5 shadow-[var(--shadow-card)] sm:p-8 animate-in fade-in slide-in-from-bottom-2 duration-300"
+          className={`${stage === "cotacao" ? "" : "rounded-2xl border bg-card p-5 shadow-[var(--shadow-card)] sm:p-8"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
         >
           {stage === "situacao" && (
             <StepSituacao
               value={situacao}
-              onNext={(v) => { setSituacao(v); goTo("veiculo"); }}
+              onNext={(v) => {
+                setSituacao(v);
+                goTo(SITUACOES_COM_SEGURO_ATUAL.includes(v) ? "seguro_atual" : "veiculo");
+              }}
+            />
+          )}
+          {stage === "seguro_atual" && (
+            <StepSeguroAtual
+              initial={seguroAtual}
+              onBack={back}
+              onNext={(v) => { setSeguroAtual(v); goTo("veiculo"); }}
             />
           )}
           {stage === "veiculo" && (
-            <StepVeiculo initial={veiculo} onBack={back} onNext={(v) => { setVeiculo(v); goTo("condutor"); }} />
+            <StepVeiculo initial={veiculo} onBack={back} onNext={(v) => { setVeiculo(v); goTo("avaliacao_risco"); }} />
           )}
+          {stage === "avaliacao_risco" && (
+            <StepAvaliacaoRisco
+              initial={avaliacaoRisco}
+              onBack={back}
+              onNext={(v) => { setAvaliacaoRisco(v); goTo("condutor"); }}
+            />
+          )}
+
           {stage === "condutor" && (
-            <StepCondutor initial={condutor} onBack={back} onNext={(v) => { setCondutor(v); goTo("prioridade"); }} />
+            <StepCondutor initial={condutor} onBack={back} onNext={(v) => { setCondutor(v); salvarParcialSegfy("pos-condutor", { condutor: v }); goTo("prioridade"); }} />
           )}
           {stage === "prioridade" && (
             <StepPrioridade value={prioridade} onBack={back} onNext={(v) => { setPrioridade(v); goTo("coberturas"); }} />
@@ -177,9 +293,7 @@ export function QuoteAutoWizard() {
           {stage === "whatsapp" && (
             <StepWhatsapp onBack={back} onNext={handleWhatsappSubmit} />
           )}
-          {stage === "cotacao" && (
-            <StepCotacaoReal protocolo={protocolo ?? gerarProtocolo({ nome: condutor.nome, cpf: condutor.cpf })} />
-          )}
+          {stage === "cotacao" && <StepCotacaoReal input={quoteInput} />}
         </div>
       </div>
     </div>

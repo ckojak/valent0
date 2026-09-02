@@ -17,8 +17,6 @@ type Lead = {
   telefone: string;
   email: string | null;
   tipo_seguro: string;
-  protocolo: string | null;
-  pagamento_status: string;
   dados: Record<string, unknown>;
   status: string;
   created_at: string;
@@ -30,7 +28,6 @@ const NEXT_STATUSES = ["novo", "contatado", "ganho", "perdido"];
 export function LeadsTable() {
   const [filter, setFilter] = useState<(typeof STATUS_OPTIONS)[number]>("todos");
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [busca, setBusca] = useState("");
   const queryClient = useQueryClient();
 
   const { data: leads, isLoading } = useQuery({
@@ -45,15 +42,7 @@ export function LeadsTable() {
     },
   });
 
-  const termo = busca.trim().toLowerCase();
-  const filtered = (leads ?? []).filter(
-    (l) =>
-      (filter === "todos" || l.status === filter) &&
-      (termo === "" ||
-        (l.protocolo ?? "").toLowerCase().includes(termo) ||
-        l.nome.toLowerCase().includes(termo) ||
-        l.telefone.includes(termo)),
-  );
+  const filtered = (leads ?? []).filter((l) => filter === "todos" || l.status === filter);
 
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("leads").update({ status }).eq("id", id);
@@ -69,13 +58,6 @@ export function LeadsTable() {
           <h2 className="font-display text-lg font-extrabold text-foreground">Leads recebidos</h2>
           <p className="text-xs text-muted-foreground">Total: {leads?.length ?? 0}</p>
         </div>
-        <div className="flex flex-1 flex-wrap items-center justify-end gap-2">
-          <input
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            placeholder="Buscar por protocolo, nome ou telefone"
-            className="h-9 w-full min-w-[200px] rounded-lg border bg-background px-3 text-sm outline-none focus:border-brand sm:w-64"
-          />
         <div className="min-w-[160px]">
           <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
             <SelectTrigger><SelectValue /></SelectTrigger>
@@ -83,7 +65,6 @@ export function LeadsTable() {
               {STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
             </SelectContent>
           </Select>
-        </div>
         </div>
       </div>
 
@@ -105,11 +86,6 @@ export function LeadsTable() {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-display text-sm font-bold text-foreground">{lead.nome}</span>
-                  {lead.protocolo && (
-                    <span className="rounded bg-secondary px-2 py-0.5 font-mono text-[10px] font-semibold text-foreground">
-                      {lead.protocolo}
-                    </span>
-                  )}
                   <StatusBadge status={lead.status} />
                   <span className="rounded bg-brand-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand">
                     {lead.tipo_seguro}
