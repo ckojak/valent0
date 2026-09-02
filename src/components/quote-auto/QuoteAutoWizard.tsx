@@ -82,7 +82,9 @@ export function QuoteAutoWizard() {
   const [situacao, setSituacao] = useState<Situacao | null>(null);
   const [seguroAtual, setSeguroAtual] = useState<SeguroAtualData>(emptySeguroAtual);
   const [veiculo, setVeiculo] = useState<VeiculoData>(emptyVeiculo);
+  const [avaliacaoRisco, setAvaliacaoRisco] = useState<AvaliacaoRiscoData>(emptyAvaliacaoRisco);
   const [condutor, setCondutor] = useState<CondutorData>(emptyCondutor);
+
   const [prioridade, setPrioridade] = useState<Prioridade | null>(null);
   const [coberturas, setCoberturas] = useState<CoberturasData>(emptyCoberturas);
   const [whatsapp, setWhatsapp] = useState("");
