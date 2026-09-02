@@ -95,8 +95,6 @@ export function QuoteAutoWizard() {
   const temSeguroAtual = situacao !== null && SITUACOES_COM_SEGURO_ATUAL.includes(situacao);
 
   const goTo = (s: Stage) => setStage(s);
-  const nextStage = (s: Stage): Stage =>
-    s === "seguro_atual" && !temSeguroAtual ? "veiculo" : s;
   const back = () => {
     const idx = STAGE_ORDER.indexOf(stage);
     if (idx <= 0) return;
