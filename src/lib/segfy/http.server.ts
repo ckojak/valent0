@@ -189,6 +189,24 @@ function mapUtilizationType(value: string) {
   return "personal";
 }
 
+// Relação do condutor principal com o segurado.
+// Se a Segfy recusar algum destes valores, ajustamos o mapeamento.
+function mapRelationship(value?: string) {
+  switch (value) {
+    case "Cônjuge":
+      return "spouse";
+    case "Filho(a)":
+      return "child";
+    case "Pai/Mãe":
+      return "parent";
+    case "Outro":
+      return "other";
+    default:
+      return "himself";
+  }
+}
+
+
 function normalizeInsurerEntry(item: unknown): { name: string; commission: number } | null {
   if (!item || typeof item !== "object") return null;
 
@@ -289,27 +307,42 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
   const condutorCpf = input.condutor.cpf.replace(/\D/g, "");
   const condutorCep = input.condutor.cep.replace(/\D/g, "");
 
-  const utilizationType = mapUtilizationType(input.condutor.uso);
+  const risco = input.avaliacao_risco;
+  const utilizationType = mapUtilizationType(risco?.tipo_uso || input.condutor.uso);
+  const residenceGarage = risco?.garagem_residencia === "sim" ? "garage" : "no_garage";
+  const jobGarage = risco?.garagem_trabalho === "sim" ? "yes" : "no";
+  const monthlyKm = String(Number(risco?.km_mensal) > 0 ? Number(risco?.km_mensal) : 1000);
 
   const isRenewal = input.situacao === "renovar";
   const renewalInput =
     (input as unknown as { renewal?: Record<string, unknown> }).renewal ?? {};
 
+  const priorPolicyEnd = input.vigencia_fim_apolice
+    ? parseDateBRToIso(input.vigencia_fim_apolice)
+    : String(renewalInput.prior_policy_end ?? "2099-12-31");
+  const priorPolicy = String(
+    input.numero_apolice_anterior || renewalInput.prior_policy || "NAO_INFORMADA",
+  );
+  const priorIc = String(input.ci_vigente || renewalInput.prior_ic || "");
+  const bonusCurrent = String(input.bonus_atual || renewalInput.bonus_current || "0");
+  const bonusLast = String(input.bonus_futuro || renewalInput.bonus_last || "0");
+
   const renewalPayload = {
     insurer: String(renewalInput.insurer ?? "ace"),
     proprio_corretor: isRenewal,
-    bonus_last: String(renewalInput.bonus_last ?? "0"),
-    bonus_current: String(renewalInput.bonus_current ?? "0"),
+    bonus_last: bonusLast,
+    bonus_current: bonusCurrent,
     claim_amount: String(renewalInput.claim_amount ?? "0"),
-    prior_policy_end: String(renewalInput.prior_policy_end ?? "2099-12-31"),
-    prior_policy: String(renewalInput.prior_policy ?? "NAO_INFORMADA"),
-    prior_ic: String(renewalInput.prior_ic ?? ""),
+    prior_policy_end: priorPolicyEnd,
+    prior_policy: priorPolicy,
+    prior_ic: priorIc,
     codigo_renovacao: String(renewalInput.codigo_renovacao ?? ""),
     codigo_sucursal: String(renewalInput.codigo_sucursal ?? ""),
     item: String(renewalInput.item ?? "1"),
     origin_bonus: String(renewalInput.origin_bonus ?? "0"),
     transferencia_corretagem: Boolean(renewalInput.transferencia_corretagem ?? false),
   };
+
 
   const insurers = await resolveInsurers(input);
 
@@ -345,13 +378,13 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
       advantages: {},
       renewal: {
         quotation_type: isRenewal ? "RENOVATION" : "NEW",
-        prior_policy_end: "2099-12-31",
-        prior_policy: "NAO_INFORMADA",
-        claim_amount: "0",
+        prior_policy_end: priorPolicyEnd,
+        prior_policy: priorPolicy,
+        claim_amount: String(renewalInput.claim_amount ?? "0"),
         insurer: String(renewalInput.insurer ?? "ace"),
-        bonus_current: String(renewalInput.bonus_current ?? "0"),
-        prior_ic: String(renewalInput.prior_ic ?? ""),
-        bonus_last: String(renewalInput.bonus_last ?? "0"),
+        bonus_current: bonusCurrent,
+        prior_ic: priorIc,
+        bonus_last: bonusLast,
         item: String(renewalInput.item ?? "1"),
         origin_bonus: String(renewalInput.origin_bonus ?? "0"),
       },
@@ -360,7 +393,7 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
         document: condutorCpf,
         name: input.condutor.nome,
         birth_date: parseDateBRToIso(input.condutor.nascimento),
-        email: input.email || "",
+        email: input.email || input.condutor.email || "",
         cellphone: input.telefone,
         sex: input.sexo ?? "male",
       },
@@ -370,7 +403,7 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
         birth_date: parseDateBRToIso(input.condutor.nascimento),
         sex: input.sexo ?? "male",
         marital_status: mapMaritalStatus(input.condutor.estado_civil),
-        relationship: "himself",
+        relationship: mapRelationship(input.condutor.relacao),
         profession: input.condutor.profissao_id || input.condutor.profissao,
       },
       vehicle: {
@@ -386,26 +419,27 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
         circulation_zip_code: condutorCep,
         category_type: "particular",
         fuel_type: "flex",
-        zero_km: false,
-        alienated: false,
-        chassis_relabeled: false,
-        armored: false,
-        gas_kit: false,
-        anti_theft: false,
+        zero_km: Boolean(input.veiculo.zero_km),
+        alienated: Boolean(input.veiculo.alienado),
+        chassis_relabeled: Boolean(input.veiculo.chassi_remarcado),
+        armored: Boolean(input.veiculo.blindado),
+        gas_kit: Boolean(input.veiculo.kit_gas),
+        anti_theft: Boolean(input.veiculo.antifurto),
         fipe_url: "",
       },
       questionnaire: {
-        residence_garage: "no_garage",
-        job_garage: "no",
+        residence_garage: residenceGarage,
+        job_garage: jobGarage,
         study_garage: "no",
         utilization_type: utilizationType,
         other_driver: "does_not_exist",
         secondary_driver_age: " ",
-        monthly_km: String(1000),
+        monthly_km: monthlyKm,
         work_distance: String(15),
         residence_type: "house",
         tax_exemption: "not_applicable",
       },
+
       questionnaire_truck: {},
       coverage: {
         fipe_percentage: String(100),

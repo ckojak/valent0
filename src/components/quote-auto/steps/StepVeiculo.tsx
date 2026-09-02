@@ -26,9 +26,25 @@ export type VeiculoData = {
   ano_mod: string;
   versao: string;
   placa: string;
+  zero_km?: boolean;
+  alienado?: boolean;
+  kit_gas?: boolean;
+  blindado?: boolean;
+  chassi_remarcado?: boolean;
+  antifurto?: boolean;
 };
 
+const CARACTERISTICAS: Array<{ key: keyof VeiculoData; label: string }> = [
+  { key: "zero_km", label: "Zero Km" },
+  { key: "alienado", label: "Alienado" },
+  { key: "kit_gas", label: "Kit gás" },
+  { key: "blindado", label: "Blindado" },
+  { key: "chassi_remarcado", label: "Chassi remarcado" },
+  { key: "antifurto", label: "Antifurto" },
+];
+
 const ANOS = Array.from({ length: 26 }, (_, i) => String(2026 - i));
+
 
 function pickString(payload: unknown, keys: string[]): string {
   if (!payload || typeof payload !== "object") return "";
@@ -179,6 +195,33 @@ export function StepVeiculo({
     setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
+  const caracteristicasBlock = (
+    <div>
+      <Label>Características do veículo</Label>
+      <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {CARACTERISTICAS.map((item) => {
+          const active = Boolean(data[item.key]);
+          return (
+            <button
+              key={String(item.key)}
+              type="button"
+              onClick={() => set(item.key, !active as never)}
+              className={`flex h-11 items-center justify-center rounded-xl border px-3 text-xs font-medium transition ${
+                active
+                  ? "border-brand bg-brand-soft text-brand"
+                  : "bg-background text-foreground hover:bg-accent"
+              }`}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+
+
   const submitPlaca = async (e: React.FormEvent) => {
     e.preventDefault();
     if (data.placa.replace(/[^A-Z0-9]/gi, "").length < 7) {
@@ -288,6 +331,10 @@ export function StepVeiculo({
             Com a placa, buscamos os dados do seu veículo automaticamente.
           </p>
         </div>
+
+        {caracteristicasBlock}
+
+
 
         <div className="flex flex-col-reverse gap-2 sm:flex-row">
           <button
@@ -441,7 +488,10 @@ export function StepVeiculo({
             maxLength={8}
           />
         </div>
+
+        <div className="sm:col-span-2">{caracteristicasBlock}</div>
       </div>
+
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row">
         <button type="button" onClick={onBack}

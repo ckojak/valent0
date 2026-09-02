@@ -6,6 +6,7 @@ import { ChevronLeft, ShieldCheck } from "lucide-react";
 import { StepSituacao } from "./steps/StepSituacao";
 import { StepSeguroAtual, emptySeguroAtual, type SeguroAtualData } from "./steps/StepSeguroAtual";
 import { StepVeiculo, type VeiculoData } from "./steps/StepVeiculo";
+import { StepAvaliacaoRisco, emptyAvaliacaoRisco, type AvaliacaoRiscoData } from "./steps/StepAvaliacaoRisco";
 import { StepCondutor, type CondutorData } from "./steps/StepCondutor";
 import { StepPrioridade } from "./steps/StepPrioridade";
 import { StepCoberturas, type CoberturasData } from "./steps/StepCoberturas";
@@ -21,6 +22,7 @@ type Stage =
   | "situacao"
   | "seguro_atual"
   | "veiculo"
+  | "avaliacao_risco"
   | "condutor"
   | "prioridade"
   | "coberturas"
@@ -32,6 +34,7 @@ const STAGE_ORDER: Stage[] = [
   "situacao",
   "seguro_atual",
   "veiculo",
+  "avaliacao_risco",
   "condutor",
   "prioridade",
   "coberturas",
@@ -42,6 +45,7 @@ const STAGE_ORDER: Stage[] = [
 
 // Situação em que o cliente vai renovar — exibimos o passo extra.
 const SITUACOES_COM_SEGURO_ATUAL: Situacao[] = ["renovar"];
+
 
 const emptyVeiculo: VeiculoData = {
   tipo: "car",
@@ -78,7 +82,9 @@ export function QuoteAutoWizard() {
   const [situacao, setSituacao] = useState<Situacao | null>(null);
   const [seguroAtual, setSeguroAtual] = useState<SeguroAtualData>(emptySeguroAtual);
   const [veiculo, setVeiculo] = useState<VeiculoData>(emptyVeiculo);
+  const [avaliacaoRisco, setAvaliacaoRisco] = useState<AvaliacaoRiscoData>(emptyAvaliacaoRisco);
   const [condutor, setCondutor] = useState<CondutorData>(emptyCondutor);
+
   const [prioridade, setPrioridade] = useState<Prioridade | null>(null);
   const [coberturas, setCoberturas] = useState<CoberturasData>(emptyCoberturas);
   const [whatsapp, setWhatsapp] = useState("");
@@ -119,8 +125,9 @@ export function QuoteAutoWizard() {
             : seguroAtual.teve_sinistro === "sim",
         bonus_atual: seguroAtual.bonus_atual || undefined,
         bonus_futuro: seguroAtual.bonus_futuro || undefined,
-        vigencia_inicio: seguroAtual.vigencia_inicio || undefined,
-        vigencia_fim: seguroAtual.vigencia_fim || undefined,
+        vigencia_fim_apolice: seguroAtual.vigencia_fim_apolice || undefined,
+        ci_vigente: seguroAtual.ci_vigente || undefined,
+
       }
     : {};
 
@@ -133,15 +140,18 @@ export function QuoteAutoWizard() {
       callback: callbackId,
       reference: callbackId,
       telefone: whatsapp,
+      email: condutorFinal.email || undefined,
       sexo: condutorFinal.sexo || undefined,
       situacao,
       prioridade,
       coberturas,
       veiculo,
+      avaliacao_risco: avaliacaoRisco,
       condutor,
       ...dadosSeguroAtual,
       ...overrides,
     };
+
     void segfySaveCustomer(partialInput).catch((err: unknown) => {
       console.error(
         `[SegfySaveCustomer:error] (${origem})`,
@@ -181,16 +191,19 @@ export function QuoteAutoWizard() {
       callback: callbackId,
       reference: callbackId,
       telefone: whatsapp,
+      email: condutor.email || undefined,
       sexo: condutor.sexo || undefined,
       situacao,
       prioridade,
       coberturas,
       veiculo,
+      avaliacao_risco: avaliacaoRisco,
       condutor,
       ...dadosSeguroAtual,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp, seguroAtual],
+    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp, seguroAtual, avaliacaoRisco],
+
   );
 
   return (
@@ -247,8 +260,16 @@ export function QuoteAutoWizard() {
             />
           )}
           {stage === "veiculo" && (
-            <StepVeiculo initial={veiculo} onBack={back} onNext={(v) => { setVeiculo(v); goTo("condutor"); }} />
+            <StepVeiculo initial={veiculo} onBack={back} onNext={(v) => { setVeiculo(v); goTo("avaliacao_risco"); }} />
           )}
+          {stage === "avaliacao_risco" && (
+            <StepAvaliacaoRisco
+              initial={avaliacaoRisco}
+              onBack={back}
+              onNext={(v) => { setAvaliacaoRisco(v); goTo("condutor"); }}
+            />
+          )}
+
           {stage === "condutor" && (
             <StepCondutor initial={condutor} onBack={back} onNext={(v) => { setCondutor(v); salvarParcialSegfy("pos-condutor", { condutor: v }); goTo("prioridade"); }} />
           )}

@@ -20,6 +20,8 @@ import {
   isValidCEP,
   isValidCPF,
   isValidDateBR,
+  isValidEmail,
+
 } from "@/lib/masks";
 import { ESTADO_CIVIL, USO_VEICULO } from "@/lib/quote-auto-data";
 
@@ -58,7 +60,18 @@ export type CondutorData = {
   estado_civil: string;
   uso: string;
   sexo?: "" | "male" | "female";
+  email?: string;
+  relacao?: string;
 };
+
+export const RELACAO_SEGURADO = [
+  "Próprio",
+  "Cônjuge",
+  "Filho(a)",
+  "Pai/Mãe",
+  "Outro",
+];
+
 
 export function StepCondutor({
   initial,
@@ -117,6 +130,9 @@ export function StepCondutor({
     if (!data.estado_civil) next.estado_civil = "Selecione.";
     if (!data.uso) next.uso = "Selecione.";
     if (!data.sexo) next.sexo = "Selecione.";
+    if (!data.email || !isValidEmail(data.email)) next.email = "Informe um e-mail válido.";
+    if (!data.relacao) next.relacao = "Selecione.";
+
     setErrors(next);
     if (Object.keys(next).length === 0) onNext(data);
   };
@@ -209,6 +225,28 @@ export function StepCondutor({
           </Select>
           {errors.sexo && <p className="mt-1 text-xs text-destructive">{errors.sexo}</p>}
         </div>
+
+        <div>
+          <Label htmlFor="email">E-mail</Label>
+          <Input id="email" type="email" inputMode="email" placeholder="voce@email.com"
+            value={data.email || ""}
+            onChange={(e) => set("email", e.target.value)}
+            className="mt-1.5 h-11" maxLength={255} />
+          {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
+        </div>
+
+        <div>
+          <Label>Relação com o segurado</Label>
+          <Select value={data.relacao || ""} onValueChange={(v) => set("relacao", v)}>
+            <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="Selecione" /></SelectTrigger>
+            <SelectContent>
+              {RELACAO_SEGURADO.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          {errors.relacao && <p className="mt-1 text-xs text-destructive">{errors.relacao}</p>}
+        </div>
+
+
 
 
 
