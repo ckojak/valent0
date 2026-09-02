@@ -125,8 +125,9 @@ export function QuoteAutoWizard() {
             : seguroAtual.teve_sinistro === "sim",
         bonus_atual: seguroAtual.bonus_atual || undefined,
         bonus_futuro: seguroAtual.bonus_futuro || undefined,
-        vigencia_inicio: seguroAtual.vigencia_inicio || undefined,
-        vigencia_fim: seguroAtual.vigencia_fim || undefined,
+        vigencia_fim_apolice: seguroAtual.vigencia_fim_apolice || undefined,
+        ci_vigente: seguroAtual.ci_vigente || undefined,
+
       }
     : {};
 
