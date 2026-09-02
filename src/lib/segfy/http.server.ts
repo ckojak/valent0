@@ -361,10 +361,10 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
       advantages: {},
       renewal: {
         quotation_type: isRenewal ? "RENOVATION" : "NEW",
-        prior_policy_end: isRenewal ? priorPolicyEnd : "",
-        prior_policy: isRenewal ? priorPolicy : "",
+        prior_policy_end: priorPolicyEnd,
+        prior_policy: priorPolicy,
         claim_amount: String(renewalInput.claim_amount ?? "0"),
-        insurer: isRenewal ? String(renewalInput.insurer ?? "ace") : "",
+        insurer: String(renewalInput.insurer ?? "ace"),
         bonus_current: bonusCurrent,
         prior_ic: priorIc,
         bonus_last: bonusLast,
