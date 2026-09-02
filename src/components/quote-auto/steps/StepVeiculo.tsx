@@ -26,9 +26,25 @@ export type VeiculoData = {
   ano_mod: string;
   versao: string;
   placa: string;
+  zero_km?: boolean;
+  alienado?: boolean;
+  kit_gas?: boolean;
+  blindado?: boolean;
+  chassi_remarcado?: boolean;
+  antifurto?: boolean;
 };
 
+const CARACTERISTICAS: Array<{ key: keyof VeiculoData; label: string }> = [
+  { key: "zero_km", label: "Zero Km" },
+  { key: "alienado", label: "Alienado" },
+  { key: "kit_gas", label: "Kit gás" },
+  { key: "blindado", label: "Blindado" },
+  { key: "chassi_remarcado", label: "Chassi remarcado" },
+  { key: "antifurto", label: "Antifurto" },
+];
+
 const ANOS = Array.from({ length: 26 }, (_, i) => String(2026 - i));
+
 
 function pickString(payload: unknown, keys: string[]): string {
   if (!payload || typeof payload !== "object") return "";
