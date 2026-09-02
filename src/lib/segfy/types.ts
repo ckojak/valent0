@@ -26,14 +26,21 @@ export type SegfyQuoteInput = {
   sexo?: "male" | "female";
   situacao: string | null;
   prioridade: string | null;
-  // Campos aditivos do mini-passo "seguro atual" (somente renovar/comprei).
+  // Campos aditivos do mini-passo "seguro atual" (somente renovar).
   seguradora_atual?: string;
   numero_apolice_anterior?: string;
   teve_sinistro?: boolean | null;
   bonus_atual?: string;
   bonus_futuro?: string;
-  vigencia_inicio?: string;
-  vigencia_fim?: string;
+  vigencia_fim_apolice?: string;
+  ci_vigente?: string;
+  // Passo aditivo "Avaliação de Risco" (obrigatório para todos).
+  avaliacao_risco?: {
+    garagem_residencia: "" | "sim" | "nao";
+    garagem_trabalho: "" | "sim" | "nao";
+    tipo_uso: string;
+    km_mensal: string;
+  };
   coberturas: {
     carro_reserva: boolean;
     vidros: boolean;
@@ -50,6 +57,12 @@ export type SegfyQuoteInput = {
     ano_mod: string;
     versao: string;
     placa: string;
+    zero_km?: boolean;
+    alienado?: boolean;
+    kit_gas?: boolean;
+    blindado?: boolean;
+    chassi_remarcado?: boolean;
+    antifurto?: boolean;
   };
   condutor: {
     nome: string;
@@ -62,8 +75,11 @@ export type SegfyQuoteInput = {
     estado_civil: string;
     uso: string;
     sexo?: "male" | "female" | "";
+    email?: string;
+    relacao?: string;
   };
 };
+
 
 export type SegfySocketMessage = {
   status?: "STEP" | "PDF" | "RESULT" | string;
