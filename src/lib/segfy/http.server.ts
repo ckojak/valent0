@@ -327,23 +327,6 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
   const bonusCurrent = String(input.bonus_atual || renewalInput.bonus_current || "0");
   const bonusLast = String(input.bonus_futuro || renewalInput.bonus_last || "0");
 
-  const renewalPayload = {
-    insurer: String(renewalInput.insurer ?? "ace"),
-    proprio_corretor: isRenewal,
-    bonus_last: bonusLast,
-    bonus_current: bonusCurrent,
-    claim_amount: String(renewalInput.claim_amount ?? "0"),
-    prior_policy_end: priorPolicyEnd,
-    prior_policy: priorPolicy,
-    prior_ic: priorIc,
-    codigo_renovacao: String(renewalInput.codigo_renovacao ?? ""),
-    codigo_sucursal: String(renewalInput.codigo_sucursal ?? ""),
-    item: String(renewalInput.item ?? "1"),
-    origin_bonus: String(renewalInput.origin_bonus ?? "0"),
-    transferencia_corretagem: Boolean(renewalInput.transferencia_corretagem ?? false),
-  };
-
-
   const insurers = await resolveInsurers(input);
 
   const roomId = String(input.reference ?? input.callback ?? "").trim() || String(input.callback ?? "").trim();
@@ -378,10 +361,10 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
       advantages: {},
       renewal: {
         quotation_type: isRenewal ? "RENOVATION" : "NEW",
-        prior_policy_end: priorPolicyEnd,
-        prior_policy: priorPolicy,
+        prior_policy_end: isRenewal ? priorPolicyEnd : "",
+        prior_policy: isRenewal ? priorPolicy : "",
         claim_amount: String(renewalInput.claim_amount ?? "0"),
-        insurer: String(renewalInput.insurer ?? "ace"),
+        insurer: isRenewal ? String(renewalInput.insurer ?? "ace") : "",
         bonus_current: bonusCurrent,
         prior_ic: priorIc,
         bonus_last: bonusLast,
