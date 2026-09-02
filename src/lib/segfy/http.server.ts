@@ -289,27 +289,42 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
   const condutorCpf = input.condutor.cpf.replace(/\D/g, "");
   const condutorCep = input.condutor.cep.replace(/\D/g, "");
 
-  const utilizationType = mapUtilizationType(input.condutor.uso);
+  const risco = input.avaliacao_risco;
+  const utilizationType = mapUtilizationType(risco?.tipo_uso || input.condutor.uso);
+  const residenceGarage = risco?.garagem_residencia === "sim" ? "garage" : "no_garage";
+  const jobGarage = risco?.garagem_trabalho === "sim" ? "yes" : "no";
+  const monthlyKm = String(Number(risco?.km_mensal) > 0 ? Number(risco?.km_mensal) : 1000);
 
   const isRenewal = input.situacao === "renovar";
   const renewalInput =
     (input as unknown as { renewal?: Record<string, unknown> }).renewal ?? {};
 
+  const priorPolicyEnd = input.vigencia_fim_apolice
+    ? parseDateBRToIso(input.vigencia_fim_apolice)
+    : String(renewalInput.prior_policy_end ?? "2099-12-31");
+  const priorPolicy = String(
+    input.numero_apolice_anterior || renewalInput.prior_policy || "NAO_INFORMADA",
+  );
+  const priorIc = String(input.ci_vigente || renewalInput.prior_ic || "");
+  const bonusCurrent = String(input.bonus_atual || renewalInput.bonus_current || "0");
+  const bonusLast = String(input.bonus_futuro || renewalInput.bonus_last || "0");
+
   const renewalPayload = {
     insurer: String(renewalInput.insurer ?? "ace"),
     proprio_corretor: isRenewal,
-    bonus_last: String(renewalInput.bonus_last ?? "0"),
-    bonus_current: String(renewalInput.bonus_current ?? "0"),
+    bonus_last: bonusLast,
+    bonus_current: bonusCurrent,
     claim_amount: String(renewalInput.claim_amount ?? "0"),
-    prior_policy_end: String(renewalInput.prior_policy_end ?? "2099-12-31"),
-    prior_policy: String(renewalInput.prior_policy ?? "NAO_INFORMADA"),
-    prior_ic: String(renewalInput.prior_ic ?? ""),
+    prior_policy_end: priorPolicyEnd,
+    prior_policy: priorPolicy,
+    prior_ic: priorIc,
     codigo_renovacao: String(renewalInput.codigo_renovacao ?? ""),
     codigo_sucursal: String(renewalInput.codigo_sucursal ?? ""),
     item: String(renewalInput.item ?? "1"),
     origin_bonus: String(renewalInput.origin_bonus ?? "0"),
     transferencia_corretagem: Boolean(renewalInput.transferencia_corretagem ?? false),
   };
+
 
   const insurers = await resolveInsurers(input);
 
