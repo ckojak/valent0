@@ -597,21 +597,39 @@ export async function handleSegfyApiRequest(request: Request): Promise<Response>
     if (pathname === "/api/segfy/vehicle/calculate" && request.method === "POST") {
       const input = await parseBodyAsJson<SegfyQuoteInput>(request);
       const body = await toCalculatePayload(input);
-      const payload = await segfyRequest("/api/vehicle/version/1.0/calculate", {
-        method: "POST",
-        body: JSON.stringify(body),
-      });
-      return json(payload);
+      try {
+        const payload = await segfyRequest("/api/vehicle/version/1.0/calculate", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+        return json(payload);
+      } catch (error) {
+        console.error("[SegfyProxy] /calculate request body:", JSON.stringify(body));
+        console.error(
+          "[SegfyProxy] /calculate error payload:",
+          error instanceof SegfyHttpError ? JSON.stringify(error.payload) : JSON.stringify({ raw: String(error) }),
+        );
+        throw error;
+      }
     }
 
     if (pathname === "/api/segfy/vehicle/save-customer" && request.method === "POST") {
       const input = await parseBodyAsJson<SegfyQuoteInput>(request);
       const body = await toCalculatePayload(input);
-      const payload = await segfyRequest("/api/vehicle/version/1.0/save-customer", {
-        method: "POST",
-        body: JSON.stringify(body),
-      });
-      return json({ saved: true, payload });
+      try {
+        const payload = await segfyRequest("/api/vehicle/version/1.0/save-customer", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+        return json({ saved: true, payload });
+      } catch (error) {
+        console.error("[SegfyProxy] /save-customer request body:", JSON.stringify(body));
+        console.error(
+          "[SegfyProxy] /save-customer error payload:",
+          error instanceof SegfyHttpError ? JSON.stringify(error.payload) : JSON.stringify({ raw: String(error) }),
+        );
+        throw error;
+      }
     }
 
     if (pathname === "/api/segfy/vehicle/show-quotation" && request.method === "POST") {
