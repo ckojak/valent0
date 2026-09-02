@@ -359,18 +359,22 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
       zip_code: condutorCep,
       customization: {},
       advantages: {},
-      renewal: {
-        quotation_type: isRenewal ? "RENOVATION" : "NEW",
-        prior_policy_end: priorPolicyEnd,
-        prior_policy: priorPolicy,
-        claim_amount: String(renewalInput.claim_amount ?? "0"),
-        insurer: String(renewalInput.insurer ?? "ace"),
-        bonus_current: bonusCurrent,
-        prior_ic: priorIc,
-        bonus_last: bonusLast,
-        item: String(renewalInput.item ?? "1"),
-        origin_bonus: String(renewalInput.origin_bonus ?? "0"),
-      },
+      ...(isRenewal
+        ? {
+            renewal: {
+              quotation_type: "RENOVATION",
+              prior_policy_end: priorPolicyEnd,
+              prior_policy: priorPolicy,
+              claim_amount: String(renewalInput.claim_amount ?? "0"),
+              insurer: String(renewalInput.insurer ?? "ace"),
+              bonus_current: bonusCurrent,
+              prior_ic: priorIc,
+              bonus_last: bonusLast,
+              item: String(renewalInput.item ?? "1"),
+              origin_bonus: String(renewalInput.origin_bonus ?? "0"),
+            },
+          }
+        : {}),
       customer: {
         social_name: input.condutor.nome,
         document: condutorCpf,
