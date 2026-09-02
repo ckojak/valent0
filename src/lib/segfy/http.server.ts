@@ -309,7 +309,7 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
 
   const risco = input.avaliacao_risco;
   const utilizationType = mapUtilizationType(risco?.tipo_uso || input.condutor.uso);
-  const residenceGarage = risco?.garagem_residencia === "sim" ? "garage" : "no_garage";
+  const residenceGarage = risco?.garagem_residencia === "sim" ? "yes" : "no";
   const jobGarage = risco?.garagem_trabalho === "sim" ? "yes" : "no";
   const monthlyKm = String(Number(risco?.km_mensal) > 0 ? Number(risco?.km_mensal) : 1000);
 
