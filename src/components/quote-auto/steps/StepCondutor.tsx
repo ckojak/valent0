@@ -58,7 +58,18 @@ export type CondutorData = {
   estado_civil: string;
   uso: string;
   sexo?: "" | "male" | "female";
+  email?: string;
+  relacao?: string;
 };
+
+export const RELACAO_SEGURADO = [
+  "Próprio",
+  "Cônjuge",
+  "Filho(a)",
+  "Pai/Mãe",
+  "Outro",
+];
+
 
 export function StepCondutor({
   initial,
