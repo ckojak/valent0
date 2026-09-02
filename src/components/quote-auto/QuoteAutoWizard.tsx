@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ShieldCheck } from "lucide-react";
 
 import { StepSituacao } from "./steps/StepSituacao";
+import { StepSeguroAtual, emptySeguroAtual, type SeguroAtualData } from "./steps/StepSeguroAtual";
 import { StepVeiculo, type VeiculoData } from "./steps/StepVeiculo";
 import { StepCondutor, type CondutorData } from "./steps/StepCondutor";
 import { StepPrioridade } from "./steps/StepPrioridade";
@@ -18,6 +19,7 @@ import type { SegfyQuoteInput } from "@/lib/segfy/types";
 
 type Stage =
   | "situacao"
+  | "seguro_atual"
   | "veiculo"
   | "condutor"
   | "prioridade"
@@ -28,6 +30,7 @@ type Stage =
 
 const STAGE_ORDER: Stage[] = [
   "situacao",
+  "seguro_atual",
   "veiculo",
   "condutor",
   "prioridade",
@@ -36,6 +39,9 @@ const STAGE_ORDER: Stage[] = [
   "whatsapp",
   "cotacao",
 ];
+
+// Situações em que o cliente já tem/teve seguro — exibimos o passo extra.
+const SITUACOES_COM_SEGURO_ATUAL: Situacao[] = ["renovar", "comprei"];
 
 const emptyVeiculo: VeiculoData = {
   tipo: "car",
@@ -50,6 +56,7 @@ const emptyVeiculo: VeiculoData = {
 };
 const emptyCondutor: CondutorData = {
   nome: "",
+  nome_social: "",
   nascimento: "",
   cpf: "",
   cep: "",
@@ -57,6 +64,7 @@ const emptyCondutor: CondutorData = {
   profissao_id: "",
   estado_civil: "",
   uso: "",
+  sexo: "",
 };
 const emptyCoberturas: CoberturasData = {
   carro_reserva: true,
@@ -68,6 +76,7 @@ const emptyCoberturas: CoberturasData = {
 export function QuoteAutoWizard() {
   const [stage, setStage] = useState<Stage>("situacao");
   const [situacao, setSituacao] = useState<Situacao | null>(null);
+  const [seguroAtual, setSeguroAtual] = useState<SeguroAtualData>(emptySeguroAtual);
   const [veiculo, setVeiculo] = useState<VeiculoData>(emptyVeiculo);
   const [condutor, setCondutor] = useState<CondutorData>(emptyCondutor);
   const [prioridade, setPrioridade] = useState<Prioridade | null>(null);
@@ -82,10 +91,16 @@ export function QuoteAutoWizard() {
   const stepIndex = STAGE_ORDER.indexOf(stage);
   const progress = Math.min(100, Math.round(((stepIndex + 1) / STAGE_ORDER.length) * 100));
 
+  // O passo "seguro_atual" só aparece para quem escolheu "renovar" ou "comprei".
+  const temSeguroAtual = situacao !== null && SITUACOES_COM_SEGURO_ATUAL.includes(situacao);
+
   const goTo = (s: Stage) => setStage(s);
   const back = () => {
     const idx = STAGE_ORDER.indexOf(stage);
-    if (idx > 0) setStage(STAGE_ORDER[idx - 1]);
+    if (idx <= 0) return;
+    let prev = STAGE_ORDER[idx - 1];
+    if (prev === "seguro_atual" && !temSeguroAtual) prev = "situacao";
+    setStage(prev);
   };
 
   /**
@@ -93,19 +108,38 @@ export function QuoteAutoWizard() {
    * temos o mínimo necessário, sem travar a navegação do wizard.
    * Usa o mesmo callback/reference da sessão para não duplicar registros.
    */
+  // Campos aditivos do seguro atual + sexo — enviados junto ao payload já existente.
+  const dadosSeguroAtual: Partial<SegfyQuoteInput> = temSeguroAtual
+    ? {
+        seguradora_atual: seguroAtual.seguradora_atual || undefined,
+        numero_apolice_anterior: seguroAtual.numero_apolice_anterior || undefined,
+        teve_sinistro:
+          seguroAtual.teve_sinistro === ""
+            ? null
+            : seguroAtual.teve_sinistro === "sim",
+        bonus_atual: seguroAtual.bonus_atual || undefined,
+        bonus_futuro: seguroAtual.bonus_futuro || undefined,
+        vigencia_inicio: seguroAtual.vigencia_inicio || undefined,
+        vigencia_fim: seguroAtual.vigencia_fim || undefined,
+      }
+    : {};
+
   const salvarParcialSegfy = (
     origem: string,
     overrides: Partial<SegfyQuoteInput> = {},
   ) => {
+    const condutorFinal = overrides.condutor ?? condutor;
     const partialInput: SegfyQuoteInput = {
       callback: callbackId,
       reference: callbackId,
       telefone: whatsapp,
+      sexo: condutorFinal.sexo || undefined,
       situacao,
       prioridade,
       coberturas,
       veiculo,
       condutor,
+      ...dadosSeguroAtual,
       ...overrides,
     };
     void segfySaveCustomer(partialInput).catch((err: unknown) => {
@@ -147,13 +181,16 @@ export function QuoteAutoWizard() {
       callback: callbackId,
       reference: callbackId,
       telefone: whatsapp,
+      sexo: condutor.sexo || undefined,
       situacao,
       prioridade,
       coberturas,
       veiculo,
       condutor,
+      ...dadosSeguroAtual,
     }),
-    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp, seguroAtual],
   );
 
   return (
@@ -196,7 +233,17 @@ export function QuoteAutoWizard() {
           {stage === "situacao" && (
             <StepSituacao
               value={situacao}
-              onNext={(v) => { setSituacao(v); goTo("veiculo"); }}
+              onNext={(v) => {
+                setSituacao(v);
+                goTo(SITUACOES_COM_SEGURO_ATUAL.includes(v) ? "seguro_atual" : "veiculo");
+              }}
+            />
+          )}
+          {stage === "seguro_atual" && (
+            <StepSeguroAtual
+              initial={seguroAtual}
+              onBack={back}
+              onNext={(v) => { setSeguroAtual(v); goTo("veiculo"); }}
             />
           )}
           {stage === "veiculo" && (

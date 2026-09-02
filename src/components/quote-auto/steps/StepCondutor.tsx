@@ -49,6 +49,7 @@ function normalizeBirthDate(value: string): string {
 
 export type CondutorData = {
   nome: string;
+  nome_social?: string;
   nascimento: string;
   cpf: string;
   cep: string;
@@ -56,6 +57,7 @@ export type CondutorData = {
   profissao_id?: string;
   estado_civil: string;
   uso: string;
+  sexo?: "" | "male" | "female";
 };
 
 export function StepCondutor({
@@ -114,6 +116,7 @@ export function StepCondutor({
     if (!data.profissao) next.profissao = "Selecione.";
     if (!data.estado_civil) next.estado_civil = "Selecione.";
     if (!data.uso) next.uso = "Selecione.";
+    if (!data.sexo) next.sexo = "Selecione.";
     setErrors(next);
     if (Object.keys(next).length === 0) onNext(data);
   };
@@ -189,6 +192,24 @@ export function StepCondutor({
           <Input id="nome" value={data.nome} onChange={(e) => set("nome", e.target.value)} className="mt-1.5 h-11" />
           {errors.nome && <p className="mt-1 text-xs text-destructive">{errors.nome}</p>}
         </div>
+
+        <div>
+          <Label htmlFor="nome_social">Nome social <span className="text-muted-foreground">(opcional)</span></Label>
+          <Input id="nome_social" value={data.nome_social || ""} onChange={(e) => set("nome_social", e.target.value)} className="mt-1.5 h-11" />
+        </div>
+
+        <div>
+          <Label>Sexo</Label>
+          <Select value={data.sexo || ""} onValueChange={(v) => set("sexo", v as "male" | "female")}>
+            <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="Selecione" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="male">Masculino</SelectItem>
+              <SelectItem value="female">Feminino</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.sexo && <p className="mt-1 text-xs text-destructive">{errors.sexo}</p>}
+        </div>
+
 
 
         <div>
