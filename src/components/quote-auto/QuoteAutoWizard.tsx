@@ -6,6 +6,7 @@ import { ChevronLeft, ShieldCheck } from "lucide-react";
 import { StepSituacao } from "./steps/StepSituacao";
 import { StepSeguroAtual, emptySeguroAtual, type SeguroAtualData } from "./steps/StepSeguroAtual";
 import { StepVeiculo, type VeiculoData } from "./steps/StepVeiculo";
+import { StepAvaliacaoRisco, emptyAvaliacaoRisco, type AvaliacaoRiscoData } from "./steps/StepAvaliacaoRisco";
 import { StepCondutor, type CondutorData } from "./steps/StepCondutor";
 import { StepPrioridade } from "./steps/StepPrioridade";
 import { StepCoberturas, type CoberturasData } from "./steps/StepCoberturas";
@@ -21,6 +22,7 @@ type Stage =
   | "situacao"
   | "seguro_atual"
   | "veiculo"
+  | "avaliacao_risco"
   | "condutor"
   | "prioridade"
   | "coberturas"
@@ -32,6 +34,7 @@ const STAGE_ORDER: Stage[] = [
   "situacao",
   "seguro_atual",
   "veiculo",
+  "avaliacao_risco",
   "condutor",
   "prioridade",
   "coberturas",
@@ -42,6 +45,7 @@ const STAGE_ORDER: Stage[] = [
 
 // Situação em que o cliente vai renovar — exibimos o passo extra.
 const SITUACOES_COM_SEGURO_ATUAL: Situacao[] = ["renovar"];
+
 
 const emptyVeiculo: VeiculoData = {
   tipo: "car",
