@@ -20,6 +20,8 @@ import {
   isValidCEP,
   isValidCPF,
   isValidDateBR,
+  isValidEmail,
+
 } from "@/lib/masks";
 import { ESTADO_CIVIL, USO_VEICULO } from "@/lib/quote-auto-data";
 
@@ -128,6 +130,9 @@ export function StepCondutor({
     if (!data.estado_civil) next.estado_civil = "Selecione.";
     if (!data.uso) next.uso = "Selecione.";
     if (!data.sexo) next.sexo = "Selecione.";
+    if (!data.email || !isValidEmail(data.email)) next.email = "Informe um e-mail válido.";
+    if (!data.relacao) next.relacao = "Selecione.";
+
     setErrors(next);
     if (Object.keys(next).length === 0) onNext(data);
   };
