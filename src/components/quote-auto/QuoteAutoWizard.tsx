@@ -191,16 +191,19 @@ export function QuoteAutoWizard() {
       callback: callbackId,
       reference: callbackId,
       telefone: whatsapp,
+      email: condutor.email || undefined,
       sexo: condutor.sexo || undefined,
       situacao,
       prioridade,
       coberturas,
       veiculo,
+      avaliacao_risco: avaliacaoRisco,
       condutor,
       ...dadosSeguroAtual,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp, seguroAtual],
+    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp, seguroAtual, avaliacaoRisco],
+
   );
 
   return (
