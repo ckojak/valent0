@@ -140,15 +140,18 @@ export function QuoteAutoWizard() {
       callback: callbackId,
       reference: callbackId,
       telefone: whatsapp,
+      email: condutorFinal.email || undefined,
       sexo: condutorFinal.sexo || undefined,
       situacao,
       prioridade,
       coberturas,
       veiculo,
+      avaliacao_risco: avaliacaoRisco,
       condutor,
       ...dadosSeguroAtual,
       ...overrides,
     };
+
     void segfySaveCustomer(partialInput).catch((err: unknown) => {
       console.error(
         `[SegfySaveCustomer:error] (${origem})`,
