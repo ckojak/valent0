@@ -110,6 +110,22 @@ export function QuoteAutoWizard() {
    * temos o mínimo necessário, sem travar a navegação do wizard.
    * Usa o mesmo callback/reference da sessão para não duplicar registros.
    */
+  // Campos aditivos do seguro atual + sexo — enviados junto ao payload já existente.
+  const dadosSeguroAtual: Partial<SegfyQuoteInput> = temSeguroAtual
+    ? {
+        seguradora_atual: seguroAtual.seguradora_atual || undefined,
+        numero_apolice_anterior: seguroAtual.numero_apolice_anterior || undefined,
+        teve_sinistro:
+          seguroAtual.teve_sinistro === ""
+            ? null
+            : seguroAtual.teve_sinistro === "sim",
+        bonus_atual: seguroAtual.bonus_atual || undefined,
+        bonus_futuro: seguroAtual.bonus_futuro || undefined,
+        vigencia_inicio: seguroAtual.vigencia_inicio || undefined,
+        vigencia_fim: seguroAtual.vigencia_fim || undefined,
+      }
+    : {};
+
   const salvarParcialSegfy = (
     origem: string,
     overrides: Partial<SegfyQuoteInput> = {},
@@ -118,11 +134,13 @@ export function QuoteAutoWizard() {
       callback: callbackId,
       reference: callbackId,
       telefone: whatsapp,
+      sexo: condutor.sexo || undefined,
       situacao,
       prioridade,
       coberturas,
       veiculo,
       condutor,
+      ...dadosSeguroAtual,
       ...overrides,
     };
     void segfySaveCustomer(partialInput).catch((err: unknown) => {
