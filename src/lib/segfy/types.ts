@@ -37,9 +37,15 @@ export type SegfyQuoteInput = {
   // Passo aditivo "Avaliação de Risco" (obrigatório para todos).
   avaliacao_risco?: {
     garagem_residencia: "" | "yes_with_electronic_gate" | "yes_without_electronic_gate" | "no_garage" | "not_kept_in_garage";
-    garagem_trabalho: "" | "sim" | "nao";
+    garagem_trabalho: string;
+    garagem_estudo?: string;
     tipo_uso: string;
+    menores_26?: string;
+    idade_condutor_adicional?: string;
     km_mensal: string;
+    distancia_trabalho?: string;
+    tipo_residencia?: string;
+    isencao_fiscal?: string;
   };
   coberturas: {
     carro_reserva: boolean;
