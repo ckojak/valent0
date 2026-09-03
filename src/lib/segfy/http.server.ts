@@ -308,9 +308,20 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
   const condutorCep = input.condutor.cep.replace(/\D/g, "");
 
   const risco = input.avaliacao_risco;
-  const utilizationType = mapUtilizationType(risco?.tipo_uso || input.condutor.uso);
+  // Os steps já guardam os valores oficiais da Segfy; só usamos fallback quando vazio.
+  const utilizationType =
+    risco?.tipo_uso === "personal" || risco?.tipo_uso === "job" || risco?.tipo_uso === "both"
+      ? risco.tipo_uso
+      : mapUtilizationType(risco?.tipo_uso || input.condutor.uso);
   const residenceGarage = risco?.garagem_residencia || "no_garage";
-  const jobGarage = risco?.garagem_trabalho === "sim" ? "yes" : "no";
+  const jobGarage =
+    risco?.garagem_trabalho === "sim" ? "yes" : risco?.garagem_trabalho === "nao" ? "no" : risco?.garagem_trabalho || "no";
+  const studyGarage = risco?.garagem_estudo || "no";
+  const otherDriver = risco?.menores_26 || "does_not_exist";
+  const secondaryDriverAge = risco?.idade_condutor_adicional || " ";
+  const residenceType = risco?.tipo_residencia || "house";
+  const taxExemption = risco?.isencao_fiscal || "not_isent";
+  const workDistance = String(Number(risco?.distancia_trabalho) >= 0 && risco?.distancia_trabalho ? Number(risco.distancia_trabalho) : 15);
   const monthlyKm = String(Number(risco?.km_mensal) > 0 ? Number(risco?.km_mensal) : 1000);
 
   const isRenewal = input.situacao === "renovar";
@@ -413,14 +424,14 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
       questionnaire: {
         residence_garage: residenceGarage,
         job_garage: jobGarage,
-        study_garage: "no",
+        study_garage: studyGarage,
         utilization_type: utilizationType,
-        other_driver: "does_not_exist",
-        secondary_driver_age: " ",
+        other_driver: otherDriver,
+        secondary_driver_age: secondaryDriverAge,
         monthly_km: monthlyKm,
-        work_distance: String(15),
-        residence_type: "house",
-        tax_exemption: "not_applicable",
+        work_distance: workDistance,
+        residence_type: residenceType,
+        tax_exemption: taxExemption,
       },
 
       questionnaire_truck: {},
