@@ -20,7 +20,9 @@ import { Route as AtendimentoRouteImport } from './routes/atendimento'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SegurosSlugRouteImport } from './routes/seguros/$slug'
+import { Route as CotacaoPersonalizadaRouteImport } from './routes/cotacao/personalizada'
 import { Route as CotacaoAutoRouteImport } from './routes/cotacao/auto'
+import { Route as ApiLeadsEmailRouteImport } from './routes/api/leads-email'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ApiPublicSegfyWebhookRouteImport } from './routes/api/public/segfy-webhook'
@@ -79,9 +81,19 @@ const SegurosSlugRoute = SegurosSlugRouteImport.update({
   path: '/seguros/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CotacaoPersonalizadaRoute = CotacaoPersonalizadaRouteImport.update({
+  id: '/cotacao/personalizada',
+  path: '/cotacao/personalizada',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CotacaoAutoRoute = CotacaoAutoRouteImport.update({
   id: '/cotacao/auto',
   path: '/cotacao/auto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLeadsEmailRoute = ApiLeadsEmailRouteImport.update({
+  id: '/api/leads-email',
+  path: '/api/leads-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -111,7 +123,9 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
+  '/api/leads-email': typeof ApiLeadsEmailRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
+  '/cotacao/personalizada': typeof CotacaoPersonalizadaRoute
   '/seguros/$slug': typeof SegurosSlugRoute
   '/api/public/segfy-webhook': typeof ApiPublicSegfyWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -127,7 +141,9 @@ export interface FileRoutesByTo {
   '/sobre': typeof SobreRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
+  '/api/leads-email': typeof ApiLeadsEmailRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
+  '/cotacao/personalizada': typeof CotacaoPersonalizadaRoute
   '/seguros/$slug': typeof SegurosSlugRoute
   '/api/public/segfy-webhook': typeof ApiPublicSegfyWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -145,7 +161,9 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
+  '/api/leads-email': typeof ApiLeadsEmailRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
+  '/cotacao/personalizada': typeof CotacaoPersonalizadaRoute
   '/seguros/$slug': typeof SegurosSlugRoute
   '/api/public/segfy-webhook': typeof ApiPublicSegfyWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -163,7 +181,9 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/termos-de-uso'
     | '/admin/login'
+    | '/api/leads-email'
     | '/cotacao/auto'
+    | '/cotacao/personalizada'
     | '/seguros/$slug'
     | '/api/public/segfy-webhook'
     | '/admin/'
@@ -179,7 +199,9 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/termos-de-uso'
     | '/admin/login'
+    | '/api/leads-email'
     | '/cotacao/auto'
+    | '/cotacao/personalizada'
     | '/seguros/$slug'
     | '/api/public/segfy-webhook'
     | '/admin'
@@ -196,7 +218,9 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/termos-de-uso'
     | '/admin/login'
+    | '/api/leads-email'
     | '/cotacao/auto'
+    | '/cotacao/personalizada'
     | '/seguros/$slug'
     | '/api/public/segfy-webhook'
     | '/_authenticated/admin/'
@@ -214,7 +238,9 @@ export interface RootRouteChildren {
   SobreRoute: typeof SobreRoute
   TermosDeUsoRoute: typeof TermosDeUsoRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  ApiLeadsEmailRoute: typeof ApiLeadsEmailRoute
   CotacaoAutoRoute: typeof CotacaoAutoRoute
+  CotacaoPersonalizadaRoute: typeof CotacaoPersonalizadaRoute
   SegurosSlugRoute: typeof SegurosSlugRoute
   ApiPublicSegfyWebhookRoute: typeof ApiPublicSegfyWebhookRoute
 }
@@ -298,11 +324,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SegurosSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cotacao/personalizada': {
+      id: '/cotacao/personalizada'
+      path: '/cotacao/personalizada'
+      fullPath: '/cotacao/personalizada'
+      preLoaderRoute: typeof CotacaoPersonalizadaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cotacao/auto': {
       id: '/cotacao/auto'
       path: '/cotacao/auto'
       fullPath: '/cotacao/auto'
       preLoaderRoute: typeof CotacaoAutoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/leads-email': {
+      id: '/api/leads-email'
+      path: '/api/leads-email'
+      fullPath: '/api/leads-email'
+      preLoaderRoute: typeof ApiLeadsEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/login': {
@@ -352,7 +392,9 @@ const rootRouteChildren: RootRouteChildren = {
   SobreRoute: SobreRoute,
   TermosDeUsoRoute: TermosDeUsoRoute,
   AdminLoginRoute: AdminLoginRoute,
+  ApiLeadsEmailRoute: ApiLeadsEmailRoute,
   CotacaoAutoRoute: CotacaoAutoRoute,
+  CotacaoPersonalizadaRoute: CotacaoPersonalizadaRoute,
   SegurosSlugRoute: SegurosSlugRoute,
   ApiPublicSegfyWebhookRoute: ApiPublicSegfyWebhookRoute,
 }

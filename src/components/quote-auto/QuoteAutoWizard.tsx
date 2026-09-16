@@ -21,9 +21,9 @@ import type { SegfyQuoteInput } from "@/lib/segfy/types";
 type Stage =
   | "situacao"
   | "seguro_atual"
+  | "condutor"
   | "veiculo"
   | "avaliacao_risco"
-  | "condutor"
   | "prioridade"
   | "coberturas"
   | "resumo"
@@ -33,9 +33,9 @@ type Stage =
 const STAGE_ORDER: Stage[] = [
   "situacao",
   "seguro_atual",
+  "condutor",
   "veiculo",
   "avaliacao_risco",
-  "condutor",
   "prioridade",
   "coberturas",
   "resumo",
@@ -256,8 +256,11 @@ export function QuoteAutoWizard() {
             <StepSeguroAtual
               initial={seguroAtual}
               onBack={back}
-              onNext={(v) => { setSeguroAtual(v); goTo("veiculo"); }}
+              onNext={(v) => { setSeguroAtual(v); goTo("condutor"); }}
             />
+          )}
+          {stage === "condutor" && (
+            <StepCondutor initial={condutor} onBack={back} onNext={(v) => { setCondutor(v); salvarParcialSegfy("pos-condutor", { condutor: v }); goTo("veiculo"); }} />
           )}
           {stage === "veiculo" && (
             <StepVeiculo initial={veiculo} onBack={back} onNext={(v) => { setVeiculo(v); goTo("avaliacao_risco"); }} />
@@ -266,12 +269,8 @@ export function QuoteAutoWizard() {
             <StepAvaliacaoRisco
               initial={avaliacaoRisco}
               onBack={back}
-              onNext={(v) => { setAvaliacaoRisco(v); goTo("condutor"); }}
+              onNext={(v) => { setAvaliacaoRisco(v); goTo("prioridade"); }}
             />
-          )}
-
-          {stage === "condutor" && (
-            <StepCondutor initial={condutor} onBack={back} onNext={(v) => { setCondutor(v); salvarParcialSegfy("pos-condutor", { condutor: v }); goTo("prioridade"); }} />
           )}
           {stage === "prioridade" && (
             <StepPrioridade value={prioridade} onBack={back} onNext={(v) => { setPrioridade(v); goTo("coberturas"); }} />

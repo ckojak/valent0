@@ -6,6 +6,13 @@ import { insertLead } from "@/lib/leads";
 
 const TIPOS = [
   { value: "auto", label: "Seguro Auto" },
+  { value: "saude", label: "Seguro Saúde e Dental" },
+  { value: "dental", label: "Seguro Dental" },
+  { value: "celular", label: "Seguro Celular/Notebook/Câmeras" },
+  { value: "equipamentos", label: "Seguro Equipamentos (Agro, Civil, Solar e Elétricos)" },
+  { value: "viagem", label: "Seguro Viagem" },
+  { value: "consorcio", label: "Consórcios" },
+  { value: "personalizado", label: "Seguros Personalizados" },
   { value: "residencial", label: "Seguro Residencial" },
   { value: "empresarial", label: "Seguro Empresarial" },
   { value: "vida", label: "Seguro de Vida" },
@@ -39,10 +46,22 @@ export function QuickQuote() {
         tipo_seguro: tipo,
         dados: { fonte: "form_home_dark_bar" },
       });
-      toast.success("Recebemos seu contato! Vamos te chamar no WhatsApp.");
+
+      const customTypes = ["saude", "dental", "celular", "equipamentos", "viagem", "consorcio", "personalizado"];
       setTipo("");
       setWa("");
-      if (tipo === "auto") navigate({ to: "/cotacao/auto" });
+
+      if (tipo === "auto") {
+        navigate({ to: "/cotacao/auto" });
+        return;
+      }
+
+      if (customTypes.includes(tipo)) {
+        navigate({ to: "/cotacao/personalizada", search: { tipo } });
+        return;
+      }
+
+      toast.success("Recebemos seu contato! Vamos te chamar no WhatsApp.");
     } catch {
       toast.error("Não foi possível enviar. Tente novamente.");
     } finally {

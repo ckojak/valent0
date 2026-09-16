@@ -195,6 +195,12 @@ export function StepVeiculo({
     setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
+  const tipoOptions: Array<{ value: VehicleKind; label: string }> = [
+    { value: "car", label: "Carro" },
+    { value: "motorcycle", label: "Moto" },
+    { value: "truck", label: "Caminhão" },
+  ];
+
   const caracteristicasBlock = (
     <div>
       <Label>Características do veículo</Label>
@@ -312,6 +318,27 @@ export function StepVeiculo({
         </div>
 
         <div>
+          <Label>Tipo de veículo</Label>
+          <div className="mt-1.5 grid grid-cols-3 gap-2">
+            {tipoOptions.map((option) => {
+              const active = data.tipo === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => set("tipo", option.value)}
+                  className={`flex h-11 items-center justify-center rounded-xl border text-sm font-medium transition ${
+                    active ? "border-brand bg-brand-soft text-brand" : "bg-background text-foreground hover:bg-accent"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
           <Label htmlFor="placa">Placa do veículo</Label>
           <div className="relative mt-1.5">
             <KeyRound className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -371,6 +398,36 @@ export function StepVeiculo({
       <div className="flex items-center gap-2 text-sm font-medium text-brand">
         <Car className="h-4 w-4" />
         Sobre o seu veículo
+      </div>
+
+      <div>
+        <Label>Tipo de veículo</Label>
+        <div className="mt-1.5 grid grid-cols-3 gap-2">
+          {tipoOptions.map((option) => {
+            const active = data.tipo === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  set("tipo", option.value);
+                  set("marca", "");
+                  set("marca_id", "");
+                  set("modelo", "");
+                  set("modelo_id", "");
+                  set("ano_fab", "");
+                  set("ano_mod", "");
+                  set("versao", "");
+                }}
+                className={`flex h-11 items-center justify-center rounded-xl border text-sm font-medium transition ${
+                  active ? "border-brand bg-brand-soft text-brand" : "bg-background text-foreground hover:bg-accent"
+                }`}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <button

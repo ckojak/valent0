@@ -179,7 +179,7 @@ export function StepCondutor({
     <form onSubmit={submit} className="flex flex-col gap-5">
       <div className="flex items-center gap-2 text-sm font-medium text-brand">
         <User className="h-4 w-4" />
-        Perfil do condutor principal
+        Dados do segurado e perfil do condutor
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -195,14 +195,17 @@ export function StepCondutor({
         </div>
 
         <div>
-          <Label htmlFor="nascimento">Data de nascimento</Label>
-          <Input id="nascimento" inputMode="numeric" placeholder="DD/MM/AAAA"
-            value={data.nascimento}
-            onChange={(e) => set("nascimento", formatDateBR(e.target.value))}
-            className="mt-1.5 h-11" maxLength={10} />
-          {errors.nascimento && <p className="mt-1 text-xs text-destructive">{errors.nascimento}</p>}
+          <Label htmlFor="cep">CEP de pernoite</Label>
+          <Input id="cep" inputMode="numeric" placeholder="00000-000"
+            value={data.cep}
+            onChange={(e) => set("cep", formatCEP(e.target.value))}
+            onBlur={handleCepBlur}
+            className="mt-1.5 h-11" maxLength={9} />
+          {errors.cep && <p className="mt-1 text-xs text-destructive">{errors.cep}</p>}
+          {loadingCep && <p className="mt-1 text-xs text-muted-foreground">Consultando CEP...</p>}
+          {!loadingCep && addressPreview && <p className="mt-1 text-xs text-muted-foreground">{addressPreview}</p>}
         </div>
-        
+
         <div className="sm:col-span-2">
           <Label htmlFor="nome">Nome completo</Label>
           <Input id="nome" value={data.nome} onChange={(e) => set("nome", e.target.value)} className="mt-1.5 h-11" />
@@ -210,8 +213,12 @@ export function StepCondutor({
         </div>
 
         <div>
-          <Label htmlFor="nome_social">Nome social <span className="text-muted-foreground">(opcional)</span></Label>
-          <Input id="nome_social" value={data.nome_social || ""} onChange={(e) => set("nome_social", e.target.value)} className="mt-1.5 h-11" />
+          <Label htmlFor="nascimento">Data de nascimento</Label>
+          <Input id="nascimento" inputMode="numeric" placeholder="DD/MM/AAAA"
+            value={data.nascimento}
+            onChange={(e) => set("nascimento", formatDateBR(e.target.value))}
+            className="mt-1.5 h-11" maxLength={10} />
+          {errors.nascimento && <p className="mt-1 text-xs text-destructive">{errors.nascimento}</p>}
         </div>
 
         <div>
@@ -233,33 +240,6 @@ export function StepCondutor({
             onChange={(e) => set("email", e.target.value)}
             className="mt-1.5 h-11" maxLength={255} />
           {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
-        </div>
-
-        <div>
-          <Label>Relação com o segurado</Label>
-          <Select value={data.relacao || ""} onValueChange={(v) => set("relacao", v)}>
-            <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="Selecione" /></SelectTrigger>
-            <SelectContent>
-              {RELACAO_SEGURADO.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          {errors.relacao && <p className="mt-1 text-xs text-destructive">{errors.relacao}</p>}
-        </div>
-
-
-
-
-
-        <div>
-          <Label htmlFor="cep">CEP de pernoite</Label>
-          <Input id="cep" inputMode="numeric" placeholder="00000-000"
-            value={data.cep}
-            onChange={(e) => set("cep", formatCEP(e.target.value))}
-            onBlur={handleCepBlur}
-            className="mt-1.5 h-11" maxLength={9} />
-          {errors.cep && <p className="mt-1 text-xs text-destructive">{errors.cep}</p>}
-          {loadingCep && <p className="mt-1 text-xs text-muted-foreground">Consultando CEP...</p>}
-          {!loadingCep && addressPreview && <p className="mt-1 text-xs text-muted-foreground">{addressPreview}</p>}
         </div>
 
         <div>
@@ -300,6 +280,22 @@ export function StepCondutor({
             </SelectContent>
           </Select>
           {errors.uso && <p className="mt-1 text-xs text-destructive">{errors.uso}</p>}
+        </div>
+
+        <div className="sm:col-span-2">
+          <Label>Relação com o segurado</Label>
+          <Select value={data.relacao || ""} onValueChange={(v) => set("relacao", v)}>
+            <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="Selecione" /></SelectTrigger>
+            <SelectContent>
+              {RELACAO_SEGURADO.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          {errors.relacao && <p className="mt-1 text-xs text-destructive">{errors.relacao}</p>}
+        </div>
+
+        <div className="sm:col-span-2">
+          <Label htmlFor="nome_social">Nome social <span className="text-muted-foreground">(opcional)</span></Label>
+          <Input id="nome_social" value={data.nome_social || ""} onChange={(e) => set("nome_social", e.target.value)} className="mt-1.5 h-11" />
         </div>
       </div>
 

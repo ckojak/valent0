@@ -33,7 +33,7 @@ export function Hero() {
               to="/cotacao/auto"
               className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand px-6 text-sm font-bold uppercase tracking-wide text-brand-foreground shadow-[0_14px_32px_-14px_oklch(0.7_0.19_47/0.75)] transition hover:brightness-110"
             >
-              Quero cotar meu seguro
+              QUERO COTAR MEU SEGURO AUTO
               <ArrowRight className="h-4 w-4" />
             </Link>
             <a

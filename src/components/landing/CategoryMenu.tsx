@@ -1,5 +1,18 @@
 import { Link } from "@tanstack/react-router";
-import { Car, Home as HomeIcon, Building2, Heart, Building, ArrowRight, type LucideIcon } from "lucide-react";
+import {
+  Car,
+  Home as HomeIcon,
+  Building2,
+  Heart,
+  Building,
+  ArrowRight,
+  Stethoscope,
+  Smartphone,
+  Plane,
+  Shield,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 
 type Cat = {
   icon: LucideIcon;
@@ -10,6 +23,11 @@ type Cat = {
 
 const CATS: Cat[] = [
   { icon: Car, title: "Seguro Auto", desc: "Proteção completa para seu carro, moto ou veículo especial.", href: "/cotacao/auto" },
+  { icon: Stethoscope, title: "Seguro Saúde e Dental", desc: "Planos com cobertura ampla, atendimento e odontologia.", href: "/cotacao/personalizada?tipo=saude" },
+  { icon: Smartphone, title: "Seguro Celular", desc: "Proteção para notebook, celular e câmeras com roubo, furto e quebra.", href: "/cotacao/personalizada?tipo=celular" },
+  { icon: Wrench, title: "Seguro Equipamentos", desc: "Agro, construção civil, solar, bike e scooter elétricos.", href: "/cotacao/personalizada?tipo=equipamentos" },
+  { icon: Plane, title: "Seguro Viagem e Consórcios", desc: "Cobertura para viagens e soluções de consórcio sob medida.", href: "/cotacao/personalizada?tipo=viagem" },
+  { icon: Shield, title: "Seguros Personalizados", desc: "Cotações adaptadas ao seu perfil e à sua rotina.", href: "/cotacao/personalizada?tipo=personalizado" },
   { icon: HomeIcon, title: "Seguro Residencial", desc: "Sua casa protegida contra imprevistos do dia a dia.", href: "/seguros/residencial" },
   { icon: Building2, title: "Seguro Empresarial", desc: "Segurança para sua empresa crescer com tranquilidade.", href: "/seguros/empresarial" },
   { icon: Heart, title: "Seguro de Vida", desc: "Proteção financeira para quem você mais ama.", href: "/seguros/vida" },
@@ -23,7 +41,7 @@ export function CategoryMenu() {
         Encontre o seguro <span className="text-brand">ideal</span> para você
       </h2>
 
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 xl:grid-cols-6">
         {CATS.map(({ icon: Icon, title, desc, href }) => (
           <Link
             key={title}
@@ -33,8 +51,8 @@ export function CategoryMenu() {
             <span className="grid h-10 w-10 place-items-center rounded-xl text-brand">
               <Icon className="h-7 w-7" strokeWidth={1.8} />
             </span>
-            <h3 className="mt-2 font-display text-base font-extrabold text-foreground">{title}</h3>
-            <p className="mt-1 text-xs text-muted-foreground">{desc}</p>
+            <h3 className="mt-2 line-clamp-2 font-display text-base font-extrabold leading-tight text-foreground">{title}</h3>
+            <p className="mt-1 line-clamp-3 text-xs leading-relaxed text-muted-foreground">{desc}</p>
             <span className="mt-auto flex items-center pt-2 text-brand">
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
             </span>

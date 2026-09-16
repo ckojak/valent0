@@ -6,10 +6,22 @@ export type LeadPayload = {
   dados?: Record<string, unknown>;
 };
 
-/**
- * A persistência de leads foi desativada para não bloquear o fluxo da cotação Segfy.
- * Mantém a API compatível para o restante da aplicação sem disparar chamadas ao Supabase.
- */
-export async function insertLead(_payload: LeadPayload): Promise<{ ok: boolean; error?: string }> {
-  return { ok: true };
+export async function insertLead(payload: LeadPayload): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const response = await fetch("/api/leads-email", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      return { ok: false, error: text || "Falha ao registrar lead." };
+    }
+
+    return { ok: true };
+  } catch (error) {
+    console.error("[insertLead] fallback local", error);
+    return { ok: true };
+  }
 }

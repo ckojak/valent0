@@ -45,6 +45,7 @@ export const MENU_SECTIONS: MenuSection[] = [
       { id: "moto", label: "Moto", subtitle: "Cobertura completa", icon: Gauge, quote: true },
       { id: "bike", label: "Speed, Mountain Bike e Passeio", subtitle: "Bicicletas convencionais", icon: Bike, quote: true },
       { id: "scooter", label: "Scooter, Patinete e Bike Elétricos", subtitle: "Mobilidade urbana elétrica", icon: Zap, quote: true },
+      { id: "equipamentos", label: "Equipamentos", subtitle: "Agro, civil, solar e elétricos", icon: Zap, quote: true },
     ],
   },
   {
@@ -54,9 +55,10 @@ export const MENU_SECTIONS: MenuSection[] = [
     items: [
       { id: "residencia", label: "Residência", subtitle: "Sua casa protegida", icon: Home, href: "/seguros/residencial" },
       { id: "vida", label: "Seguro de Vida", subtitle: "Proteção pra quem você ama", icon: HeartPulse, href: "/seguros/vida" },
-      { id: "viagem", label: "Viagem", subtitle: "Nacional e internacional", icon: Plane, quote: true },
-      { id: "celular", label: "Celular", subtitle: "Roubo, furto e quebra", icon: Smartphone, quote: true },
-      { id: "saude", label: "Saúde", subtitle: "Planos individuais e família", icon: Stethoscope, quote: true },
+      { id: "viagem", label: "Viagem", subtitle: "Nacional e internacional", icon: Plane, href: "/cotacao/personalizada?tipo=viagem" },
+      { id: "celular", label: "Celular / Notebook / Câmeras", subtitle: "Roubo, furto e quebra", icon: Smartphone, href: "/cotacao/personalizada?tipo=celular" },
+      { id: "saude", label: "Saúde e Dental", subtitle: "Planos individuais e família", icon: Stethoscope, href: "/cotacao/personalizada?tipo=saude" },
+      { id: "consorcio", label: "Consórcios", subtitle: "Automóvel, imóvel e outros", icon: Shield, href: "/cotacao/personalizada?tipo=consorcio" },
     ],
   },
   {
