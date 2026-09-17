@@ -13,7 +13,7 @@ export const Route = createFileRoute("/api/leads-email")({
           const dados = payload?.dados && typeof payload.dados === "object" ? payload.dados : {};
 
           const body = {
-            to: "contato@valentseguros.ciom.br",
+            to: "contato@valentseguros.com.br",
             subject: `Nova cotação - ${tipoSeguro}`,
             text: `Nova solicitação de cotação\n\nNome: ${nome}\nTelefone: ${telefone}\nE-mail: ${email || "Não informado"}\nTipo de seguro: ${tipoSeguro}\n\nDados: ${JSON.stringify(dados, null, 2)}`,
             html: `
