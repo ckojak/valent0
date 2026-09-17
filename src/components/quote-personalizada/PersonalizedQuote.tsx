@@ -6,7 +6,7 @@ import portoLogo from "@/assets/porto-logo.svg";
 import pierLogo from "@/assets/logo_pier-digital.png";
 import sulamericaLogo from "@/assets/logo-sulamerica-color.png";
 
-const SAFE_EMAIL = "contato@valentseguros.ciom.br";
+const SAFE_EMAIL = "contato@valentseguros.com.br";
 
 type PersonalType = "saude" | "dental" | "celular" | "equipamentos" | "viagem" | "consorcio" | "personalizado";
 
