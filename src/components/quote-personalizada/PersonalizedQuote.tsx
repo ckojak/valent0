@@ -56,6 +56,9 @@ type FormState = {
   tipoSeguro?: string;
   inicioVigencia?: string;
   telefoneComercial?: string;
+  descricaoEquipamento?: string;
+  valorEstimado?: string;
+  localUso?: string;
 };
 
 const TIPOS: Array<{ value: PersonalType; label: string; icon: typeof HeartPulse; description: string }> = [
@@ -149,6 +152,9 @@ export function PersonalizedQuote({ tipoInicial }: { tipoInicial: PersonalType }
     tipoSeguro: "",
     inicioVigencia: "",
     telefoneComercial: "",
+    descricaoEquipamento: "",
+    valorEstimado: "",
+    localUso: "",
   });
   const [complete, setComplete] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -170,6 +176,8 @@ export function PersonalizedQuote({ tipoInicial }: { tipoInicial: PersonalType }
       showForm: tipo === "saude" || tipo === "equipamentos" || tipo === "consorcio",
     };
   }, [tipo]);
+
+  const isBikeEquipment = form.tipo === "Bike/Scooter Elétrica";
 
   function handleChange<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -551,164 +559,219 @@ export function PersonalizedQuote({ tipoInicial }: { tipoInicial: PersonalType }
                   </div>
                 </div>
 
-                <div className="rounded-2xl border bg-muted/20 p-4">
-                  <p className="mb-4 text-lg font-semibold text-foreground">Fale um pouco do seguro que será contratado!</p>
+                {isBikeEquipment ? (
+                  <div className="rounded-2xl border bg-muted/20 p-4">
+                    <p className="mb-4 text-lg font-semibold text-foreground">Fale um pouco do seguro que será contratado!</p>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Fabricante</label>
-                      <select value={form.fabricante ?? ""} onChange={(e) => handleChange("fabricante", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
-                        <option value="">Selecione</option>
-                        <option value="Caloi">Caloi</option>
-                        <option value="Cannondale">Cannondale</option>
-                        <option value="Oggi">Oggi</option>
-                        <option value="Scott">Scott</option>
-                        <option value="Specialized">Specialized</option>
-                        <option value="Trek">Trek</option>
-                        <option value="Outros">Outros</option>
-                      </select>
-                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Fabricante</label>
+                        <select value={form.fabricante ?? ""} onChange={(e) => handleChange("fabricante", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
+                          <option value="">Selecione</option>
+                          <option value="Caloi">Caloi</option>
+                          <option value="Cannondale">Cannondale</option>
+                          <option value="Oggi">Oggi</option>
+                          <option value="Scott">Scott</option>
+                          <option value="Specialized">Specialized</option>
+                          <option value="Trek">Trek</option>
+                          <option value="Outros">Outros</option>
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Qual o modelo da bike?</label>
-                      <input value={form.modeloBike ?? ""} onChange={(e) => handleChange("modeloBike", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Qual o modelo da bike?</label>
+                        <input value={form.modeloBike ?? ""} onChange={(e) => handleChange("modeloBike", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Ano de fabricação</label>
-                      <select value={form.anoFabricacao ?? ""} onChange={(e) => handleChange("anoFabricacao", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
-                        <option value="">Selecione</option>
-                        {Array.from({ length: 11 }, (_, idx) => 2013 + idx).map((year) => (
-                          <option key={year} value={String(year)}>{year}</option>
-                        ))}
-                      </select>
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Ano de fabricação</label>
+                        <select value={form.anoFabricacao ?? ""} onChange={(e) => handleChange("anoFabricacao", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
+                          <option value="">Selecione</option>
+                          {Array.from({ length: 11 }, (_, idx) => 2013 + idx).map((year) => (
+                            <option key={year} value={String(year)}>{year}</option>
+                          ))}
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Número de série</label>
-                      <input value={form.numeroSerie ?? ""} onChange={(e) => handleChange("numeroSerie", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Número de série</label>
+                        <input value={form.numeroSerie ?? ""} onChange={(e) => handleChange("numeroSerie", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">É elétrica?</label>
-                      <select value={form.eletrica ?? ""} onChange={(e) => handleChange("eletrica", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
-                        <option value="">Selecione</option>
-                        <option value="Sim">Sim</option>
-                        <option value="Não, é comum / tradicional">Não, é comum / tradicional</option>
-                      </select>
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">É elétrica?</label>
+                        <select value={form.eletrica ?? ""} onChange={(e) => handleChange("eletrica", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
+                          <option value="">Selecione</option>
+                          <option value="Sim">Sim</option>
+                          <option value="Não, é comum / tradicional">Não, é comum / tradicional</option>
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">O quadro da bike é composto por:</label>
-                      <select value={form.materialQuadro ?? ""} onChange={(e) => handleChange("materialQuadro", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
-                        <option value="">Selecione</option>
-                        <option value="Aço">Aço</option>
-                        <option value="Alumínio">Alumínio</option>
-                        <option value="Carbono">Carbono</option>
-                      </select>
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">O quadro da bike é composto por:</label>
+                        <select value={form.materialQuadro ?? ""} onChange={(e) => handleChange("materialQuadro", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
+                          <option value="">Selecione</option>
+                          <option value="Aço">Aço</option>
+                          <option value="Alumínio">Alumínio</option>
+                          <option value="Carbono">Carbono</option>
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Quantidade de sinistros da apólice anterior</label>
-                      <input value={form.sinistros ?? ""} onChange={(e) => handleChange("sinistros", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Quantidade de sinistros da apólice anterior</label>
+                        <input value={form.sinistros ?? ""} onChange={(e) => handleChange("sinistros", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Possui a nota fiscal?</label>
-                      <select value={form.notaFiscal ?? ""} onChange={(e) => handleChange("notaFiscal", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
-                        <option value="">Selecione</option>
-                        <option value="Não">Não</option>
-                        <option value="Sim">Sim</option>
-                      </select>
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Possui a nota fiscal?</label>
+                        <select value={form.notaFiscal ?? ""} onChange={(e) => handleChange("notaFiscal", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
+                          <option value="">Selecione</option>
+                          <option value="Não">Não</option>
+                          <option value="Sim">Sim</option>
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Quanto o mercado paga por sua bike?</label>
-                      <input value={form.valorMercado ?? ""} onChange={(e) => handleChange("valorMercado", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Quanto o mercado paga por sua bike?</label>
+                        <input value={form.valorMercado ?? ""} onChange={(e) => handleChange("valorMercado", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">É utilizada em competições?</label>
-                      <select value={form.competicoes ?? ""} onChange={(e) => handleChange("competicoes", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
-                        <option value="">Selecione</option>
-                        <option value="Não">Não</option>
-                        <option value="Sim">Sim</option>
-                      </select>
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">É utilizada em competições?</label>
+                        <select value={form.competicoes ?? ""} onChange={(e) => handleChange("competicoes", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
+                          <option value="">Selecione</option>
+                          <option value="Não">Não</option>
+                          <option value="Sim">Sim</option>
+                        </select>
+                      </div>
 
-                    <div className="sm:col-span-2">
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Cobertura básica</label>
-                      <select value={form.coberturaBasica ?? ""} onChange={(e) => handleChange("coberturaBasica", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
-                        <option value="">Selecione</option>
-                        <option value="Danos à bike">Danos à bike</option>
-                        <option value="Roubo / Furto qualificado">Roubo / Furto qualificado</option>
-                        <option value="Danos à bike + Roubo / Furto qualificado">Danos à bike + Roubo / Furto qualificado</option>
-                      </select>
-                    </div>
+                      <div className="sm:col-span-2">
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Cobertura básica</label>
+                        <select value={form.coberturaBasica ?? ""} onChange={(e) => handleChange("coberturaBasica", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
+                          <option value="">Selecione</option>
+                          <option value="Danos à bike">Danos à bike</option>
+                          <option value="Roubo / Furto qualificado">Roubo / Furto qualificado</option>
+                          <option value="Danos à bike + Roubo / Furto qualificado">Danos à bike + Roubo / Furto qualificado</option>
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Cobertura de Responsabilidade Civil</label>
-                      <select value={form.responsabilidadeCivil ?? ""} onChange={(e) => handleChange("responsabilidadeCivil", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
-                        <option value="">Selecione</option>
-                        <option value="100%">100%</option>
-                        <option value="200%">200%</option>
-                        <option value="300%">300%</option>
-                      </select>
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Cobertura de Responsabilidade Civil</label>
+                        <select value={form.responsabilidadeCivil ?? ""} onChange={(e) => handleChange("responsabilidadeCivil", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
+                          <option value="">Selecione</option>
+                          <option value="100%">100%</option>
+                          <option value="200%">200%</option>
+                          <option value="300%">300%</option>
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Cobertura para roubo de celular / smartwatch</label>
-                      <select value={form.rouboCelular ?? ""} onChange={(e) => handleChange("rouboCelular", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
-                        <option value="">Selecione</option>
-                        <option value="Não contratada">Não contratada</option>
-                        <option value="5%">5%</option>
-                        <option value="10%">10%</option>
-                      </select>
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Cobertura para roubo de celular / smartwatch</label>
+                        <select value={form.rouboCelular ?? ""} onChange={(e) => handleChange("rouboCelular", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
+                          <option value="">Selecione</option>
+                          <option value="Não contratada">Não contratada</option>
+                          <option value="5%">5%</option>
+                          <option value="10%">10%</option>
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Deseja estender a cobertura para território internacional?</label>
-                      <select value={form.territorioInternacional ?? ""} onChange={(e) => handleChange("territorioInternacional", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
-                        <option value="">Selecione</option>
-                        <option value="Não contratada">Não contratada</option>
-                        <option value="Apenas para América do Sul e América Central">Apenas para América do Sul e América Central</option>
-                        <option value="Apenas para América do Norte e Europa">Apenas para América do Norte e Europa</option>
-                        <option value="Apenas para África, Ásia, Oceania e Antártida">Apenas para África, Ásia, Oceania e Antártida</option>
-                        <option value="Sim, para todos os continentes">Sim, para todos os continentes</option>
-                      </select>
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Deseja estender a cobertura para território internacional?</label>
+                        <select value={form.territorioInternacional ?? ""} onChange={(e) => handleChange("territorioInternacional", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
+                          <option value="">Selecione</option>
+                          <option value="Não contratada">Não contratada</option>
+                          <option value="Apenas para América do Sul e América Central">Apenas para América do Sul e América Central</option>
+                          <option value="Apenas para América do Norte e Europa">Apenas para América do Norte e Europa</option>
+                          <option value="Apenas para África, Ásia, Oceania e Antártida">Apenas para África, Ásia, Oceania e Antártida</option>
+                          <option value="Sim, para todos os continentes">Sim, para todos os continentes</option>
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Campanha</label>
-                      <input value={form.campanha ?? ""} onChange={(e) => handleChange("campanha", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Campanha</label>
+                        <input value={form.campanha ?? ""} onChange={(e) => handleChange("campanha", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Tipo de seguro</label>
-                      <select value={form.tipoSeguro ?? ""} onChange={(e) => handleChange("tipoSeguro", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
-                        <option value="">Selecione</option>
-                        <option value="Seguro novo">Seguro novo</option>
-                        <option value="Renovação da própria corretora">Renovação da própria corretora</option>
-                        <option value="Renovação de outra corretora">Renovação de outra corretora</option>
-                      </select>
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Tipo de seguro</label>
+                        <select value={form.tipoSeguro ?? ""} onChange={(e) => handleChange("tipoSeguro", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand">
+                          <option value="">Selecione</option>
+                          <option value="Seguro novo">Seguro novo</option>
+                          <option value="Renovação da própria corretora">Renovação da própria corretora</option>
+                          <option value="Renovação de outra corretora">Renovação de outra corretora</option>
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Início de vigência</label>
-                      <input value={form.inicioVigencia ?? ""} onChange={(e) => handleChange("inicioVigencia", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Início de vigência</label>
+                        <input value={form.inicioVigencia ?? ""} onChange={(e) => handleChange("inicioVigencia", e.target.value)} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
+                      </div>
 
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Telefone Comercial</label>
-                      <input value={form.telefoneComercial ?? ""} onChange={(e) => handleChange("telefoneComercial", maskPhone(e.target.value))} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
-                    </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Telefone Comercial</label>
+                        <input value={form.telefoneComercial ?? ""} onChange={(e) => handleChange("telefoneComercial", maskPhone(e.target.value))} className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand" />
+                      </div>
 
-                    <div className="sm:col-span-2">
-                      <label className="mb-1.5 block text-sm font-medium text-foreground">Observações (Impressas no orçamento)</label>
-                      <textarea rows={4} value={form.observacoes ?? ""} onChange={(e) => handleChange("observacoes", e.target.value)} className="w-full rounded-xl border bg-background px-3 py-2 outline-none transition focus:border-brand" placeholder="Descreva observações para o orçamento..." />
+                      <div className="sm:col-span-2">
+                        <label className="mb-1.5 block text-sm font-medium text-foreground">Observações (Impressas no orçamento)</label>
+                        <textarea rows={4} value={form.observacoes ?? ""} onChange={(e) => handleChange("observacoes", e.target.value)} className="w-full rounded-xl border bg-background px-3 py-2 outline-none transition focus:border-brand" placeholder="Descreva observações para o orçamento..." />
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  form.tipo && (
+                    <div className="rounded-2xl border bg-muted/20 p-4">
+                      <p className="mb-4 text-lg font-semibold text-foreground">Fale um pouco do equipamento</p>
+
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="sm:col-span-2">
+                          <label className="mb-1.5 block text-sm font-medium text-foreground">Descrição do equipamento</label>
+                          <input
+                            value={form.descricaoEquipamento ?? ""}
+                            onChange={(e) => handleChange("descricaoEquipamento", e.target.value)}
+                            placeholder="Ex: Trator, gerador, painel solar, betoneira..."
+                            className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="mb-1.5 block text-sm font-medium text-foreground">Valor estimado</label>
+                          <input
+                            value={form.valorEstimado ?? ""}
+                            onChange={(e) => handleChange("valorEstimado", e.target.value)}
+                            placeholder="Ex: R$ 25.000,00"
+                            className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="mb-1.5 block text-sm font-medium text-foreground">Ano de fabricação (se aplicável)</label>
+                          <input
+                            value={form.anoFabricacao ?? ""}
+                            onChange={(e) => handleChange("anoFabricacao", e.target.value.replace(/\D/g, "").slice(0, 4))}
+                            placeholder="Ex: 2020"
+                            className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label className="mb-1.5 block text-sm font-medium text-foreground">Local de uso</label>
+                          <input
+                            value={form.localUso ?? ""}
+                            onChange={(e) => handleChange("localUso", e.target.value)}
+                            placeholder="Ex: Fazenda, obra, residência..."
+                            className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label className="mb-1.5 block text-sm font-medium text-foreground">Observações (Impressas no orçamento)</label>
+                          <textarea rows={4} value={form.observacoes ?? ""} onChange={(e) => handleChange("observacoes", e.target.value)} className="w-full rounded-xl border bg-background px-3 py-2 outline-none transition focus:border-brand" placeholder="Descreva observações para o orçamento..." />
+                        </div>
+                      </div>
+                    </div>
+                  )
+                )}
               </div>
             )}
 
@@ -748,6 +811,17 @@ export function PersonalizedQuote({ tipoInicial }: { tipoInicial: PersonalType }
                     />
                   </div>
                 )}
+
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-foreground">Telefone</label>
+                  <input
+                    required
+                    value={form.telefone}
+                    onChange={(e) => handleChange("telefone", maskPhone(e.target.value))}
+                    placeholder="(00) 00000-0000"
+                    className="h-11 w-full rounded-xl border bg-background px-3 outline-none transition focus:border-brand"
+                  />
+                </div>
               </>
             )}
 
