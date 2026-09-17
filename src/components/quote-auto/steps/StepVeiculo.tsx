@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Car, ChevronLeft, ChevronRight, Info, KeyRound, PencilLine } from "lucide-react";
+import { Car, ChevronLeft, ChevronRight, Info, KeyRound, PencilLine, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,7 +44,6 @@ const CARACTERISTICAS: Array<{ key: keyof VeiculoData; label: string }> = [
 ];
 
 const ANOS = Array.from({ length: 26 }, (_, i) => String(2026 - i));
-
 
 function pickString(payload: unknown, keys: string[]): string {
   if (!payload || typeof payload !== "object") return "";
@@ -109,7 +108,6 @@ export function StepVeiculo({
   const [brandsLoading, setBrandsLoading] = useState(false);
   const [modelsLoading, setModelsLoading] = useState(false);
   const [decodeLoading, setDecodeLoading] = useState(false);
-  // Placa é o caminho principal. "manual" só aparece se a pessoa não tiver a placa em mãos.
   const [mode, setMode] = useState<"placa" | "manual">(initial.marca ? "manual" : "placa");
 
   const canLoadModels = Boolean(data.marca_id && data.ano_fab && data.ano_mod);
@@ -131,6 +129,67 @@ export function StepVeiculo({
       })),
     [modelOptions],
   );
+
+  // Busca automática da placa assim que 7 caracteres válidos são inseridos
+  useEffect(() => {
+    const cleanPlate = data.placa.replace(/[^A-Z0-9]/gi, "");
+    if (cleanPlate.length !== 7 || mode !== "placa") return;
+
+    let active = true;
+    const autoFetchPlate = async () => {
+      setDecodeLoading(true);
+      try {
+        const decoded = await segfyDecodePlate(data.placa);
+        if (!active) return;
+        const decodedPayload = decoded.payload;
+
+        const marca =
+          pickString(decodedPayload, ["brand_name", "brand", "marca"]) ||
+          pickFromArrayItem(decodedPayload, "brands", ["value", "text", "name"]);
+        const marcaId =
+          pickString(decodedPayload, ["brand_id", "marca_id", "fipe_brand_id"]) ||
+          pickFromArrayItem(decodedPayload, "brands", ["id", "brand_id", "value"]);
+        const modelo =
+          pickString(decodedPayload, ["model_name", "model", "modelo"]) ||
+          pickFromArrayItem(decodedPayload, "models", ["value", "text", "name"]);
+        const modeloId =
+          pickString(decodedPayload, ["model_id", "modelo_id", "fipe_model_id"]) ||
+          pickFromArrayItem(decodedPayload, "models", ["model_id", "id", "value"]);
+        const tipo =
+          pickString(decodedPayload, ["vehicle_type", "tipo"]) ||
+          pickFromArrayItem(decodedPayload, "brands", ["vehicle_type"]);
+        const anoFab = pickString(decodedPayload, ["manufacture_year", "ano_fabricacao", "year"]);
+        const anoMod = pickString(decodedPayload, ["model_year", "ano_modelo", "year_model"]);
+        const versao =
+          pickModelFipeCode(decodedPayload) ||
+          pickString(decodedPayload, ["version_name", "version", "versao"]);
+
+        if (marca && modelo) {
+          setData((old) => ({
+            ...old,
+            tipo: (tipo as VehicleKind) || old.tipo,
+            marca: marca || old.marca,
+            marca_id: marcaId || old.marca_id,
+            modelo: modelo || old.modelo,
+            modelo_id: modeloId || old.modelo_id,
+            ano_fab: anoFab || old.ano_fab,
+            ano_mod: anoMod || old.ano_mod,
+            versao: versao || old.versao,
+          }));
+          toast.success("Veículo localizado com sucesso!");
+        }
+      } catch {
+        // Falha silenciosa para permitir preenchimento manual se necessário
+      } finally {
+        if (active) setDecodeLoading(false);
+      }
+    };
+
+    autoFetchPlate();
+    return () => {
+      active = false;
+    };
+  }, [data.placa, mode]);
 
   useEffect(() => {
     let active = true;
@@ -191,7 +250,22 @@ export function StepVeiculo({
   }, [canLoadModels, data.tipo, data.marca, data.marca_id, data.ano_mod]);
 
   const set = <K extends keyof VeiculoData>(k: K, v: VeiculoData[K]) => {
-    setData((d) => ({ ...d, [k]: v }));
+    // Se alterar a placa, limpa os dados antigos de marca e modelo
+    if (k === "placa") {
+      setData((d) => ({
+        ...d,
+        placa: v as string,
+        marca: "",
+        marca_id: "",
+        modelo: "",
+        modelo_id: "",
+        ano_fab: "",
+        ano_mod: "",
+        versao: "",
+      }));
+    } else {
+      setData((d) => ({ ...d, [k]: v }));
+    }
     setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
@@ -226,8 +300,6 @@ export function StepVeiculo({
     </div>
   );
 
-
-
   const submitPlaca = async (e: React.FormEvent) => {
     e.preventDefault();
     if (data.placa.replace(/[^A-Z0-9]/gi, "").length < 7) {
@@ -235,67 +307,66 @@ export function StepVeiculo({
       return;
     }
 
-    let nextData = data;
-    setDecodeLoading(true);
-    try {
-      const decoded = await segfyDecodePlate(data.placa);
-      const decodedPayload = decoded.payload;
+    // Se ainda não buscou ou está sem marca/modelo, força a busca
+    if (!data.marca || !data.modelo) {
+      setDecodeLoading(true);
+      try {
+        const decoded = await segfyDecodePlate(data.placa);
+        const decodedPayload = decoded.payload;
 
-      const marca =
-        pickString(decodedPayload, ["brand_name", "brand", "marca"]) ||
-        pickFromArrayItem(decodedPayload, "brands", ["value", "text", "name"]);
-      const marcaId =
-        pickString(decodedPayload, ["brand_id", "marca_id", "fipe_brand_id"]) ||
-        pickFromArrayItem(decodedPayload, "brands", ["id", "brand_id", "value"]);
-      const modelo =
-        pickString(decodedPayload, ["model_name", "model", "modelo"]) ||
-        pickFromArrayItem(decodedPayload, "models", ["value", "text", "name"]);
-      const modeloId =
-        pickString(decodedPayload, ["model_id", "modelo_id", "fipe_model_id"]) ||
-        pickFromArrayItem(decodedPayload, "models", ["model_id", "id", "value"]);
-      const tipo =
-        pickString(decodedPayload, ["vehicle_type", "tipo"]) ||
-        pickFromArrayItem(decodedPayload, "brands", ["vehicle_type"]);
-      const anoFab = pickString(decodedPayload, ["manufacture_year", "ano_fabricacao", "year"]);
-      const anoMod = pickString(decodedPayload, ["model_year", "ano_modelo", "year_model"]);
-      const versao =
-        pickModelFipeCode(decodedPayload) ||
-        pickString(decodedPayload, ["version_name", "version", "versao"]);
+        const marca =
+          pickString(decodedPayload, ["brand_name", "brand", "marca"]) ||
+          pickFromArrayItem(decodedPayload, "brands", ["value", "text", "name"]);
+        const marcaId =
+          pickString(decodedPayload, ["brand_id", "marca_id", "fipe_brand_id"]) ||
+          pickFromArrayItem(decodedPayload, "brands", ["id", "brand_id", "value"]);
+        const modelo =
+          pickString(decodedPayload, ["model_name", "model", "modelo"]) ||
+          pickFromArrayItem(decodedPayload, "models", ["value", "text", "name"]);
+        const modeloId =
+          pickString(decodedPayload, ["model_id", "modelo_id", "fipe_model_id"]) ||
+          pickFromArrayItem(decodedPayload, "models", ["model_id", "id", "value"]);
+        const tipo =
+          pickString(decodedPayload, ["vehicle_type", "tipo"]) ||
+          pickFromArrayItem(decodedPayload, "brands", ["vehicle_type"]);
+        const anoFab = pickString(decodedPayload, ["manufacture_year", "ano_fabricacao", "year"]);
+        const anoMod = pickString(decodedPayload, ["model_year", "ano_modelo", "year_model"]);
+        const versao =
+          pickModelFipeCode(decodedPayload) ||
+          pickString(decodedPayload, ["version_name", "version", "versao"]);
 
-      nextData = {
-        ...data,
-        tipo: (tipo as VehicleKind) || data.tipo,
-        marca: marca || data.marca,
-        marca_id: marcaId || data.marca_id,
-        modelo: modelo || data.modelo,
-        modelo_id: modeloId || data.modelo_id,
-        ano_fab: anoFab || data.ano_fab,
-        ano_mod: anoMod || data.ano_mod,
-        versao: versao || data.versao,
-      };
-      setData((old) => ({
-        ...old,
-        ...nextData,
-      }));
+        const updated = {
+          ...data,
+          tipo: (tipo as VehicleKind) || data.tipo,
+          marca: marca || data.marca,
+          marca_id: marcaId || data.marca_id,
+          modelo: modelo || data.modelo,
+          modelo_id: modeloId || data.modelo_id,
+          ano_fab: anoFab || data.ano_fab,
+          ano_mod: anoMod || data.ano_mod,
+          versao: versao || data.versao,
+        };
 
-      toast.success("Dados do veículo encontrados pela placa.");
-    } catch {
-      toast.message("Não foi possível decodificar a placa agora", {
-        description: "Você pode continuar preenchendo marca, modelo e versão manualmente.",
-      });
-    } finally {
-      setDecodeLoading(false);
+        if (!updated.marca || !updated.modelo) {
+          toast.error("Não foi possível localizar o veículo automaticamente.", {
+            description: "Por favor, informe os dados manualmente.",
+          });
+          setMode("manual");
+          return;
+        }
+
+        onNext(updated);
+        return;
+      } catch {
+        toast.error("Erro ao consultar a placa. Preencha manualmente.");
+        setMode("manual");
+        return;
+      } finally {
+        setDecodeLoading(false);
+      }
     }
 
-    if (!nextData.marca || !nextData.marca_id || !nextData.modelo) {
-      toast.error("Não foi possível completar marca/modelo pela placa.", {
-        description: "Preencha manualmente para continuar a cotação sem erro no cálculo.",
-      });
-      setMode("manual");
-      return;
-    }
-
-    onNext(nextData);
+    onNext(data);
   };
 
   const submitManual = (e: React.FormEvent) => {
@@ -351,17 +422,50 @@ export function StepVeiculo({
               maxLength={8}
               autoFocus
             />
+            {decodeLoading && (
+              <Loader2 className="absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-brand" />
+            )}
           </div>
           {errors.placa && <p className="mt-1 text-xs text-destructive">{errors.placa}</p>}
+
           <p className="mt-1.5 flex items-start gap-1.5 text-xs text-muted-foreground">
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             Com a placa, buscamos os dados do seu veículo automaticamente.
           </p>
+
+          {/* CARD DE RETORNO DA API COM MARCA, MODELO E ANO */}
+          {data.marca && data.modelo && (
+            <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs transition-all">
+              <div className="flex items-center gap-1.5 font-semibold text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                Veículo localizado
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-foreground">
+                <div>
+                  <span className="block text-[10px] font-medium uppercase text-muted-foreground">Marca / Modelo</span>
+                  <span className="font-semibold text-sm">{data.marca} {data.modelo}</span>
+                </div>
+                <div>
+                  <span className="block text-[10px] font-medium uppercase text-muted-foreground">Ano Fab / Modelo</span>
+                  <span className="font-semibold text-sm">
+                    {data.ano_fab || "—"} / {data.ano_mod || "—"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setMode("manual")}
+            className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground underline-offset-2 hover:text-brand hover:underline"
+          >
+            <PencilLine className="h-3.5 w-3.5" />
+            Não tenho a placa em mãos — quero informar manualmente
+          </button>
         </div>
 
         {caracteristicasBlock}
-
-
 
         <div className="flex flex-col-reverse gap-2 sm:flex-row">
           <button
@@ -380,15 +484,6 @@ export function StepVeiculo({
             {decodeLoading ? "Buscando placa..." : "Continuar"} <ChevronRight className="h-4 w-4" />
           </button>
         </div>
-
-        <button
-          type="button"
-          onClick={() => setMode("manual")}
-          className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-muted-foreground underline-offset-2 hover:text-brand hover:underline"
-        >
-          <PencilLine className="h-3.5 w-3.5" />
-          Não tenho a placa em mãos — quero informar manualmente
-        </button>
       </form>
     );
   }
@@ -548,7 +643,6 @@ export function StepVeiculo({
 
         <div className="sm:col-span-2">{caracteristicasBlock}</div>
       </div>
-
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row">
         <button type="button" onClick={onBack}
