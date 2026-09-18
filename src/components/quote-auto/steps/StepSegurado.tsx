@@ -199,18 +199,6 @@ export function StepSegurado({
         </div>
 
         <div>
-          <Label htmlFor="segurado-celular">Celular / WhatsApp</Label>
-          <Input
-            id="segurado-celular"
-            inputMode="tel"
-            value={data.celular || ""}
-            onChange={(e) => set("celular", e.target.value)}
-            className="mt-1.5 h-11"
-            placeholder="(11) 99999-9999"
-          />
-        </div>
-
-        <div>
           <Label htmlFor="segurado-cep">CEP do pernoite</Label>
           <Input
             id="segurado-cep"
