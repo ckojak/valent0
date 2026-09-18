@@ -214,20 +214,30 @@ export function QuoteAutoWizard() {
   };
 
   const handleWhatsappSubmit = async (telefone: string) => {
-    setWhatsapp(telefone);
-    salvarParcialSegfy("pos-whatsapp", { telefone });
+    const telefoneLimpo = telefone.replace(/\D/g, "");
+
+    setWhatsapp(telefoneLimpo);
+    setSegurado((prev) => ({ ...prev, celular: prev.celular || telefoneLimpo }));
+    setPerfilCondutor((prev) => ({ ...prev, celular: prev.celular || telefoneLimpo }));
+
+    salvarParcialSegfy("pos-whatsapp", { telefone: telefoneLimpo, condutor: { ...buildCondutor(), celular: telefoneLimpo } });
     const payload = {
+      client_name: condutor.nome || "Lead cotação auto",
       nome: condutor.nome || "Lead cotação auto",
-      telefone,
+      telefone: telefoneLimpo,
+      email: condutor.email || segurado.email || "",
       tipo_seguro: "auto",
+      form_type: "auto",
+      form_title: "Cotação Auto",
       dados: {
         situacao,
         veiculo,
         segurado: {
           ...segurado,
+          celular: segurado.celular || telefoneLimpo,
           documento: segurado.documento ? `***${segurado.documento.replace(/\D/g, '').slice(-4)}` : "",
         },
-        condutor: { ...condutor, cpf: condutor.cpf ? `***${condutor.cpf.replace(/\D/g, '').slice(-4)}` : "" },
+        condutor: { ...condutor, celular: condutor.celular || telefoneLimpo, cpf: condutor.cpf ? `***${condutor.cpf.replace(/\D/g, '').slice(-4)}` : "" },
         perfil_condutor: perfilCondutor,
         prioridade,
         coberturas,

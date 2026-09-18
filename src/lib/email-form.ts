@@ -49,6 +49,33 @@ export function formatFormValue(value: FormValue): string {
   return String(value);
 }
 
+function flattenFormData(data: Record<string, unknown>, prefix = ""): Record<string, FormValue> {
+  const result: Record<string, FormValue> = {};
+
+  for (const [key, value] of Object.entries(data)) {
+    const nextKey = prefix ? `${prefix}.${key}` : key;
+
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      Object.assign(result, flattenFormData(value as Record<string, unknown>, nextKey));
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      result[nextKey] = value.map((item) => {
+        if (item && typeof item === "object") {
+          return JSON.stringify(item);
+        }
+        return formatFormValue(item as FormValue);
+      });
+      continue;
+    }
+
+    result[nextKey] = value as FormValue;
+  }
+
+  return result;
+}
+
 function renderSectionCard(title: string, rowsHtml: string): string {
   return `
     <div style="margin:0 0 18px 0;">
@@ -103,15 +130,24 @@ export function buildFormDetailsTable(rawFields: Record<string, FormValue>, labe
 }
 
 export function renderAutoContent(formData: Record<string, FormValue>): string {
+  const flattened = flattenFormData(formData as Record<string, unknown>);
+  const nestedVeiculo = (formData.veiculo && typeof formData.veiculo === "object" ? formData.veiculo : {}) as Record<string, FormValue>;
+  const nestedSegurado = (formData.segurado && typeof formData.segurado === "object" ? formData.segurado : {}) as Record<string, FormValue>;
+  const nestedCondutor = (formData.condutor && typeof formData.condutor === "object" ? formData.condutor : {}) as Record<string, FormValue>;
+  const nestedCoberturas = (formData.coberturas && typeof formData.coberturas === "object" ? formData.coberturas : {}) as Record<string, FormValue>;
+
   const autoFields = {
-    placa: formData.placa ?? "",
-    marca: formData.marca ?? "",
-    modelo: formData.modelo ?? "",
-    ano: formData.ano ?? "",
-    zero_km: formData.zero_km ?? "",
-    nome_condutor: formData.nome_condutor ?? formData.nome ?? "",
-    cpf_condutor: formData.cpf_condutor ?? formData.cpf ?? "",
-    telefone_condutor: formData.telefone_condutor ?? formData.telefone ?? "",
+    placa: flattened.placa ?? flattened["veiculo.placa"] ?? nestedVeiculo.placa ?? "",
+    marca: flattened.marca ?? flattened["veiculo.marca"] ?? nestedVeiculo.marca ?? "",
+    modelo: flattened.modelo ?? flattened["veiculo.modelo"] ?? nestedVeiculo.modelo ?? "",
+    ano: flattened.ano ?? flattened["veiculo.ano_mod"] ?? flattened["veiculo.ano_fab"] ?? nestedVeiculo.ano_mod ?? nestedVeiculo.ano_fab ?? "",
+    zero_km: flattened.zero_km ?? flattened["veiculo.zero_km"] ?? nestedVeiculo.zero_km ?? "",
+    nome_condutor: flattened.nome_condutor ?? flattened.nome ?? flattened["condutor.nome"] ?? nestedCondutor.nome ?? nestedSegurado.nome ?? "",
+    cpf_condutor: flattened.cpf_condutor ?? flattened.cpf ?? flattened["condutor.cpf"] ?? nestedCondutor.cpf ?? nestedSegurado.documento ?? "",
+    telefone_condutor: flattened.telefone_condutor ?? flattened.telefone ?? flattened["condutor.celular"] ?? flattened["segurado.celular"] ?? nestedCondutor.celular ?? nestedSegurado.celular ?? "",
+    situacao: flattened.situacao ?? "",
+    prioridade: flattened.prioridade ?? "",
+    cobertura: flattened.coberturas ?? flattened["coberturas.carro_reserva"] ?? nestedCoberturas.carro_reserva ?? "",
   };
 
   const veiculoRows = [
@@ -120,12 +156,15 @@ export function renderAutoContent(formData: Record<string, FormValue>): string {
     renderKeyValueRow("Modelo", autoFields.modelo),
     renderKeyValueRow("Ano", autoFields.ano),
     renderKeyValueRow("Zero KM", autoFields.zero_km),
+    renderKeyValueRow("Situação", autoFields.situacao),
   ].join("");
 
   const condutorRows = [
     renderKeyValueRow("Nome", autoFields.nome_condutor),
     renderKeyValueRow("CPF", autoFields.cpf_condutor),
     renderKeyValueRow("Telefone", autoFields.telefone_condutor),
+    renderKeyValueRow("Prioridade", autoFields.prioridade),
+    renderKeyValueRow("Coberturas", autoFields.cobertura),
   ].join("");
 
   return `${renderSectionCard("Veículo", veiculoRows)}${renderSectionCard("Condutor principal", condutorRows)}`;

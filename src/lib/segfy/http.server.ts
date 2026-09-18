@@ -342,6 +342,12 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
 
   const roomId = String(input.reference ?? input.callback ?? "").trim() || String(input.callback ?? "").trim();
   const calculateToken = process.env.SEGFY_CALCULATE_TOKEN?.trim() || input.token || "";
+  const priorityLabel = input.prioridade
+    ? input.prioridade
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+    : "Selecione";
+  const priorityValue = input.prioridade ?? " ";
   const extensionGuid = process.env.SEGFY_EXTENSION_GUID?.trim() || "";
   if (!extensionGuid) {
     // Importante: isso não é garantia absoluta de falha, porque a Segfy pode continuar emitindo eventos
@@ -437,8 +443,13 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
       questionnaire_truck: {},
       coverage: {
         fipe_percentage: String(100),
-        selected_coverage: { label: "Selecione", value: " " },
-        description: "",
+        selected_coverage: {
+          label: priorityLabel,
+          value: priorityValue,
+        },
+        priority: priorityValue,
+        preference: priorityValue,
+        description: priorityLabel,
         coverage_type: "exclusive",
         franchise: "normal",
         assistance: input.coberturas.guincho_24h ? "assistance_200_km_referenced" : "no_assistance",
