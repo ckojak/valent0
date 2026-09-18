@@ -334,24 +334,43 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
 
   const priorPolicyEnd = input.vigencia_fim_apolice
     ? parseDateBRToIso(input.vigencia_fim_apolice)
-    : String(renewalInput.prior_policy_end ?? "2099-12-31");
+    : String(renewalInput.prior_policy_end ?? "");
   const priorPolicy = String(
-    input.numero_apolice_anterior || renewalInput.prior_policy || "NAO_INFORMADA",
+    input.numero_apolice_anterior || renewalInput.prior_policy || "",
   );
   const priorIc = String(input.ci_vigente || renewalInput.prior_ic || "");
-  const bonusCurrent = String(input.bonus_atual || renewalInput.bonus_current || "0");
-  const bonusLast = String(input.bonus_futuro || renewalInput.bonus_last || "0");
+  const bonusCurrent = String(input.bonus_atual || renewalInput.bonus_current || " ");
+  const bonusLast = String(input.bonus_futuro || renewalInput.bonus_last || " ");
 
   const insurers = await resolveInsurers(input);
 
   const roomId = String(input.reference ?? input.callback ?? "").trim() || String(input.callback ?? "").trim();
   const calculateToken = process.env.SEGFY_CALCULATE_TOKEN?.trim() || input.token || "";
-  const priorityLabel = input.prioridade
-    ? input.prioridade
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (char) => char.toUpperCase())
-    : "Selecione";
-  const priorityValue = input.prioridade ?? " ";
+  const segfyPredefinedCoverageMap: Record<string, { label: string; value: string }> = {
+    menor_preco: {
+      label: "Menor Preço",
+      value: "6259a494-9b44-4a3e-abed-b83d294e7525",
+    },
+    melhor_cobertura: {
+      label: "Melhor cobertura",
+      value: "80e0011f-ecef-450f-9a5a-201006da1680",
+    },
+    mais_assistencia: {
+      label: "Mais assistencia 24hs",
+      value: "b9406e42-aea0-4d33-9f71-999f7685cab0",
+    },
+    equilibrio: {
+      label: "Equilibrio Entre Preço e Cobertura",
+      value: "b7db981b-9c0f-4800-bb54-6ad88e0dd1d7",
+    },
+  };
+
+  const priorityConfig = input.prioridade ? segfyPredefinedCoverageMap[input.prioridade] ?? {
+    label: input.prioridade.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()),
+    value: " ",
+  } : { label: "Selecione", value: " " };
+  const priorityLabel = priorityConfig.label;
+  const priorityValue = priorityConfig.value;
   const extensionGuid = process.env.SEGFY_EXTENSION_GUID?.trim() || "";
   if (!extensionGuid) {
     // Importante: isso não é garantia absoluta de falha, porque a Segfy pode continuar emitindo eventos
@@ -382,9 +401,9 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
       advantages: {},
       renewal: {
         quotation_type: isRenewal ? "RENOVATION" : "NEW_QUOTATION",
-        prior_policy_end: isRenewal ? priorPolicyEnd : "2099-12-31",
-        prior_policy: isRenewal ? priorPolicy : "0",
-        claim_amount: String(renewalInput.claim_amount ?? "0"),
+        prior_policy_end: isRenewal ? priorPolicyEnd : "",
+        prior_policy: isRenewal ? priorPolicy : "",
+        claim_amount: String(renewalInput.claim_amount ?? ""),
         insurer: isRenewal ? String(renewalInput.insurer ?? "ace") : "new",
         bonus_current: bonusCurrent,
         prior_ic: priorIc,
@@ -412,14 +431,14 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
       },
       vehicle: {
         vehicle_type: input.veiculo.tipo,
-        plate: input.veiculo.placa,
+        plate: String(input.veiculo.placa || "").replace(/[^A-Za-z0-9]/g, ""),
         chassis: "",
         manufacture_year: Number(input.veiculo.ano_fab) || 0,
         model_year: Number(input.veiculo.ano_mod) || 0,
         brand: String(input.veiculo.marca || "").trim(),
         model: String(input.veiculo.modelo || "").trim(),
         fipe_code: String(input.veiculo.versao ?? "").trim() || "0000000",
-        fipe_value: "0",
+        fipe_value: Number(String(input.veiculo.versao ?? "").trim()) || 0,
         circulation_zip_code: condutorCep,
         category_type: "particular",
         fuel_type: "flex",
@@ -446,33 +465,31 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
 
       questionnaire_truck: {},
       coverage: {
-        fipe_percentage: String(100),
+        fipe_percentage: "100",
         selected_coverage: {
           label: priorityLabel,
           value: priorityValue,
         },
-        priority: priorityValue,
-        preference: priorityValue,
         description: priorityLabel,
-        coverage_type: "exclusive",
+        coverage_type: "comprehensive",
         franchise: "normal",
         assistance: input.coberturas.guincho_24h ? "assistance_200_km_referenced" : "no_assistance",
         glass: input.coberturas.vidros ? "glass_basic_referenced" : "no_glass",
-        rental_car: input.coberturas.carro_reserva ? "rental_car_07_days_referenced" : "no_car",
-        rental_car_profile: "",
+        rental_car: input.coberturas.carro_reserva ? "rental_car_15_days_referenced" : "no_car",
+        rental_car_profile: "essential",
         replacement_zero_km: "no_replacement",
-        material_damage: String(input.coberturas.terceiros ? 100000 : 0),
-        body_injuries: String(input.coberturas.terceiros ? 100000 : 0),
-        moral_damage: String(input.coberturas.terceiros ? 50000 : 0),
-        death_illness: String(input.coberturas.terceiros ? 10000 : 0),
-        expense_extraordinary: 0,
-        dmh: 0,
+        material_damage: input.coberturas.terceiros ? "150000.00" : "0",
+        body_injuries: input.coberturas.terceiros ? "50000.00" : "0",
+        moral_damage: input.coberturas.terceiros ? "10000.00" : "0.00",
+        death_illness: input.coberturas.terceiros ? "2500.00" : "0.00",
+        expense_extraordinary: "0",
+        dmh: "0",
         maxpar_coverages: {
           bodywork_and_paint: false,
           wheel_tire_and_suspension: false,
         },
         lmi_residential: 0,
-        defense_costs: 0,
+        defense_costs: "0",
         quick_repairs: false,
         body_shop_repair: false,
         exemption_franchise: false,

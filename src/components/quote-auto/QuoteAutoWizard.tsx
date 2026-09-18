@@ -150,9 +150,23 @@ export function QuoteAutoWizard() {
       }
     : {};
 
+  const mapUsoVeiculo = (value?: string) => {
+    switch (value) {
+      case "personal":
+        return "Locomoção diária";
+      case "job":
+        return "Uso comercial";
+      case "both":
+        return "Locomoção diária e uso comercial";
+      default:
+        return value || "";
+    }
+  };
+
   const buildCondutor = (): SegfyQuoteInput["condutor"] => {
     const relacao = perfilCondutor.relacao || "Próprio";
     const isProprio = relacao === "Próprio";
+    const usoFinal = perfilCondutor.uso || mapUsoVeiculo(avaliacaoRisco.tipo_uso) || "";
 
     return {
       nome: isProprio ? segurado.nome : perfilCondutor.nome || segurado.nome,
@@ -163,7 +177,7 @@ export function QuoteAutoWizard() {
       profissao: perfilCondutor.profissao || "",
       profissao_id: perfilCondutor.profissao_id || "",
       estado_civil: perfilCondutor.estado_civil || "",
-      uso: perfilCondutor.uso || "",
+      uso: usoFinal,
       sexo: isProprio ? segurado.sexo || "" : perfilCondutor.sexo || "",
       email: isProprio ? segurado.email || "" : perfilCondutor.email || segurado.email || "",
       relacao,
@@ -359,7 +373,14 @@ export function QuoteAutoWizard() {
             <StepAvaliacaoRisco
               initial={avaliacaoRisco}
               onBack={back}
-              onNext={(v) => { setAvaliacaoRisco(v); goTo("prioridade"); }}
+              onNext={(v) => {
+                setAvaliacaoRisco(v);
+                setPerfilCondutor((prev) => ({
+                  ...prev,
+                  uso: prev.uso || mapUsoVeiculo(v.tipo_uso) || "",
+                }));
+                goTo("prioridade");
+              }}
             />
           )}
           {stage === "prioridade" && (

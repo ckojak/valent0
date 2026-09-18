@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SearchableSelect, type SearchableSelectOption } from "@/components/ui/searchable-select";
 import { segfyListProfessions } from "@/lib/segfy/client";
 import type { SegfyOption } from "@/lib/segfy/types";
-import { ESTADO_CIVIL } from "@/lib/quote-auto-data";
+import { ESTADO_CIVIL, USO_VEICULO } from "@/lib/quote-auto-data";
 
 export type PerfilCondutorData = {
   relacao: string;
@@ -87,6 +87,7 @@ export function StepPerfilCondutor({
     if (!data.relacao) next.relacao = "Selecione a relação.";
     if (!data.estado_civil) next.estado_civil = "Selecione o estado civil.";
     if (!data.profissao) next.profissao = "Selecione a profissão.";
+    if (!data.uso) next.uso = "Selecione o uso do veículo.";
     setErrors(next);
     if (Object.keys(next).length === 0) onNext(data);
   };
@@ -142,6 +143,19 @@ export function StepPerfilCondutor({
             }}
           />
           {errors.profissao && <p className="mt-1 text-xs text-destructive">{errors.profissao}</p>}
+        </div>
+
+        <div className="sm:col-span-2">
+          <Label>Uso do veículo</Label>
+          <Select value={data.uso || ""} onValueChange={(value) => set("uso", value)}>
+            <SelectTrigger className="mt-1.5 h-11"><SelectValue placeholder="Selecione" /></SelectTrigger>
+            <SelectContent>
+              {USO_VEICULO.map((item) => (
+                <SelectItem key={item} value={item}>{item}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.uso && <p className="mt-1 text-xs text-destructive">{errors.uso}</p>}
         </div>
       </div>
 
