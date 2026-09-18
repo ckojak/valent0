@@ -1,21 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { buildInsuranceEmailHtml } from "@/lib/email-form";
 
-function getPayloadInfo(payload: Record<string, unknown>) {
-  const legacyName = String(payload?.nome ?? payload?.client_name ?? "Lead");
-  const legacyEmail = String(payload?.email ?? payload?.client_email ?? "");
-  const legacyTipo = String(payload?.tipo_seguro ?? payload?.form_type ?? "generic");
-  const legacyDados = payload?.dados && typeof payload.dados === "object" ? payload.dados : payload?.form_data && typeof payload.form_data === "object" ? payload.form_data : {};
-  const formTitle = String(payload?.form_title ?? payload?.title ?? "Cotação");
-  const clientName = String(payload?.client_name ?? legacyName);
-  const clientEmail = String(payload?.client_email ?? legacyEmail);
+function normalizePayload(payload: Record<string, unknown>) {
+  const rawName = String(payload?.client_name ?? payload?.nome ?? "Lead");
+  const rawEmail = String(payload?.client_email ?? payload?.email ?? "");
+  const rawType = String(payload?.form_type ?? payload?.tipo_seguro ?? "generic");
+  const rawTitle = String(payload?.form_title ?? payload?.title ?? "Cotação");
+  const rawData = payload?.form_data && typeof payload.form_data === "object"
+    ? payload.form_data
+    : payload?.dados && typeof payload.dados === "object"
+      ? payload.dados
+      : {};
 
   return {
-    nome: clientName,
-    email: clientEmail,
-    tipoSeguro: legacyTipo,
-    formTitle,
-    dados: legacyDados as Record<string, string | number | boolean | null | undefined>,
+    clientName: rawName,
+    clientEmail: rawEmail,
+    formType: rawType,
+    formTitle: rawTitle,
+    formData: rawData as Record<string, string | number | boolean | null | undefined>,
   };
 }
 
@@ -24,7 +26,7 @@ const resendApiKey = () => (globalThis as Record<string, unknown>).process && ty
   : "";
 
 const TEST_RECIPIENT_EMAIL = "cjr.conde@gmail.com";
-const TEST_FROM_EMAIL = "onboarding@resend.dev";
+const TEST_FROM_EMAIL = "contato@valentseguros.com.br";
 
 const getEnv = (keys: string[]) => {
   const globalWithProcess = globalThis as typeof globalThis & {
@@ -38,13 +40,13 @@ const getEnv = (keys: string[]) => {
 const recipientEmail = () => getEnv(["EMAIL_TO", "RECIPIENT_EMAIL"]) || TEST_RECIPIENT_EMAIL;
 const senderEmail = () => getEnv(["RESEND_FROM_EMAIL", "EMAIL_FROM"]) || TEST_FROM_EMAIL;
 
-export const Route = createFileRoute("/api/leads-email")({
+export const Route = createFileRoute("/api/send-email")({
   server: {
     handlers: {
       POST: async ({ request }: { request: Request }) => {
         try {
           const payload = (await request.json()) as Record<string, unknown>;
-          const { nome, email, tipoSeguro, dados, formTitle } = getPayloadInfo(payload);
+          const { clientName, clientEmail, formType, formTitle, formData } = normalizePayload(payload);
           const submittedAt = new Date().toLocaleString("pt-BR", {
             dateStyle: "short",
             timeStyle: "short",
@@ -52,11 +54,11 @@ export const Route = createFileRoute("/api/leads-email")({
 
           const html = buildInsuranceEmailHtml({
             formTitle: String(formTitle || "Cotação"),
-            formType: String(tipoSeguro || "generic"),
-            clientName: String(nome || "Lead"),
-            clientEmail: String(email || ""),
+            formType: String(formType || "generic"),
+            clientName: String(clientName || "Lead"),
+            clientEmail: String(clientEmail || ""),
             submittedAt,
-            formData: dados,
+            formData,
             formLabels: {},
           });
 
@@ -69,8 +71,8 @@ export const Route = createFileRoute("/api/leads-email")({
             body: JSON.stringify({
               from: `Valent Seguros <${senderEmail()}>`,
               to: recipientEmail(),
-              subject: `Nova cotação - ${String(tipoSeguro || "Seguro")}`,
-              text: `Nova solicitação de cotação\n\nNome: ${nome}\nE-mail: ${email || "Não informado"}\nTipo de seguro: ${tipoSeguro}\n\nDados: ${JSON.stringify(dados, null, 2)}`,
+              subject: `Nova cotação - ${String(formType || "Seguro")}`,
+              text: `Nova solicitação de cotação\n\nNome: ${clientName}\nE-mail: ${clientEmail || "Não informado"}\nTipo de seguro: ${formType}\n\nDados: ${JSON.stringify(formData, null, 2)}`,
               html,
             }),
           });

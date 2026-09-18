@@ -193,29 +193,38 @@ export function PersonalizedQuote({ tipoInicial }: { tipoInicial: PersonalType }
 
     try {
       const phoneDigits = form.telefone.replace(/\D/g, "");
+      const normalizedType = tipo === "consorcio" ? "consorcio" : tipo;
       const payload = {
         nome: form.nome,
         telefone: phoneDigits,
         email: form.email,
-        tipo_seguro: tipo,
+        tipo_seguro: normalizedType,
         dados: {
           ...form,
           telefone: form.telefone,
           cpf: form.cpf,
           nascimento: form.nascimento,
-          origem: "cotacao_personalizada",
+          origem: normalizedType === "consorcio" ? "cotacao_consorcio" : "cotacao_personalizada",
           ddd: form.ddd || (phoneDigits.length >= 10 ? phoneDigits.slice(0, 2) : ""),
         },
       };
 
-      const response = await fetch("/api/leads-email", {
+      const response = await fetch("/api/send-email", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          client_name: payload.nome,
+          client_email: payload.email,
+          form_title: normalizedType === "consorcio" ? "Cotação de consórcio" : "Cotação personalizada",
+          form_type: normalizedType,
+          form_data: payload.dados,
+          form_labels: {},
+        }),
       });
 
       if (!response.ok) {
-        throw new Error("Falha ao enviar dados.");
+        const errorText = await response.text();
+        throw new Error(errorText || "Falha ao enviar dados.");
       }
 
       setComplete(true);

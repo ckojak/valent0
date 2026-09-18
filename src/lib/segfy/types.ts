@@ -70,6 +70,16 @@ export type SegfyQuoteInput = {
     chassi_remarcado?: boolean;
     antifurto?: boolean;
   };
+  segurado?: {
+    documento: string;
+    cep: string;
+    nome: string;
+    nome_social?: string;
+    nascimento: string;
+    sexo?: "male" | "female" | "";
+    email?: string;
+    celular?: string;
+  };
   condutor: {
     nome: string;
     nome_social?: string;
@@ -83,6 +93,8 @@ export type SegfyQuoteInput = {
     sexo?: "male" | "female" | "";
     email?: string;
     relacao?: string;
+    documento?: string;
+    celular?: string;
   };
 };
 

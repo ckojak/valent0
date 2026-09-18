@@ -22,6 +22,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SegurosSlugRouteImport } from './routes/seguros/$slug'
 import { Route as CotacaoPersonalizadaRouteImport } from './routes/cotacao/personalizada'
 import { Route as CotacaoAutoRouteImport } from './routes/cotacao/auto'
+import { Route as ApiSendEmailRouteImport } from './routes/api/send-email'
 import { Route as ApiLeadsEmailRouteImport } from './routes/api/leads-email'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -91,6 +92,11 @@ const CotacaoAutoRoute = CotacaoAutoRouteImport.update({
   path: '/cotacao/auto',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSendEmailRoute = ApiSendEmailRouteImport.update({
+  id: '/api/send-email',
+  path: '/api/send-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLeadsEmailRoute = ApiLeadsEmailRouteImport.update({
   id: '/api/leads-email',
   path: '/api/leads-email',
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/leads-email': typeof ApiLeadsEmailRoute
+  '/api/send-email': typeof ApiSendEmailRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/cotacao/personalizada': typeof CotacaoPersonalizadaRoute
   '/seguros/$slug': typeof SegurosSlugRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/leads-email': typeof ApiLeadsEmailRoute
+  '/api/send-email': typeof ApiSendEmailRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/cotacao/personalizada': typeof CotacaoPersonalizadaRoute
   '/seguros/$slug': typeof SegurosSlugRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/leads-email': typeof ApiLeadsEmailRoute
+  '/api/send-email': typeof ApiSendEmailRoute
   '/cotacao/auto': typeof CotacaoAutoRoute
   '/cotacao/personalizada': typeof CotacaoPersonalizadaRoute
   '/seguros/$slug': typeof SegurosSlugRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/termos-de-uso'
     | '/admin/login'
     | '/api/leads-email'
+    | '/api/send-email'
     | '/cotacao/auto'
     | '/cotacao/personalizada'
     | '/seguros/$slug'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/termos-de-uso'
     | '/admin/login'
     | '/api/leads-email'
+    | '/api/send-email'
     | '/cotacao/auto'
     | '/cotacao/personalizada'
     | '/seguros/$slug'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/termos-de-uso'
     | '/admin/login'
     | '/api/leads-email'
+    | '/api/send-email'
     | '/cotacao/auto'
     | '/cotacao/personalizada'
     | '/seguros/$slug'
@@ -239,6 +251,7 @@ export interface RootRouteChildren {
   TermosDeUsoRoute: typeof TermosDeUsoRoute
   AdminLoginRoute: typeof AdminLoginRoute
   ApiLeadsEmailRoute: typeof ApiLeadsEmailRoute
+  ApiSendEmailRoute: typeof ApiSendEmailRoute
   CotacaoAutoRoute: typeof CotacaoAutoRoute
   CotacaoPersonalizadaRoute: typeof CotacaoPersonalizadaRoute
   SegurosSlugRoute: typeof SegurosSlugRoute
@@ -338,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CotacaoAutoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/send-email': {
+      id: '/api/send-email'
+      path: '/api/send-email'
+      fullPath: '/api/send-email'
+      preLoaderRoute: typeof ApiSendEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/leads-email': {
       id: '/api/leads-email'
       path: '/api/leads-email'
@@ -393,6 +413,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermosDeUsoRoute: TermosDeUsoRoute,
   AdminLoginRoute: AdminLoginRoute,
   ApiLeadsEmailRoute: ApiLeadsEmailRoute,
+  ApiSendEmailRoute: ApiSendEmailRoute,
   CotacaoAutoRoute: CotacaoAutoRoute,
   CotacaoPersonalizadaRoute: CotacaoPersonalizadaRoute,
   SegurosSlugRoute: SegurosSlugRoute,

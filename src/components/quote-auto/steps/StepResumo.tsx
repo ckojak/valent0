@@ -1,7 +1,8 @@
 import { ChevronLeft, Send } from "lucide-react";
 import type { CoberturasData } from "./StepCoberturas";
-import type { CondutorData } from "./StepCondutor";
 import type { VeiculoData } from "./StepVeiculo";
+import type { PerfilCondutorData } from "./StepPerfilCondutor";
+import type { SeguradoData } from "./StepSegurado";
 import {
   PRIORIDADE_LABEL,
   SITUACAO_LABEL,
@@ -21,18 +22,35 @@ function Row({ label, value }: { label: string; value: string }) {
 export function StepResumo({
   situacao,
   veiculo,
+  segurado,
+  perfilCondutor,
   condutor,
   prioridade,
   coberturas,
   onBack,
+  onEditSegurado,
+  onEditPerfilCondutor,
   onConfirm,
 }: {
   situacao: Situacao | null;
   veiculo: VeiculoData;
-  condutor: CondutorData;
+  segurado: SeguradoData;
+  perfilCondutor: PerfilCondutorData;
+  condutor: {
+    nome: string;
+    nascimento: string;
+    cpf: string;
+    cep: string;
+    profissao: string;
+    estado_civil: string;
+    uso: string;
+    relacao?: string;
+  };
   prioridade: Prioridade | null;
   coberturas: CoberturasData;
   onBack: () => void;
+  onEditSegurado: () => void;
+  onEditPerfilCondutor: () => void;
   onConfirm: () => void;
 }) {
   const coberturasLabel = [
@@ -53,19 +71,43 @@ export function StepResumo({
         </p>
       </div>
 
-      <div className="rounded-xl border bg-secondary/30 p-4">
-        <Row label="Situação" value={situacao ? SITUACAO_LABEL[situacao] : "—"} />
-        <Row label="Veículo" value={[veiculo.marca, veiculo.modelo].filter(Boolean).join(" ") || "—"} />
-        <Row label="Ano fab/mod" value={`${veiculo.ano_fab}/${veiculo.ano_mod}`} />
-        {veiculo.placa && <Row label="Placa" value={veiculo.placa} />}
-        <Row label="Condutor" value={condutor.nome} />
-        <Row label="Nascimento" value={condutor.nascimento} />
-        <Row label="CEP" value={condutor.cep} />
-        <Row label="Profissão" value={condutor.profissao || "—"} />
-        <Row label="Estado civil" value={condutor.estado_civil} />
-        <Row label="Uso" value={condutor.uso} />
-        <Row label="Prioridade" value={prioridade ? PRIORIDADE_LABEL[prioridade] : "—"} />
-        <Row label="Coberturas" value={coberturasLabel} />
+      <div className="space-y-4 rounded-xl border bg-secondary/30 p-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-foreground">Dados do segurado</h3>
+            <button type="button" onClick={onEditSegurado} className="text-xs font-medium text-brand underline-offset-4 hover:underline">
+              Editar
+            </button>
+          </div>
+          <Row label="Nome" value={segurado.nome || "—"} />
+          <Row label="CPF / CNPJ" value={segurado.documento || "—"} />
+          <Row label="Nascimento" value={segurado.nascimento || "—"} />
+          <Row label="CEP" value={segurado.cep || "—"} />
+          <Row label="E-mail" value={segurado.email || "—"} />
+        </div>
+
+        <div className="space-y-2 pt-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-foreground">Perfil do condutor</h3>
+            <button type="button" onClick={onEditPerfilCondutor} className="text-xs font-medium text-brand underline-offset-4 hover:underline">
+              Editar
+            </button>
+          </div>
+          <Row label="Condutor" value={condutor.nome || "—"} />
+          <Row label="Relação" value={perfilCondutor.relacao || "—"} />
+          <Row label="Profissão" value={condutor.profissao || "—"} />
+          <Row label="Estado civil" value={condutor.estado_civil || "—"} />
+          <Row label="Uso" value={condutor.uso || "—"} />
+        </div>
+
+        <div className="space-y-2 pt-2">
+          <Row label="Situação" value={situacao ? SITUACAO_LABEL[situacao] : "—"} />
+          <Row label="Veículo" value={[veiculo.marca, veiculo.modelo].filter(Boolean).join(" ") || "—"} />
+          <Row label="Ano fab/mod" value={`${veiculo.ano_fab}/${veiculo.ano_mod}` || "—"} />
+          {veiculo.placa && <Row label="Placa" value={veiculo.placa} />}
+          <Row label="Prioridade" value={prioridade ? PRIORIDADE_LABEL[prioridade] : "—"} />
+          <Row label="Coberturas" value={coberturasLabel} />
+        </div>
       </div>
 
       <div className="flex flex-col-reverse gap-2 sm:flex-row">
