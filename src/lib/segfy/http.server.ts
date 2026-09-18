@@ -207,6 +207,15 @@ function mapRelationship(value?: string) {
 }
 
 
+function normalizeInsurerName(value: unknown): string {
+  const raw = String(value ?? "").trim();
+  if (!raw) return "";
+
+  const withoutAccent = raw.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const compact = withoutAccent.toLowerCase().replace(/\bseguradora\b/g, "").replace(/\s+/g, " ").trim();
+  return compact || withoutAccent.toLowerCase().trim();
+}
+
 function normalizeInsurerEntry(item: unknown): { name: string; commission: number } | null {
   if (!item || typeof item !== "object") return null;
 
@@ -217,7 +226,7 @@ function normalizeInsurerEntry(item: unknown): { name: string; commission: numbe
 
   const rawName = nestedCompany?.name ?? source.name ?? source.id ?? source.slug ?? source.code ?? "";
   const rawCommission = nestedCompany?.commission ?? source.commission ?? 20;
-  const name = String(rawName).trim().toLowerCase();
+  const name = normalizeInsurerName(rawName);
 
   if (!name) return null;
 
@@ -243,15 +252,14 @@ async function resolveInsurers(input: SegfyQuoteInput): Promise<Array<{ name: st
       return items.slice(0, 10).map((it) => {
         const raw = it as unknown as JsonRecord;
         const company = raw["company"];
-        const companyName = String(
+        const companyName = normalizeInsurerName(
           (company && typeof company === "object" ? (company as JsonRecord).name : null)
           ?? raw["name"]
           ?? raw["id"]
           ?? raw["slug"]
           ?? raw["code"]
           ?? "ace",
-        ).trim().toLowerCase();
-
+        );
 
         return {
           name: companyName || "ace",
@@ -274,7 +282,7 @@ async function resolveInsurers(input: SegfyQuoteInput): Promise<Array<{ name: st
       });
       const renewalItems = normalizeList(renewalPayload)
         .map(mapOption)
-        .map((it) => String(it.name ?? it.id ?? "").trim().toLowerCase())
+        .map((it) => normalizeInsurerName(it.name ?? it.id ?? ""))
         .filter((name) => name.length > 0 && name !== "new" && name !== "ace");
 
       const uniqueNames = Array.from(new Set(renewalItems));

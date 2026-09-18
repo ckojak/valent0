@@ -134,6 +134,26 @@ export function QuoteAutoWizard() {
    * Usa o mesmo callback/reference da sessão para não duplicar registros.
    */
   // Campos aditivos do seguro atual + sexo — enviados junto ao payload já existente.
+  const normalizeInsurerName = (value?: string) => {
+    const raw = (value ?? "").trim();
+    if (!raw) return "";
+    return raw
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/\bseguradora\b/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  };
+
+  const insurers = (() => {
+    const selected = seguroAtual.seguradora_atual?.trim();
+    if (!selected) return undefined;
+    const normalized = normalizeInsurerName(selected);
+    if (!normalized) return undefined;
+    return [{ name: normalized, commission: 10 }];
+  })();
+
   const dadosSeguroAtual: Partial<SegfyQuoteInput> = temSeguroAtual
     ? {
         seguradora_atual: seguroAtual.seguradora_atual || undefined,
@@ -215,6 +235,7 @@ export function QuoteAutoWizard() {
         celular: segurado.celular || "",
       },
       condutor: condutorFinal,
+      insurers,
       ...dadosSeguroAtual,
       ...overrides,
     };
@@ -291,10 +312,11 @@ export function QuoteAutoWizard() {
         celular: segurado.celular || "",
       },
       condutor,
+      insurers,
       ...dadosSeguroAtual,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp, seguroAtual, avaliacaoRisco],
+    [callbackId, coberturas, condutor, prioridade, situacao, veiculo, whatsapp, seguroAtual, avaliacaoRisco, insurers],
 
   );
 
