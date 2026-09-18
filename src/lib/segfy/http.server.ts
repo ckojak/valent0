@@ -306,6 +306,10 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
 
   const condutorCpf = input.condutor.cpf.replace(/\D/g, "");
   const condutorCep = input.condutor.cep.replace(/\D/g, "");
+  const condutorNomeSocial = String(input.condutor.nome_social ?? "").trim();
+  const condutorNomeCivil = String(input.condutor.nome ?? "").trim();
+  const socialNameForSegfy =
+    condutorNomeSocial && condutorNomeSocial !== condutorNomeCivil ? condutorNomeSocial : "";
 
   const risco = input.avaliacao_risco;
   // Os steps já guardam os valores oficiais da Segfy; só usamos fallback quando vazio.
@@ -389,7 +393,7 @@ async function toCalculatePayload(input: SegfyQuoteInput): Promise<JsonRecord> {
         origin_bonus: String(renewalInput.origin_bonus ?? "0"),
       },
       customer: {
-        social_name: input.condutor.nome,
+        ...(socialNameForSegfy ? { social_name: socialNameForSegfy } : {}),
         document: condutorCpf,
         name: input.condutor.nome,
         birth_date: parseDateBRToIso(input.condutor.nascimento),
