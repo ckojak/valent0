@@ -138,22 +138,6 @@ export function StepSegurado({
           {loadingInsured && <p className="mt-1 text-xs text-muted-foreground">Consultando dados do segurado...</p>}
         </div>
 
-        <div>
-          <Label htmlFor="segurado-cep">CEP do pernoite</Label>
-          <Input
-            id="segurado-cep"
-            inputMode="numeric"
-            value={data.cep}
-            onChange={(e) => set("cep", formatCEP(e.target.value))}
-            onBlur={handleCepBlur}
-            className="mt-1.5 h-11"
-            placeholder="00000-000"
-          />
-          {errors.cep && <p className="mt-1 text-xs text-destructive">{errors.cep}</p>}
-          {loadingCep && <p className="mt-1 text-xs text-muted-foreground">Consultando CEP...</p>}
-          {!loadingCep && addressPreview && <p className="mt-1 text-xs text-muted-foreground">{addressPreview}</p>}
-        </div>
-
         <div className="sm:col-span-2">
           <Label htmlFor="segurado-nome">Nome completo / Razão social</Label>
           <Input
@@ -224,6 +208,22 @@ export function StepSegurado({
             className="mt-1.5 h-11"
             placeholder="(11) 99999-9999"
           />
+        </div>
+
+        <div>
+          <Label htmlFor="segurado-cep">CEP do pernoite</Label>
+          <Input
+            id="segurado-cep"
+            inputMode="numeric"
+            value={data.cep}
+            onChange={(e) => set("cep", formatCEP(e.target.value))}
+            onBlur={handleCepBlur}
+            className="mt-1.5 h-11"
+            placeholder="00000-000"
+          />
+          {errors.cep && <p className="mt-1 text-xs text-destructive">{errors.cep}</p>}
+          {loadingCep && <p className="mt-1 text-xs text-muted-foreground">Consultando CEP...</p>}
+          {!loadingCep && addressPreview && <p className="mt-1 text-xs text-muted-foreground">{addressPreview}</p>}
         </div>
       </div>
 
