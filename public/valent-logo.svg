@@ -1,0 +1,8 @@
+<svg width="240" height="64" viewBox="0 0 240 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="64" rx="16" fill="#F8FAFC"/>
+  <rect x="10" y="10" width="44" height="44" rx="12" fill="#C2410C"/>
+  <path d="M25 18.5C19.7533 18.5 15.5 22.7533 15.5 28V36C15.5 41.2467 19.7533 45.5 25 45.5H29V17.5H25C20.8579 17.5 17.5 20.8579 17.5 25V29H21.5V25C21.5 23.067 23.067 21.5 25 21.5H27V18.5H25ZM32.5 18.5V45.5H34.5V30.5H41.5C45.6421 30.5 49 27.1421 49 23V18.5H32.5ZM34.5 22.5H44.5V23C44.5 24.933 42.933 26.5 41 26.5H34.5V22.5Z" fill="#FFF7ED"/>
+  <path d="M17.5 46V50.5H25.5C27.933 50.5 30 48.433 30 46V38H26V45.5H17.5Z" fill="#F59E0B"/>
+  <text x="68" y="38" fill="#0F172A" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" font-weight="700" letter-spacing="1.5">VALENT</text>
+  <text x="69" y="52" fill="#475569" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="9" font-weight="600" letter-spacing="2.1">SEGUROS</text>
+</svg>

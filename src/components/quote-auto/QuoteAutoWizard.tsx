@@ -7,7 +7,8 @@ import { StepSituacao } from "./steps/StepSituacao";
 import { StepSeguroAtual, emptySeguroAtual, type SeguroAtualData } from "./steps/StepSeguroAtual";
 import { StepVeiculo, type VeiculoData } from "./steps/StepVeiculo";
 import { StepAvaliacaoRisco, emptyAvaliacaoRisco, type AvaliacaoRiscoData } from "./steps/StepAvaliacaoRisco";
-import { StepCondutor, type CondutorData } from "./steps/StepCondutor";
+import { StepSegurado, type SeguradoData } from "./steps/StepSegurado";
+import { StepPerfilCondutor, type PerfilCondutorData } from "./steps/StepPerfilCondutor";
 import { StepPrioridade } from "./steps/StepPrioridade";
 import { StepCoberturas, type CoberturasData } from "./steps/StepCoberturas";
 import { StepResumo } from "./steps/StepResumo";
@@ -21,8 +22,9 @@ import type { SegfyQuoteInput } from "@/lib/segfy/types";
 type Stage =
   | "situacao"
   | "seguro_atual"
-  | "condutor"
   | "veiculo"
+  | "segurado"
+  | "perfil_condutor"
   | "avaliacao_risco"
   | "prioridade"
   | "coberturas"
@@ -33,8 +35,9 @@ type Stage =
 const STAGE_ORDER: Stage[] = [
   "situacao",
   "seguro_atual",
-  "condutor",
   "veiculo",
+  "segurado",
+  "perfil_condutor",
   "avaliacao_risco",
   "prioridade",
   "coberturas",
@@ -58,18 +61,33 @@ const emptyVeiculo: VeiculoData = {
   versao: "",
   placa: "",
 };
-const emptyCondutor: CondutorData = {
+const emptySegurado: SeguradoData = {
+  documento: "",
+  cep: "",
+  nome: "",
+  nome_social: "",
+  nascimento: "",
+  sexo: "",
+  email: "",
+  celular: "",
+};
+
+const emptyPerfilCondutor: PerfilCondutorData = {
+  relacao: "",
+  estado_civil: "",
+  profissao: "",
+  profissao_id: "",
   nome: "",
   nome_social: "",
   nascimento: "",
   cpf: "",
   cep: "",
-  profissao: "",
-  profissao_id: "",
-  estado_civil: "",
-  uso: "",
+  email: "",
+  celular: "",
   sexo: "",
+  uso: "",
 };
+
 const emptyCoberturas: CoberturasData = {
   carro_reserva: true,
   vidros: true,
@@ -83,7 +101,8 @@ export function QuoteAutoWizard() {
   const [seguroAtual, setSeguroAtual] = useState<SeguroAtualData>(emptySeguroAtual);
   const [veiculo, setVeiculo] = useState<VeiculoData>(emptyVeiculo);
   const [avaliacaoRisco, setAvaliacaoRisco] = useState<AvaliacaoRiscoData>(emptyAvaliacaoRisco);
-  const [condutor, setCondutor] = useState<CondutorData>(emptyCondutor);
+  const [segurado, setSegurado] = useState<SeguradoData>(emptySegurado);
+  const [perfilCondutor, setPerfilCondutor] = useState<PerfilCondutorData>(emptyPerfilCondutor);
 
   const [prioridade, setPrioridade] = useState<Prioridade | null>(null);
   const [coberturas, setCoberturas] = useState<CoberturasData>(emptyCoberturas);
@@ -131,6 +150,30 @@ export function QuoteAutoWizard() {
       }
     : {};
 
+  const buildCondutor = (): SegfyQuoteInput["condutor"] => {
+    const relacao = perfilCondutor.relacao || "Próprio";
+    const isProprio = relacao === "Próprio";
+
+    return {
+      nome: isProprio ? segurado.nome : perfilCondutor.nome || segurado.nome,
+      nome_social: isProprio ? segurado.nome_social || "" : perfilCondutor.nome_social || "",
+      nascimento: isProprio ? segurado.nascimento : perfilCondutor.nascimento || segurado.nascimento,
+      cpf: isProprio ? segurado.documento : perfilCondutor.cpf || segurado.documento,
+      cep: isProprio ? segurado.cep : perfilCondutor.cep || segurado.cep,
+      profissao: perfilCondutor.profissao || "",
+      profissao_id: perfilCondutor.profissao_id || "",
+      estado_civil: perfilCondutor.estado_civil || "",
+      uso: perfilCondutor.uso || "",
+      sexo: isProprio ? segurado.sexo || "" : perfilCondutor.sexo || "",
+      email: isProprio ? segurado.email || "" : perfilCondutor.email || segurado.email || "",
+      relacao,
+      documento: segurado.documento,
+      celular: isProprio ? segurado.celular || "" : perfilCondutor.celular || segurado.celular || "",
+    };
+  };
+
+  const condutor = buildCondutor();
+
   const salvarParcialSegfy = (
     origem: string,
     overrides: Partial<SegfyQuoteInput> = {},
@@ -147,7 +190,17 @@ export function QuoteAutoWizard() {
       coberturas,
       veiculo,
       avaliacao_risco: avaliacaoRisco,
-      condutor,
+      segurado: {
+        documento: segurado.documento,
+        cep: segurado.cep,
+        nome: segurado.nome,
+        nome_social: segurado.nome_social || "",
+        nascimento: segurado.nascimento,
+        sexo: segurado.sexo || "",
+        email: segurado.email || "",
+        celular: segurado.celular || "",
+      },
+      condutor: condutorFinal,
       ...dadosSeguroAtual,
       ...overrides,
     };
@@ -170,7 +223,12 @@ export function QuoteAutoWizard() {
       dados: {
         situacao,
         veiculo,
-        condutor: { ...condutor, cpf: condutor.cpf ? `***${condutor.cpf.slice(-4)}` : "" },
+        segurado: {
+          ...segurado,
+          documento: segurado.documento ? `***${segurado.documento.replace(/\D/g, '').slice(-4)}` : "",
+        },
+        condutor: { ...condutor, cpf: condutor.cpf ? `***${condutor.cpf.replace(/\D/g, '').slice(-4)}` : "" },
+        perfil_condutor: perfilCondutor,
         prioridade,
         coberturas,
         fonte: "wizard_auto_cotacao_real",
@@ -198,6 +256,16 @@ export function QuoteAutoWizard() {
       coberturas,
       veiculo,
       avaliacao_risco: avaliacaoRisco,
+      segurado: {
+        documento: segurado.documento,
+        cep: segurado.cep,
+        nome: segurado.nome,
+        nome_social: segurado.nome_social || "",
+        nascimento: segurado.nascimento,
+        sexo: segurado.sexo || "",
+        email: segurado.email || "",
+        celular: segurado.celular || "",
+      },
       condutor,
       ...dadosSeguroAtual,
     }),
@@ -256,14 +324,26 @@ export function QuoteAutoWizard() {
             <StepSeguroAtual
               initial={seguroAtual}
               onBack={back}
-              onNext={(v) => { setSeguroAtual(v); goTo("condutor"); }}
+              onNext={(v) => { setSeguroAtual(v); goTo("veiculo"); }}
             />
           )}
-          {stage === "condutor" && (
-            <StepCondutor initial={condutor} onBack={back} onNext={(v) => { setCondutor(v); salvarParcialSegfy("pos-condutor", { condutor: v }); goTo("veiculo"); }} />
-          )}
           {stage === "veiculo" && (
-            <StepVeiculo initial={veiculo} onBack={back} onNext={(v) => { setVeiculo(v); goTo("avaliacao_risco"); }} />
+            <StepVeiculo initial={veiculo} onBack={back} onNext={(v) => { setVeiculo(v); goTo("segurado"); }} />
+          )}
+          {stage === "segurado" && (
+            <StepSegurado initial={segurado} onBack={back} onNext={(v) => { setSegurado(v); goTo("perfil_condutor"); }} />
+          )}
+          {stage === "perfil_condutor" && (
+            <StepPerfilCondutor
+              initial={perfilCondutor}
+              segurado={segurado}
+              onBack={back}
+              onNext={(v) => {
+                setPerfilCondutor(v);
+                salvarParcialSegfy("pos-perfil-condutor", { condutor: buildCondutor() });
+                goTo("avaliacao_risco");
+              }}
+            />
           )}
           {stage === "avaliacao_risco" && (
             <StepAvaliacaoRisco
@@ -282,10 +362,14 @@ export function QuoteAutoWizard() {
             <StepResumo
               situacao={situacao}
               veiculo={veiculo}
+              segurado={segurado}
+              perfilCondutor={perfilCondutor}
               condutor={condutor}
               prioridade={prioridade}
               coberturas={coberturas}
               onBack={back}
+              onEditSegurado={() => goTo("segurado")}
+              onEditPerfilCondutor={() => goTo("perfil_condutor")}
               onConfirm={() => goTo("whatsapp")}
             />
           )}
